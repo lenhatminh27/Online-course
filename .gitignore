@@ -38,3 +38,6 @@ build/
 .DS_Store
 /.mvn/
 /.idea/
+.idea
+.mvn
+*.gitignore
