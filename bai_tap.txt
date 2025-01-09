@@ -1,0 +1,55 @@
+@WebServlet(value = "/product") render file product.jsp
+show list product pagination, filter: name, nameOfCategory (phan trang)
+
+api:
+
+Method post: /api/products
+request :
+{
+    name(Not blank, not duplicated), price( > 0), List<String> categoryName() (Not Empty size > 0);
+}
+
+response:
+success: status: 201
+{
+    id,
+    price,
+    List<Category> categories
+}
+
+error: BadRequest: 400
+{
+    error: List<String>;
+}
+
+
+Method put: /api/products/{id}
+//findProductById(id) : ko tim thay
+request :
+{
+    name(Not blank, not duplicated), price( > 0), List<String> categoryName() (Not Empty size > 0);
+}
+
+response:
+success: status: 200
+{
+    id,
+    price,
+    List<Category> categories
+}
+
+not-found: status: 404
+{
+    error: 'Not found'
+}
+
+error: BadRequest: 400
+{
+    error: List<String>;
+}
+
+Method delete: /api/products/{ids} //List<String> ids
+response: No-content
+
+
+
