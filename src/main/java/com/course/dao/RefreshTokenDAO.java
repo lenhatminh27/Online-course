@@ -12,4 +12,7 @@ public interface RefreshTokenDAO {
     List<RefreshTokenEntity> findByAccountAndRevoked(AccountEntity account, boolean isRevoked);
 
     void saveAll(List<RefreshTokenEntity> listRefreshTokenAccount);
+
+    RefreshTokenEntity findByRefreshTokenAnsRevoked(String refreshToken, boolean isRevoked);
+
 }

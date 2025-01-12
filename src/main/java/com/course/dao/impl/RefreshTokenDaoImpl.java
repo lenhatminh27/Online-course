@@ -61,4 +61,20 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
             throw new RuntimeException("Failed to update all RefreshTokenEntity", e);
         }
     }
+
+    @Override
+    public RefreshTokenEntity findByRefreshTokenAnsRevoked(String refreshToken, boolean isRevoked) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                            "FROM RefreshTokenEntity rt WHERE rt.token = :refreshToken AND rt.revoked = :revoked",
+                            RefreshTokenEntity.class
+                    )
+                    .setParameter("refreshToken", refreshToken)
+                    .setParameter("revoked", isRevoked)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch refresh token", e);
+        }
+    }
 }

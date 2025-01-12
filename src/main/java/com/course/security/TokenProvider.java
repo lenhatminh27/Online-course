@@ -1,28 +1,25 @@
 package com.course.security;
 
 import com.course.common.utils.StringUtils;
-import com.course.properties.SecurityProperties;
+import com.course.config.properties.SecurityProperties;
 import com.course.security.context.AuthenticationContext;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.Key;
 import java.util.Date;
 
-@Named(value = "tokenProvider")
-@ApplicationScoped
+
 @Slf4j
 public class TokenProvider {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
-    private static final String AUTHORITIES_KEY = "auth";
+    public static final String AUTHORITIES_KEY = "auth";
 
     private static final String INVALID_JWT_TOKEN = "Invalid JWT token.";
 
@@ -35,6 +32,10 @@ public class TokenProvider {
     private final long refreshTokenValidityInMilliseconds;
 
     private final long tokenValidityInMillisecondsForRememberMe;
+
+    public JwtParser getJwtParser() {
+        return jwtParser;
+    }
 
     public TokenProvider() {
         byte[] keyBytes;

@@ -1,4 +1,4 @@
-package com.course.properties;
+package com.course.config.properties;
 
 
 public interface SecurityProperties {
