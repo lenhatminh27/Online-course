@@ -7,18 +7,21 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class AuthenticationResponse implements Serializable {
+@NoArgsConstructor
+public class AccountResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String accessToken;
+    private String email;
 
-    private String refreshToken;
+    private String avatar;
+
+    private List<String> roles;
 
 }

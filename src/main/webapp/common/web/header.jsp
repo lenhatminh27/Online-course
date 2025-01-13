@@ -1,8 +1,8 @@
 <header>
     <!-- Header Start -->
     <div class="header-area header-transparent">
-        <div class="main-header ">
-            <div class="header-bottom  header-sticky">
+        <div class="main-header">
+            <div class="header-bottom header-sticky">
                 <div class="container-fluid">
                     <div class="row align-items-center">
                         <!-- Logo -->
@@ -17,7 +17,7 @@
                                 <div class="main-menu d-none d-lg-block">
                                     <nav>
                                         <ul id="navigation">
-                                            <li class="active" ><a href="index.html">Home</a></li>
+                                            <li class="active"><a href="/home">Home</a></li>
                                             <li><a href="courses.html">Courses</a></li>
                                             <li><a href="about.html">About</a></li>
                                             <li><a href="#">Blog</a>
@@ -28,9 +28,26 @@
                                                 </ul>
                                             </li>
                                             <li><a href="contact.html">Contact</a></li>
-                                            <!-- Button -->
-                                            <li class="button-header margin-left "><a href="#" class="btn">Join</a></li>
-                                            <li class="button-header"><a href="login.html" class="btn btn3">Log in</a></li>
+
+                                            <!-- Join button -->
+                                            <li class="button-header margin-left" id="joinBtn">
+                                                <a href="#" class="btn">Join</a>
+                                            </li>
+
+                                            <!-- Log in button -->
+                                            <li class="button-header" id="loginBtn">
+                                                <a href="/login" class="btn btn3">Log in</a>
+                                            </li>
+
+                                            <!-- Display user info when logged in -->
+                                            <li id="userInfo" class="user-info" >
+                                                <img id="userAvatar" src="" alt="User Avatar"
+                                                     style="width: 40px; height: 40px; object-fit: cover;
+                                                      border-radius: 50%;
+                                                    "
+                                                     class="avatar">
+                                            </li>
+
                                         </ul>
                                     </nav>
                                 </div>
@@ -47,3 +64,16 @@
     </div>
     <!-- Header End -->
 </header>
+
+<script type="text/javascript">
+    const userCurrent = localStorage.getItem('online_course_user_current');
+    if (userCurrent) {
+        const user = JSON.parse(userCurrent);
+        document.getElementById('loginBtn').style.display = 'none';
+        const userAvatar = user.avatar;
+        document.getElementById('userAvatar').src = userAvatar;
+    } else {
+        document.getElementById('joinBtn').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'none';
+    }
+</script>

@@ -10,6 +10,7 @@ import com.course.dao.impl.RefreshTokenDaoImpl;
 import com.course.dto.request.AuthenticationRequest;
 import com.course.dto.response.AuthenticationResponse;
 import com.course.dto.response.ErrorResponse;
+import com.course.exceptions.AuthenticationException;
 import com.course.security.TokenProvider;
 import com.course.service.AuthenticationService;
 import com.course.service.impl.AuthenticationServiceImpl;
@@ -66,8 +67,11 @@ public class AuthenticationApi extends HttpServlet {
             AuthenticationResponse authenticate = authenticationService.authenticate(authenticationRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(authenticate));
         }catch (JsonSyntaxException e){
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Invalid JSON format\"}");
-        }catch (Exception e){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "{\"error\":\"Invalid JSON format\"}");
+        }catch (AuthenticationException authenticationException){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, gson.toJson(authenticationException.getMessage()));
+        }
+        catch (Exception e){
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

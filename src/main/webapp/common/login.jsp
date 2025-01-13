@@ -42,34 +42,108 @@
 
 <main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
     <!-- Login Admin -->
-    <form class="form-default" action="login-bg.mp4" method="POST">
-
+    <form class="form-default" id="login-form">
         <div class="login-form">
             <!-- logo-login -->
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
             <h2>Login Here</h2>
+            <!-- Error message container -->
+            <div id="error-message" class="error-message" style="color: red; margin-bottom: 10px;"></div>
             <div class="form-input">
-                <label for="name">Email</label>
-                <input  type="email" name="email" placeholder="Email">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="Email">
             </div>
             <div class="form-input">
-                <label for="name">Password</label>
-                <input type="password" name="password" placeholder="Password">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Password">
             </div>
             <div class="form-input pt-30">
                 <input type="submit" name="submit" value="login">
             </div>
-
             <!-- Forget Password -->
             <a href="#" class="forget">Forget Password</a>
-            <!-- Forget Password -->
+            <!-- Registration -->
             <a href="register.html" class="registration">Registration</a>
         </div>
     </form>
     <!-- /end login form -->
 </main>
+
+
+<script type="module">
+    import { apiRequestWithToken } from  '../assets/config/service.js';
+    import { environment, STORAGE_KEY, avatarDefault } from  '../assets/config/env.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('login-form');
+        const errorMessageDiv = document.getElementById('error-message');
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMessageDiv.textContent = '';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const data = {
+                email: email,
+                password: password,
+            };
+            try {
+                const response = await fetch(environment.apiUrl + '/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                if (response.ok) {
+                    const responseData = await response.json();
+                    localStorage.setItem(STORAGE_KEY.accessToken, responseData.accessToken);
+                    localStorage.setItem(STORAGE_KEY.refreshToken, responseData.refreshToken);
+                    callApiAfterLogin();
+                } else {
+                    const errorData = await response.json();
+                    errorMessageDiv.textContent = errorData;
+                }
+            } catch (error) {
+                console.error('Login failed:', error);
+                errorMessageDiv.textContent = 'Failed to connect to the server. Please try again later.';
+            }
+        });
+
+        async function callApiAfterLogin() {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + '/api/accounts', {
+                    method: 'GET',
+                });
+                console.log('API response after login:', response);
+                const userCurrent = {
+                    email: response.email,
+                    avatar: getAvatarUrl(response.avatar)
+                }
+                localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
+                if(response.roles.includes('ADMIN')){
+                    window.location.href = '/admin';
+                }
+                else{
+                    window.location.href = '/home';
+                }
+            } catch (error) {
+                console.error('Error making authenticated API request:', error);
+            }
+        }
+
+        function getAvatarUrl(avatar) {
+            const isAvatarPresent = !!avatar;
+            if (isAvatarPresent) {
+                return typeof avatar === 'string' ? avatar : avatarDefault;
+            } else {
+                return avatarDefault;
+            }
+        }
+    });
+</script>
+
 
 
 <script src="../assets/js/vendor/modernizr-3.5.0.min.js"></script>

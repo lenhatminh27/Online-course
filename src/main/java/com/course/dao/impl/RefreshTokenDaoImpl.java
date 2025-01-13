@@ -16,7 +16,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(refreshToken);
+            session.save(refreshToken);//Insert into
             transaction.commit();
             return refreshToken;
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             for (RefreshTokenEntity refreshToken : listRefreshTokenAccount) {
-                session.merge(refreshToken);
+                session.merge(refreshToken);//Update
             }
             transaction.commit();
         } catch (Exception e) {
