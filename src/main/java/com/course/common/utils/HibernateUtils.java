@@ -9,7 +9,7 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
-public class HibernateUtil {
+public class HibernateUtils {
 
     private static final SessionFactory sessionFactory;
 

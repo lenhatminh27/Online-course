@@ -15,7 +15,6 @@ public final class ResponseUtils {
         try (PrintWriter out = resp.getWriter()) {
             out.write(jsonResponse);
         }
-        resp.setStatus(HttpServletResponse.SC_CREATED);
     }
 
 }

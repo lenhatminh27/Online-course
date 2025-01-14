@@ -10,7 +10,7 @@ public class TestConnection {
 
     public static void main(String[] args) {
         // Get the Hibernate SessionFactory
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        SessionFactory sessionFactory = HibernateUtils.getSessionFactory();
         // Open a session to test the connection
         Session session = null;
         try {

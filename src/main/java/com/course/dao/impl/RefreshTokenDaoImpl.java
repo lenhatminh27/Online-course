@@ -1,6 +1,6 @@
 package com.course.dao.impl;
 
-import com.course.common.utils.HibernateUtil;
+import com.course.common.utils.HibernateUtils;
 import com.course.dao.RefreshTokenDAO;
 import com.course.entity.AccountEntity;
 import com.course.entity.RefreshTokenEntity;
@@ -14,7 +14,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
     @Override
     public RefreshTokenEntity save(RefreshTokenEntity refreshToken) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.save(refreshToken);//Insert into
             transaction.commit();
@@ -30,7 +30,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
 
     @Override
     public List<RefreshTokenEntity> findByAccountAndRevoked(AccountEntity account, boolean isRevoked) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             return session.createQuery(
                             "FROM RefreshTokenEntity rt WHERE rt.account = :account AND rt.revoked = :revoked",
                             RefreshTokenEntity.class
@@ -47,7 +47,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
     @Override
     public void saveAll(List<RefreshTokenEntity> listRefreshTokenAccount) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             for (RefreshTokenEntity refreshToken : listRefreshTokenAccount) {
                 session.merge(refreshToken);//Update
@@ -64,7 +64,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
 
     @Override
     public RefreshTokenEntity findByRefreshTokenAnsRevoked(String refreshToken, boolean isRevoked) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             return session.createQuery(
                             "FROM RefreshTokenEntity rt WHERE rt.token = :refreshToken AND rt.revoked = :revoked",
                             RefreshTokenEntity.class

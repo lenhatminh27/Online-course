@@ -1,5 +1,6 @@
 package com.course.config;
 
+import com.course.common.utils.HibernateUtils;
 import com.course.config.filter.AccessTokenFilter;
 import com.course.config.filter.RefreshTokenFilter;
 import jakarta.servlet.FilterRegistration;
@@ -24,8 +25,16 @@ public class AppInitializer implements ServletContextListener {
         FilterRegistration.Dynamic refreshTokenFilter = servletContext.addFilter("refreshTokenFilter", new RefreshTokenFilter());
         refreshTokenFilter.addMappingForUrlPatterns(null, true, "/refresh-token");
 
+        // Khởi tạo sẵn Hibernate SessionFactory
+        HibernateUtils.getSessionFactory();
+
         // Không đăng ký bất kỳ filter nào cho các URL /auth và /register
         // Các API này sẽ không bị bất kỳ filter nào áp dụng
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        HibernateUtils.shutdown();
     }
 
 }
