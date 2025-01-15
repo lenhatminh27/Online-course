@@ -16,5 +16,4 @@ public final class ResponseUtils {
             out.write(jsonResponse);
         }
     }
-
 }

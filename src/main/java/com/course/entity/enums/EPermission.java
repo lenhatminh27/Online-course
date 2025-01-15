@@ -1,0 +1,16 @@
+package com.course.entity.enums;
+
+public enum EPermission {
+    AUTHORIZATION_MANAGEMENT,
+    UPLOAD_FILE,
+    DOWNLOAD_FILE,
+    CREATE_BLOG,
+    UPDATE_BLOG,
+    DELETE_BLOG,
+    REACT_BLOG,
+    CREAT_COMMENT_BLOG,
+    UPDATE_COMMENT_BLOG,
+    DELETE_COMMENT_BLOG,
+    ANSWER_COMMENT_BLOG,
+    BOOKMARK_BLOG,
+}

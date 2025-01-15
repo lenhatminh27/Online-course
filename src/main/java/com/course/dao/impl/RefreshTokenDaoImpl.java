@@ -16,7 +16,24 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
         Transaction transaction = null;
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(refreshToken);//Insert into
+            session.save(refreshToken);
+            transaction.commit();
+            return refreshToken;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save RefreshTokenEntity", e);
+        }
+    }
+
+    @Override
+    public RefreshTokenEntity update(RefreshTokenEntity refreshToken) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(refreshToken);
             transaction.commit();
             return refreshToken;
         } catch (Exception e) {
@@ -66,7 +83,7 @@ public class RefreshTokenDaoImpl implements RefreshTokenDAO {
     public RefreshTokenEntity findByRefreshTokenAnsRevoked(String refreshToken, boolean isRevoked) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             return session.createQuery(
-                            "FROM RefreshTokenEntity rt WHERE rt.token = :refreshToken AND rt.revoked = :revoked",
+                            "FROM RefreshTokenEntity rt WHERE rt.refreshToken = :refreshToken AND rt.revoked = :revoked",
                             RefreshTokenEntity.class
                     )
                     .setParameter("refreshToken", refreshToken)
