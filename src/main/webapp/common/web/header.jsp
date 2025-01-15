@@ -110,10 +110,13 @@
             .then(response => {
                 console.log(response);
             })
-            .catch(error => console.error('Error:', error));
-            localStorage.removeItem(STORAGE_KEY.userCurrent);
-            localStorage.removeItem(STORAGE_KEY.accessToken);
-            localStorage.removeItem(STORAGE_KEY.refreshToken);
-            window.location.assign('/home');
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                localStorage.removeItem(STORAGE_KEY.userCurrent);
+                localStorage.removeItem(STORAGE_KEY.accessToken);
+                localStorage.removeItem(STORAGE_KEY.refreshToken);
+                // Redirect to the login page
+                window.location.href = '/login';
+        });
     });
 </script>

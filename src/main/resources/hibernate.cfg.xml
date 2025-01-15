@@ -18,6 +18,6 @@
         <property name="hibernate.generate_statistics">true</property>
 
 <!--         Mapped Entity Classes-->
-<!--        <mapping class="com.course.entity.AccountEntity" />-->
+        <mapping class="com.course.entity.PermissionEntity" />
     </session-factory>
 </hibernate-configuration>
