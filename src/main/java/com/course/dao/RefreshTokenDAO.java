@@ -9,6 +9,8 @@ public interface RefreshTokenDAO {
 
     RefreshTokenEntity save(RefreshTokenEntity refreshToken);
 
+    RefreshTokenEntity update(RefreshTokenEntity refreshToken);
+
     List<RefreshTokenEntity> findByAccountAndRevoked(AccountEntity account, boolean isRevoked);
 
     void saveAll(List<RefreshTokenEntity> listRefreshTokenAccount);

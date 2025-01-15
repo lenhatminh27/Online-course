@@ -19,6 +19,5 @@
 
 <!--         Mapped Entity Classes-->
 <!--        <mapping class="com.course.entity.AccountEntity" />-->
-<!--        <mapping class="com.course.entity.RoleEntity" />-->
     </session-factory>
 </hibernate-configuration>

@@ -1,3 +1,18 @@
+<style>
+    #logout {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #logout:hover {
+        background-color: #ff1a1a;
+    }
+</style>
 <header>
     <!-- Header Start -->
     <div class="header-area header-transparent">
@@ -48,6 +63,10 @@
                                                      class="avatar">
                                             </li>
 
+                                            <li id="userInfo" class="user-info" >
+                                               <button id="logout">Logout</button>
+                                            </li>
+
                                         </ul>
                                     </nav>
                                 </div>
@@ -65,7 +84,9 @@
     <!-- Header End -->
 </header>
 
-<script type="text/javascript">
+<script type="module">
+    import {STORAGE_KEY, environment} from '../../assets/config/env.js';
+    import {apiRequestWithToken} from '../../assets/config/service.js';
     const userCurrent = localStorage.getItem('online_course_user_current');
     if (userCurrent) {
         const user = JSON.parse(userCurrent);
@@ -75,5 +96,24 @@
     } else {
         document.getElementById('joinBtn').style.display = 'none';
         document.getElementById('userInfo').style.display = 'none';
+        document.getElementById('logout').style.display = 'none';
     }
+
+    document.getElementById('logout').addEventListener('click', function() {
+        apiRequestWithToken(environment.apiUrl + '/api/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({refreshToken: localStorage.getItem(STORAGE_KEY.refreshToken)})
+        })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => console.error('Error:', error));
+            localStorage.removeItem(STORAGE_KEY.userCurrent);
+            localStorage.removeItem(STORAGE_KEY.accessToken);
+            localStorage.removeItem(STORAGE_KEY.refreshToken);
+            window.location.assign('/home');
+    });
 </script>

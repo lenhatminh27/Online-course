@@ -2,7 +2,6 @@ import {STORAGE_KEY, environment} from '../config/env.js'
 
 function apiRequestWithToken(url, options = {}) {
     const token = localStorage.getItem(STORAGE_KEY.accessToken);
-    // Set default headers and add token if available
     const headers = new Headers(options.headers || {});
     if (token) {
         headers.append('Authorization', `Bearer ${token}`);
@@ -20,31 +19,27 @@ function apiRequest(url, options = {}) {
         ...options,
         headers: new Headers(options.headers || {}),
     };
-
     return fetch(url, config)
         .then(response => {
+            console.log('Response Status:', response.status);
+            if (response.status === 204) {
+                return {};
+            }
             if (!response.ok) {
                 if (response.status === 401) {
                     return handle401Error(url, config);
-                } else if (response.status === 403 || response.status === 500) {
-                    return response.json().then(errorData => {
-                        const error = new Error('API Error');
-                        error.response = response;
-                        error.data = errorData;
-                        throw error;
-                    });
-                } else {
-                    return response.json().then(errorData => {
-                        const error = new Error('API Error');
-                        error.response = response;
-                        error.data = errorData;
-                        throw error;
-                    });
                 }
+                return response.json().then(errorData => {
+                    const error = new Error('API Error');
+                    error.response = response;
+                    error.data = errorData;
+                    throw error;
+                });
             }
             return response.json();
         })
         .catch(error => {
+            console.log('Catch block triggered:', error);
             if (error.response) {
                 switch (error.response.status) {
                     case 403:
@@ -54,7 +49,7 @@ function apiRequest(url, options = {}) {
                         alert('Internal server error. Please try again later.');
                         break;
                     default:
-                        throw error; // Let other errors be handled by the caller
+                        throw error;
                 }
             } else {
                 alert('No response from the server. Please check your network.');
@@ -64,7 +59,7 @@ function apiRequest(url, options = {}) {
 }
 
 function handle401Error(url, originalConfig) {
-    const refreshToken = localStorage.getItem('refresh-token');
+    const refreshToken = localStorage.getItem(STORAGE_KEY.refreshToken);
     const headers = new Headers();
     headers.append('Authorization', `Bearer ${refreshToken}`);
     return fetch(environment.apiUrl + '/refresh-token', { method: 'GET', headers })
@@ -75,23 +70,17 @@ function handle401Error(url, originalConfig) {
             return response.json();
         })
         .then(data => {
-            localStorage.setItem('token', data.token);
+            localStorage.setItem(STORAGE_KEY.accessToken, data.accessToken);
+            localStorage.setItem(STORAGE_KEY.refreshToken, data.refreshToken);
             originalConfig.headers.set('Authorization', `Bearer ${data.token}`);
             return fetch(url, originalConfig).then(res => res.json());
         })
         .catch(() => {
+            localStorage.removeItem(STORAGE_KEY.accessToken);
+            localStorage.removeItem(STORAGE_KEY.refreshToken);
+            localStorage.removeItem(STORAGE_KEY.userCurrent);
             window.location.href = '/login';
-            throw new Error('Redirecting to login');
         });
 }
-
-// Example usage
-// apiRequestWithToken('/api/example-endpoint', { method: 'GET' })
-//     .then(data => console.log(data))
-//     .catch(error => console.error('API call failed:', error));
-
-// apiRequest('/api/public-endpoint', { method: 'GET' })
-//     .then(data => console.log(data))
-//     .catch(error => console.error('API call failed:', error));
 
 export { apiRequestWithToken, apiRequest };

@@ -1,4 +1,4 @@
-package com.course.web.rest;
+package com.course.web.rest.auth;
 
 import com.course.common.utils.MessageUtils;
 import com.course.common.utils.ObjectUtils;
