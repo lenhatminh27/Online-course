@@ -17,6 +17,8 @@ import java.util.Date;
 @Slf4j
 public class TokenProvider {
 
+    private final SecurityProperties securityProperties = SecurityProperties.getInstance();
+
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
     public static final String AUTHORITIES_KEY = "auth";
@@ -39,16 +41,16 @@ public class TokenProvider {
 
     public TokenProvider() {
         byte[] keyBytes;
-        var secret = SecurityProperties.jwtSecret;
+        var secret = securityProperties.getJwtSecret();
         log.debug("Using a Base64-encoded JWT secret key");
         keyBytes = Decoders.BASE64.decode(secret);
         key = Keys.hmacShaKeyFor(keyBytes);
         jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
-        this.accessTokenValidityInMilliseconds = 1000 * SecurityProperties.jwtAccessExpiration;
+        this.accessTokenValidityInMilliseconds = 1000 * securityProperties.getJwtAccessExpiration();
         this.refreshTokenValidityInMilliseconds =
-                1000 * SecurityProperties.jwtRefreshExpiration;
+                1000 * securityProperties.getJwtRefreshExpiration();
         this.tokenValidityInMillisecondsForRememberMe =
-                1000 * SecurityProperties.rememberMeExpiration;
+                1000 * securityProperties.getRememberMeExpiration();
     }
 
     public String createAccessToken(AuthenticationContext authentication) {

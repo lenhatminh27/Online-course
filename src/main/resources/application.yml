@@ -1,0 +1,6 @@
+security:
+  jwt:
+    secret: "MWM0NzE4MDk2MGQwMWFkNjZiNDQ5ZTJkMTJjYTE2N2M1YTFhY2E3M2UzMzBlMGMzZjU3OGVhMGQwMmQyZGM5OTgyODJlOWIwZGVhMzJkOTUzNTdlMjM4ZDIxMTk0YjgzNmEzNDNlMTBjZTMwMGMyNjgzYTc2ZTlmZjE5MzZkZmM" # Replace with a secure secret
+    accessExpiration: 900          # Access token valid for 15 minutes (in seconds)
+    refreshExpiration: 259200      # Refresh token valid for 3 days (in seconds)
+    rememberMeExpiration: 2592000  # Remember me token valid for 30 days (in seconds)
