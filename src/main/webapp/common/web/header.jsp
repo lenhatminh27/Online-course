@@ -43,10 +43,9 @@
                                                 </ul>
                                             </li>
                                             <li><a href="contact.html">Contact</a></li>
-
                                             <!-- Join button -->
                                             <li class="button-header margin-left" id="joinBtn">
-                                                <a href="#" class="btn">Join</a>
+                                                <a href="/joinInstructor" class="btn">Join Instructor</a>
                                             </li>
 
                                             <!-- Log in button -->
