@@ -1,7 +1,6 @@
 package com.course.entity.enums;
 
 public enum EPermission {
-    AUTHORIZATION_MANAGEMENT,
     UPLOAD_FILE,
     DOWNLOAD_FILE,
     CREATE_BLOG,

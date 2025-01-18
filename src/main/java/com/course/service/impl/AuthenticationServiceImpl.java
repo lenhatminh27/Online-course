@@ -2,6 +2,7 @@ package com.course.service.impl;
 
 import com.course.common.utils.MessageUtils;
 import com.course.common.utils.ObjectUtils;
+import com.course.common.utils.PasswordUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.AccountDAO;
 import com.course.dao.RefreshTokenDAO;
@@ -42,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AuthenticationException(MessageUtils.LOGIN_FAIL);
         }
         AccountEntity account = authenticationDAO.findByEmail(authenticationRequest.getEmail());
-        if(!account.getPasswordHash().equals(authenticationRequest.getPassword())) {
+        if(!account.getPasswordHash().equals(PasswordUtils.hashPassword(authenticationRequest.getPassword()))) {
             throw new AuthenticationException(MessageUtils.LOGIN_FAIL);
         }
         return authenticationResponse(account);
