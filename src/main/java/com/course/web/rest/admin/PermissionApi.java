@@ -71,7 +71,7 @@ public class PermissionApi extends BaseServlet {
 
     @Override
     @IsAuthenticated
-    @HasPermission("AUTHORIZATION_MANAGEMENT")
+    @HasPermission("ADMIN")
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");

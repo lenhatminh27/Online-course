@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
         accountProfileEntity.setAccount(newAccount);  // Liên kết AccountProfileEntity với AccountEntity
         accountProfileEntity.setFirstName(registerRequest.getFirstName());
         accountProfileEntity.setLastName(registerRequest.getLastName());
-        accountProfileEntity.setCreateAt(LocalDateTime.now());
+        accountProfileEntity.setCreatedAt(LocalDateTime.now());
 
         // Lưu AccountProfileEntity vào cơ sở dữ liệu
         accountDAO.saveAccountProfile(accountProfileEntity);
