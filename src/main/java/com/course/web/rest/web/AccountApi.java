@@ -2,7 +2,9 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.AccountDAO;
+import com.course.dao.RoleDAO;
 import com.course.dao.impl.AccountDaoImpl;
+import com.course.dao.impl.RoleDAOImpl;
 import com.course.dto.response.AccountResponse;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -29,8 +31,10 @@ public class AccountApi extends BaseServlet {
 
     public AccountApi() {
         AccountDAO acccountDao = new AccountDaoImpl();
-        this.accountService = new AccountServiceImpl(acccountDao);
+        RoleDAO roleDAO = new RoleDAOImpl();
+        this.accountService = new AccountServiceImpl(acccountDao, roleDAO);
     }
+
 
     @Override
     @IsAuthenticated()

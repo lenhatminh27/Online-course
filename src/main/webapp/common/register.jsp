@@ -40,109 +40,124 @@
 <!-- Preloader Start-->
 
 
+<!-- Register -->
+
 <main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
     <!-- Login Admin -->
-    <form class="form-default" id="login-form">
+    <form class="form-default" id="register-form">
+
         <div class="login-form">
+
             <!-- logo-login -->
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Login Here</h2>
-            <!-- Error message container -->
-            <div id="error-message" class="error-message" style="color: red; margin-bottom: 10px;"></div>
+            <h2>Registration Here</h2>
+            <div id="error">
+
+            </div>
             <div class="form-input">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" placeholder="Email">
+                <label for="firstname">First name</label>
+                <input  type="text" name="name" id="firstname" placeholder="First name">
+            </div>
+            <div class="form-input">
+                <label for="lastname">Last name</label>
+                <input  type="text" name="name" id="lastname" placeholder="Last name">
+            </div>
+            <div class="form-input">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" placeholder="Email Address">
             </div>
             <div class="form-input">
                 <label for="password">Password</label>
                 <input type="password" name="password" id="password" placeholder="Password">
             </div>
+            <div class="form-input">
+                <label for="confirmpassword">Confirm Password</label>
+                <input type="password" name="password" id="confirmpassword" placeholder="Confirm Password">
+            </div>
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="login">
+                <input type="submit" name="submit" value="Registration">
             </div>
             <!-- Forget Password -->
-            <a href="#" class="forget">Forget Password</a>
-            <!-- Registration -->
-            <a href="register" class="registration">Registration</a>
+            <a href="login" class="registration">login</a>
         </div>
     </form>
     <!-- /end login form -->
 </main>
 
-
 <script type="module">
-    import { apiRequestWithToken } from  '../assets/config/service.js';
-    import { environment, STORAGE_KEY, avatarDefault } from  '../assets/config/env.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginForm = document.getElementById('login-form');
-        const errorMessageDiv = document.getElementById('error-message');
-        loginForm.addEventListener('submit', async (e) => {
+    import {environment} from '../assets/config/env.js';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const registerForm = document.getElementById('register-form');
+        const errorMessageDiv = document.querySelector('#error');
+        errorMessageDiv.style.color = 'red';
+
+        registerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            errorMessageDiv.textContent = '';
+
+            const firstName = document.getElementById('firstname').value;
+            const lastName = document.getElementById('lastname').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmpassword').value;
+
+            // Validate the inputs
+            let errors = [];
+            if (!firstName) errors.push('First name is required');
+            if (!lastName) errors.push('Last name is required');
+            if (!email) errors.push('Email is required');
+            if (!password) errors.push('Password is required');
+            if (password !== confirmPassword) errors.push('Passwords do not match');
+
+            if (errors.length > 0) {
+                errorMessageDiv.textContent = errors.join(', ');
+                return;
+            }
+
             const data = {
+                firstName: firstName,
+                lastName: lastName,
                 email: email,
                 password: password,
+                confirmPassword: confirmPassword
             };
+
             try {
-                const response = await fetch(environment.apiUrl + '/auth', {
+                const response = await fetch(environment.apiUrl + '/register', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(data)
                 });
+
                 if (response.ok) {
-                    const responseData = await response.json();
-                    localStorage.setItem(STORAGE_KEY.accessToken, responseData.accessToken);
-                    localStorage.setItem(STORAGE_KEY.refreshToken, responseData.refreshToken);
-                    callApiAfterLogin();
+                    window.location.href = '/login';
                 } else {
                     const errorData = await response.json();
-                    errorMessageDiv.textContent = errorData;
+                    let errorMess = "";
+                    for (const x of errorData.error) {
+                        errorMess += x;
+                    }
+                    errorMessageDiv.textContent = errorMess;
                 }
             } catch (error) {
-                console.error('Login failed:', error);
-                errorMessageDiv.textContent = 'Failed to connect to the server. Please try again later.';
+                errorMessageDiv.textContent = 'An error occurred. Please try again later.';
             }
         });
-
-        async function callApiAfterLogin() {
-            try {
-                const response = await apiRequestWithToken(environment.apiUrl + '/api/accounts', {
-                    method: 'GET',
-                });
-                console.log('API response after login:', response);
-                const userCurrent = {
-                    email: response.email,
-                    avatar: getAvatarUrl(response.avatar)
-                }
-                localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
-                if(response.roles.includes('ADMIN')){
-                    window.location.href = '/admin';
-                }
-                else{
-                    window.location.href = '/home';
-                }
-            } catch (error) {
-                console.error('Error making authenticated API request:', error);
-            }
-        }
-
-        function getAvatarUrl(avatar) {
-            const isAvatarPresent = !!avatar;
-            if (isAvatarPresent) {
-                return typeof avatar === 'string' ? avatar : avatarDefault;
-            } else {
-                return avatarDefault;
-            }
-        }
     });
 </script>
+
+
+
+
+
+
+
+
 
 
 
