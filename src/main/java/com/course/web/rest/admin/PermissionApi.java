@@ -8,7 +8,6 @@ import com.course.dao.impl.RoleDAOImpl;
 import com.course.dto.request.PermissionRequest;
 import com.course.dto.response.PermissionResponse;
 import com.course.dto.response.RoleResponse;
-import com.course.entity.RoleEntity;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;

@@ -1,7 +1,9 @@
 package com.course.entity;
 
 import com.course.entity.enums.ERole;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -14,6 +16,8 @@ import java.util.List;
 @Table(name = "roles")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoleEntity implements Serializable {
 
     @Serial

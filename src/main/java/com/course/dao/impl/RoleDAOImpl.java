@@ -3,6 +3,7 @@ package com.course.dao.impl;
 import com.course.common.utils.HibernateUtils;
 import com.course.dao.RoleDAO;
 import com.course.entity.RoleEntity;
+import com.course.entity.enums.ERole;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -23,6 +24,7 @@ public class RoleDAOImpl implements RoleDAO {
             return false;
         }
     }
+
 
     @Override
     public List<RoleEntity> findAll() {
@@ -61,4 +63,45 @@ public class RoleDAOImpl implements RoleDAO {
             return null;
         }
     }
+
+
+    @Override
+    public RoleEntity findByName(ERole name) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM RoleEntity a WHERE a.name = :name";
+            return session.createQuery(hql, RoleEntity.class)
+                    .setParameter("name", name)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<RoleEntity> findByNameLike(List<String> names) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String queryStr = "SELECT r FROM RoleEntity r WHERE ";
+            // Tạo một điều kiện LIKE cho mỗi tên trong danh sách
+            for (int i = 0; i < names.size(); i++) {
+                queryStr += "r.name LIKE :name" + i;
+                if (i < names.size() - 1) {
+                    queryStr += " OR "; // Dùng OR nếu có nhiều tên
+                }
+            }
+
+            var query = session.createQuery(queryStr, RoleEntity.class);
+
+            // Thiết lậptham số cho mỗi tên trong danh sách
+            for (int i = 0; i < names.size(); i++) {
+                query.setParameter("name" + i, "%" + names.get(i) + "%");
+            }
+
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
 }
