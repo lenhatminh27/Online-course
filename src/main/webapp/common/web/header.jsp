@@ -23,7 +23,7 @@
                         <!-- Logo -->
                         <div class="col-xl-2 col-lg-2">
                             <div class="logo">
-                                <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
+                                <a href="index.html"><img src="/assets/img/logo/logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-xl-10 col-lg-10">
@@ -43,6 +43,7 @@
                                                 </ul>
                                             </li>
                                             <li><a href="contact.html">Contact</a></li>
+                                            <li id="redInstructor"><a href="/instructor">Instructor</a></li>
                                             <!-- Join button -->
                                             <li class="button-header margin-left" id="joinBtn">
                                                 <a href="/joinInstructor" class="btn">Join Instructor</a>
@@ -86,7 +87,7 @@
 <script type="module">
     import {STORAGE_KEY, environment} from '../../assets/config/env.js';
     import {apiRequestWithToken} from '../../assets/config/service.js';
-    const userCurrent = localStorage.getItem('online_course_user_current');
+    const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);
     if (userCurrent) {
         const user = JSON.parse(userCurrent);
         document.getElementById('loginBtn').style.display = 'none';
@@ -97,7 +98,15 @@
         document.getElementById('userInfo').style.display = 'none';
         document.getElementById('logout').style.display = 'none';
     }
-
+    if(userCurrent !== '' || userCurrent !== null){
+        let userData = JSON.parse(userCurrent);
+        if(userData.roles.includes('INSTRUCTOR')){
+            document.getElementById('joinBtn').style.display = 'none';
+        }
+        else{
+            document.getElementById('redInstructor').style.display = 'none';
+        }
+    }
     document.getElementById('logout').addEventListener('click', function() {
         apiRequestWithToken(environment.apiUrl + '/api/logout', {
             method: 'POST',

@@ -28,11 +28,12 @@ public class AccountEntity implements Serializable {
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 
+    @Column(name = "avatar", columnDefinition = "TEXT")
+    private String avatar;
+
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "avatar", columnDefinition = "TEXT")
-    private String avatar;
 
     @Column(name = "created_at")
     @CreationTimestamp

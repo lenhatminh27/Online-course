@@ -119,7 +119,8 @@
                 console.log('API response after login:', response);
                 const userCurrent = {
                     email: response.email,
-                    avatar: getAvatarUrl(response.avatar)
+                    avatar: getAvatarUrl(response.avatar),
+                    roles: response.roles
                 }
                 localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
                 if(response.roles.includes('ADMIN')){
