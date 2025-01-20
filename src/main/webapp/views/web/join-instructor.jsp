@@ -89,43 +89,65 @@
 </main>
 <%@include file="../../common/web/footer.jsp" %>
 <script type="module">
-    import {environment, STORAGE_KEY} from "../../assets/config/env.js";
+    import { environment, STORAGE_KEY, avatarDefault } from "../../assets/config/env.js";
+    import { apiRequestWithToken } from "../../assets/config/service.js";
 
     document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById("to-instructor")
+        const form = document.getElementById("to-instructor");
         const checkbox = document.getElementById("agree-terms");
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
             if (!checkbox.checked) {
-                e.preventDefault();
                 alert('Bạn cần đồng ý với các điều khoản để tiếp tục.');
                 return;
             }
-            updateToInstructor(e)
-        })
-    })
+            const success = await updateToInstructor();
+            if (success) {
+                await callApiAfterChangeRole();
+            }
+        });
+    });
 
-    async function updateToInstructor(e) {
-        e.preventDefault()
+    async function updateToInstructor() {
         try {
-            const response = await fetch(environment.apiUrl + '/api/to-instructor', {
+            const response = await fetch(environment.apiUrl + `/api/to-instructor`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': "Bearer " + localStorage.getItem(STORAGE_KEY.accessToken)
+                    'Authorization': `Bearer ` + localStorage.getItem(STORAGE_KEY.accessToken)
                 }
-            });
-
+            })
             if (response.status === 204) {
-                window.location.href = '/home'
+                return true;
             } else {
                 const errorMessage = await response.text();
-                alert('Error: ' + errorMessage);
+                alert(`Error: ` + errorMessage);
+                return false;
             }
         } catch (error) {
-            console.error('Error occurred:', error);
+            console.error('Error occurred while updating the role:', error);
             alert('An error occurred while updating the role.');
+            return false;
         }
     }
+
+    async function callApiAfterChangeRole() {
+        try {
+            const response = await apiRequestWithToken(environment.apiUrl + `/api/accounts`, {
+                method: 'GET',
+            });
+            const userCurrent = {
+                email: response.email,
+                avatar: response.avatar || avatarDefault,
+                roles: response.roles || [],
+            };
+            localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
+            window.location.assign("/home")
+        } catch (error) {
+            console.error('Error making authenticated API request:', error);
+        }
+    }
+
 </script>
 <!-- Scroll Up -->
 <div id="back-top">

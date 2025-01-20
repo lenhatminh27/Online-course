@@ -6,30 +6,33 @@
         </a>
         <div class="d-flex align-items-center ms-4 mb-4">
             <div class="position-relative">
-                <img class="rounded-circle" id="avatarMenu" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                <img class="rounded-circle" id="avatarMenu" src="img/user.jpg" alt=""
+                     style="width: 40px; height: 40px;">
                 <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
             </div>
             <div class="ms-3">
-                <h6 class="mb-0" id="emailMenu" >Jhon Doe</h6>
+                <h6 class="mb-0" id="emailMenu">Jhon Doe</h6>
                 <span>Admin</span>
             </div>
         </div>
         <div class="navbar-nav w-100">
             <a href="index.html" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-<%--            <div class="nav-item dropdown">--%>
-<%--                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Elements</a>--%>
-<%--                <div class="dropdown-menu bg-transparent border-0">--%>
-<%--                    <a href="button.html" class="dropdown-item">Buttons</a>--%>
-<%--                    <a href="typography.html" class="dropdown-item">Typography</a>--%>
-<%--                    <a href="element.html" class="dropdown-item">Other Elements</a>--%>
-<%--                </div>--%>
-<%--            </div>--%>
             <a href="/admin/authorization" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Authorization</a>
-            <a href="form.html" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        class="far fa-file-alt me-2"></i>Blogs</a>
+                <div class="dropdown-menu bg-transparent border-0">
+                    <a href="/admin/blogs?action=create" class="dropdown-item"><i class="fa fa-plus me-2"></i>Create Blog</a>
+                    <a href="/admin/blogs?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>View Blogs</a>
+                    <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Update Blog</a>
+                    <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Delete Blog</a>
+                </div>
+            </div>
             <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
             <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        class="far fa-file-alt me-2"></i>Pages</a>
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="signin.html" class="dropdown-item">Sign In</a>
                     <a href="signup.html" class="dropdown-item">Sign Up</a>
@@ -44,6 +47,7 @@
 
 <script type="module">
     import {STORAGE_KEY} from '../../assets/config/env.js';
+
     const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);
     if (userCurrent) {
         const user = JSON.parse(userCurrent);
