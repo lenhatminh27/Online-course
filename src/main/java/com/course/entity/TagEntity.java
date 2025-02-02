@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
@@ -25,5 +23,8 @@ public class TagEntity {
     @Column(name = "name")
     private String name;
 
+    public TagEntity(String tagName) {
+        this.name = tagName;
+    }
 }
 

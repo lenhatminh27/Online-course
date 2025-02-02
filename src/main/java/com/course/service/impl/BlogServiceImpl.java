@@ -5,8 +5,10 @@ import com.course.dao.AccountDAO;
 import com.course.dao.BlogDAO;
 import com.course.dao.TagDAO;
 import com.course.dto.request.BlogCreateRequest;
+import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.BlogResponse;
+import com.course.dto.response.PageResponse;
 import com.course.dto.response.TagResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.BlogEntity;
@@ -16,13 +18,13 @@ import com.course.service.BlogService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BlogServiceImpl implements BlogService {
 
     private final BlogDAO blogDAO;
-
     private final AccountDAO accountDAO;
-
     private final TagDAO tagDAO;
 
     public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO) {
@@ -33,73 +35,88 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public BlogResponse createBlog(BlogCreateRequest blogCreateRequest) {
+        AccountEntity account = getAuthenticatedAccount();
+        String slug = generateSlug(blogCreateRequest.getTitle(), account.getId());
 
-        String email = AuthenticationContextHolder.getContext().getEmail();
-        AccountEntity accountEntity = accountDAO.findByEmail(email);
+        List<TagEntity> tags = getOrCreateTags(blogCreateRequest.getTagName());
 
-        String slug = StringUtils.toSlug(blogCreateRequest.getTitle()) + "-" + accountEntity.getId();
-
-        List<TagEntity> existingTags = tagDAO.findAllByTagName(blogCreateRequest.getTagName());
-        // Kiểm tra xem những tagName nào đã tồn tại cho vào list
-        List<String> existingTagNames = existingTags.stream()
-                .map(TagEntity::getName)
-                .toList();
-
-        // Lấy những tagName mới vao list
-        List<String> newTagNames = blogCreateRequest.getTagName().stream()
-                .filter(tagName -> !existingTagNames.contains(tagName))
-                .toList();
-
-        // Tạo TagEntity cho những tag name mới
-        List<TagEntity> newTags = newTagNames.stream()
-                .map(tagName -> {
-                    TagEntity tagEntity = new TagEntity();
-                    tagEntity.setName(tagName);
-                    return tagEntity;
-                })
-                .toList();
-
-        if (!newTags.isEmpty()) {
-            tagDAO.saveAll(newTags);
-        }
-
-        List<TagEntity> allTags = new java.util.ArrayList<>();
-        allTags.addAll(existingTags);
-        allTags.addAll(newTags);
-
-        // Tạo blogEntity
         BlogEntity blogEntity = new BlogEntity();
         blogEntity.setTitle(blogCreateRequest.getTitle());
         blogEntity.setSlug(slug);
-        blogEntity.setAccount(accountEntity);
-        blogEntity.setTags(allTags);
+        blogEntity.setAccount(account);
+        blogEntity.setTags(tags);
         blogEntity.setContent(blogCreateRequest.getContent());
-        blogEntity.setCreateBy(email);
+        blogEntity.setCreateBy(account.getEmail());
         blogEntity.setUpdatedAt(LocalDateTime.now());
-        BlogEntity savedBlog = blogDAO.createBlog(blogEntity);
 
-        AccountResponse accountResponse = new AccountResponse();
-        accountResponse.setEmail(email);
-        accountResponse.setAvatar(accountEntity.getAvatar());
-
-        List<TagResponse> tagResponses = allTags.stream()
-                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
-                .toList();
-
-        BlogResponse blogResponse = new BlogResponse();
-        blogResponse.setId(savedBlog.getId());
-        blogResponse.setTitle(savedBlog.getTitle());
-        blogResponse.setSlug(savedBlog.getSlug());
-        blogResponse.setContent(savedBlog.getContent());
-        blogResponse.setCreateAt(savedBlog.getCreateAt().toString());
-        blogResponse.setTagResponses(tagResponses);
-        blogResponse.setAccountResponse(accountResponse);
-
-        return blogResponse;
+        return convertToBlogResponse(blogDAO.createBlog(blogEntity));
     }
 
     @Override
     public boolean existTitle(String title) {
         return blogDAO.existTitle(title);
     }
+
+    @Override
+    public PageResponse<BlogResponse> getBlogs(BlogFilterRequest filterRequest) {
+        PageResponse<BlogEntity> pageResponse = blogDAO.getBlogsByPage(filterRequest);
+        List<BlogResponse> blogs = pageResponse.getData().stream()
+                .map(this::convertToBlogResponse)
+                .toList();
+
+        return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), blogs);
+    }
+
+    @Override
+    public List<BlogResponse> getTopBlogRecent() {
+        return blogDAO.getTopBlogsRecent().stream()
+                .map(this::convertToBlogResponse)
+                .toList();
+    }
+
+    private AccountEntity getAuthenticatedAccount() {
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        return accountDAO.findByEmail(email);
+    }
+
+    private String generateSlug(String title, Long accountId) {
+        return StringUtils.toSlug(title) + "-" + accountId;
+    }
+
+    private List<TagEntity> getOrCreateTags(List<String> tagNames) {
+        List<TagEntity> existingTags = tagDAO.findAllByTagName(tagNames);
+        Set<String> existingTagNames = existingTags.stream().map(TagEntity::getName).collect(Collectors.toSet());
+
+        List<TagEntity> newTags = tagNames.stream()
+                .filter(tag -> !existingTagNames.contains(tag))
+                .map(tagName -> new TagEntity(tagName))
+                .toList();
+
+        if (!newTags.isEmpty()) {
+            tagDAO.saveAll(newTags);
+        }
+
+        existingTags.addAll(newTags);
+        return existingTags;
+    }
+
+    private BlogResponse convertToBlogResponse(BlogEntity blogEntity) {
+        List<TagResponse> tagResponses = blogEntity.getTags().stream()
+                .map(tag -> new TagResponse(tag.getId(), tag.getName()))
+                .toList();
+
+        AccountEntity author = blogEntity.getAccount();
+        AccountResponse accountResponse = new AccountResponse(author.getEmail(), author.getAvatar());
+
+        return new BlogResponse(
+                blogEntity.getId(),
+                blogEntity.getTitle(),
+                blogEntity.getSlug(),
+                blogEntity.getContent(),
+                accountResponse,
+                tagResponses,
+                blogEntity.getCreateAt().toString()
+        );
+    }
 }
+

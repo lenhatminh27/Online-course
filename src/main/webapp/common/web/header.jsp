@@ -23,7 +23,7 @@
                         <!-- Logo -->
                         <div class="col-xl-2 col-lg-2">
                             <div class="logo">
-                                <a href="index.html"><img src="/assets/img/logo/logo.png" alt=""></a>
+                                <a href="/home"><img src="/assets/img/logo/logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-xl-10 col-lg-10">
@@ -35,13 +35,7 @@
                                             <li class="active"><a href="/home">Home</a></li>
                                             <li><a href="courses.html">Courses</a></li>
                                             <li><a href="about.html">About</a></li>
-                                            <li><a href="#">Blog</a>
-                                                <ul class="submenu">
-                                                    <li><a href="blog.html">Blog</a></li>
-                                                    <li><a href="blog_details.html">Blog Details</a></li>
-                                                    <li><a href="elements.html">Element</a></li>
-                                                </ul>
-                                            </li>
+                                            <li><a href="/blogs">Blog</a></li>
                                             <li><a href="contact.html">Contact</a></li>
                                             <li id="redInstructor"><a href="/instructor">Instructor</a></li>
                                             <!-- Join button -->

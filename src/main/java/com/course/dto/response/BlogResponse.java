@@ -1,6 +1,5 @@
 package com.course.dto.response;
 
-import com.course.entity.TagEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

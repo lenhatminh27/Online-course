@@ -39,6 +39,10 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .ck-editor__editable {
+            min-height: 300px !important;
+        }
+
         h2 {
             text-align: center;
             margin-bottom: 20px;

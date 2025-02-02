@@ -7,25 +7,22 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountResponse implements Serializable {
+public class PageResponse<T> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String email;
+    private int page;
 
-    private String avatar;
+    private int totalPages;
 
-    private List<String> roles;
+    private List<T> data = new ArrayList<T>();
 
-    public AccountResponse(String email, String avatar) {
-        this.email = email;
-        this.avatar = avatar;
-    }
 }

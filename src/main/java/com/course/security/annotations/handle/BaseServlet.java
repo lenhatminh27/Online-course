@@ -52,7 +52,6 @@ public abstract class BaseServlet extends HttpServlet {
         } catch (NoSuchMethodException e) {
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, gson.toJson("Method Not Allowed"));
-            return;
         } catch (Exception e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Error invoking method"));
         }
