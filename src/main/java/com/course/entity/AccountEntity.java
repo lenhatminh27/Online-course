@@ -42,6 +42,10 @@ public class AccountEntity implements Serializable {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+
+    @OneToOne(mappedBy = "account")
+    private AccountProfileEntity accountProfile;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "account_roles",
@@ -49,4 +53,5 @@ public class AccountEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<RoleEntity> roles = new ArrayList<>();
+
 }
