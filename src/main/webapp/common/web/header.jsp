@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <style>
     #logout {
         background-color: #ff4d4d;
@@ -14,7 +15,7 @@
     }
 </style>
 <header>
-    <!-- Header Start -->
+    <!-- Bắt đầu Header -->
     <div class="header-area header-transparent">
         <div class="main-header">
             <div class="header-bottom header-sticky">
@@ -23,42 +24,40 @@
                         <!-- Logo -->
                         <div class="col-xl-2 col-lg-2">
                             <div class="logo">
-                                <a href="/home"><img src="/assets/img/logo/logo.png" alt=""></a>
+                                <a href="/home"><img src="/assets/img/logo/logo.png" alt="Logo"></a>
                             </div>
                         </div>
                         <div class="col-xl-10 col-lg-10">
                             <div class="menu-wrapper d-flex align-items-center justify-content-end">
-                                <!-- Main-menu -->
+                                <!-- Menu chính -->
                                 <div class="main-menu d-none d-lg-block">
                                     <nav>
                                         <ul id="navigation">
-                                            <li class="active"><a href="/home">Home</a></li>
-                                            <li><a href="courses.html">Courses</a></li>
-                                            <li><a href="about.html">About</a></li>
-                                            <li><a href="/blogs">Blog</a></li>
-                                            <li><a href="contact.html">Contact</a></li>
-                                            <li id="redInstructor"><a href="/instructor">Instructor</a></li>
-                                            <!-- Join button -->
+                                            <li class="active"><a href="/home">Trang chủ</a></li>
+                                            <li><a href="courses.html">Khóa học</a></li>
+                                            <li><a href="about.html">Giới thiệu</a></li>
+                                            <li><a href="/blogs">Bài viết</a></li>
+                                            <li><a href="contact.html">Liên hệ</a></li>
+                                            <li id="redInstructor"><a href="/instructor">Giảng viên</a></li>
+                                            <!-- Nút tham gia -->
                                             <li class="button-header margin-left" id="joinBtn">
-                                                <a href="/joinInstructor" class="btn">Join Instructor</a>
+                                                <a href="/joinInstructor" class="btn">Tham gia giảng viên</a>
                                             </li>
 
-                                            <!-- Log in button -->
+                                            <!-- Nút đăng nhập -->
                                             <li class="button-header" id="loginBtn">
-                                                <a href="/login" class="btn btn3">Log in</a>
+                                                <a href="/login" class="btn btn3">Đăng nhập</a>
                                             </li>
 
-                                            <!-- Display user info when logged in -->
-                                            <li id="userInfo" class="user-info" >
-                                                <img id="userAvatar" src="" alt="User Avatar"
+                                            <!-- Hiển thị thông tin người dùng khi đã đăng nhập -->
+                                            <li id="userInfo" class="user-info">
+                                                <img id="userAvatar" src="" alt="Ảnh đại diện"
                                                      style="width: 40px; height: 40px; object-fit: cover;
-                                                      border-radius: 50%;
-                                                    "
-                                                     class="avatar">
+                                                      border-radius: 50%;">
                                             </li>
 
-                                            <li id="userInfo" class="user-info" >
-                                               <button id="logout">Logout</button>
+                                            <li id="userInfo" class="user-info">
+                                                <button id="logout">Đăng xuất</button>
                                             </li>
 
                                         </ul>
@@ -66,7 +65,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Mobile Menu -->
+                        <!-- Menu trên điện thoại -->
                         <div class="col-12">
                             <div class="mobile_menu d-block d-lg-none"></div>
                         </div>
@@ -75,7 +74,7 @@
             </div>
         </div>
     </div>
-    <!-- Header End -->
+    <!-- Kết thúc Header -->
 </header>
 
 <script type="module">
@@ -92,7 +91,7 @@
         document.getElementById('userInfo').style.display = 'none';
         document.getElementById('logout').style.display = 'none';
     }
-    if(userCurrent !== '' || userCurrent !== null){
+    if(userCurrent !== '' && userCurrent !== null){
         let userData = JSON.parse(userCurrent);
         if(userData.roles.includes('INSTRUCTOR')){
             document.getElementById('joinBtn').style.display = 'none';
@@ -100,6 +99,9 @@
         else{
             document.getElementById('redInstructor').style.display = 'none';
         }
+    }
+    else{
+        document.getElementById('redInstructor').style.display = 'none';
     }
     document.getElementById('logout').addEventListener('click', function() {
         apiRequestWithToken(environment.apiUrl + '/api/logout', {

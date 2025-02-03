@@ -5,7 +5,7 @@ function apiRequestWithToken(url, options = {}) {
     const headers = new Headers(options.headers || {});
     if (token) {
         headers.append('Authorization', `Bearer ${token}`);
-    }
+    };
     const config = {
         ...options,
         headers,
@@ -43,10 +43,10 @@ function apiRequest(url, options = {}) {
             if (error.response) {
                 switch (error.response.status) {
                     case 403:
-                        alert('You do not have permission to perform this action.');
+                        window.location.assign('/403');
                         break;
                     case 500:
-                        alert('Internal server error. Please try again later.');
+                        window.location.assign('/500');
                         break;
                     default:
                         throw error;

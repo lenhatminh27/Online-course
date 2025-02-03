@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <html lang="en">
 
 <head>
@@ -48,46 +49,44 @@
     <!-- Sidebar End -->
 
 
-    <!-- Content Start -->
+    <!-- Nội dung Bắt đầu -->
     <div class="content">
         <%@include file="../../common/admin/header.jsp"%>
 
-
         <div class="container mt-4">
-            <h3>Assign Permissions to Role</h3>
+            <h3>Gán quyền cho vai trò</h3>
             <form id="roleForm" method="POST">
                 <div class="row">
-                    <!-- Select Role Column (4) -->
+                    <!-- Cột Chọn Vai trò (4) -->
                     <div class="col-md-4">
                         <div class="form-group mb-4">
-                            <label for="roleSelect">Select Role</label>
+                            <label for="roleSelect">Chọn Vai trò</label>
                             <select class="form-control" id="roleSelect" name="role">
-                                <option value="" selected disabled>Choose a role</option>
-                                <!-- Options will be populated dynamically from the API -->
+                                <option value="" selected disabled>Chọn một vai trò</option>
+                                <!-- Các tùy chọn sẽ được điền động từ API -->
                             </select>
                         </div>
                     </div>
 
-                    <!-- Permissions Column (7) -->
+                    <!-- Cột Quyền (7) -->
                     <div class="col-md-7">
                         <div class="form-group" id="form-group">
-                            <label for="permissions">Permissions</label><br>
-                            <!-- Buttons will be populated dynamically from the API -->
+                            <label for="permissions">Quyền</label><br>
+                            <!-- Các nút sẽ được điền động từ API -->
                         </div>
                     </div>
                 </div>
 
-                <button type="button" id="submitBtn" class="btn btn-primary mt-3">Submit</button>
+                <button type="button" id="submitBtn" class="btn btn-primary mt-3">Gửi</button>
             </form>
         </div>
 
-
-
-        <!-- Footer Start -->
+        <!-- Footer Bắt đầu -->
         <%@include file="../../common/admin/footer.jsp"%>
-        <!-- Footer End -->
+        <!-- Footer Kết thúc -->
     </div>
-    <!-- Content End -->
+    <!-- Nội dung Kết thúc -->
+
 
 
     <!-- Back to Top -->

@@ -1,4 +1,5 @@
 <!-- Navbar Start -->
+<%@ page contentType="text/html; charset=UTF-8" %>
 <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
     <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">
         <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
@@ -7,21 +8,21 @@
         <i class="fa fa-bars"></i>
     </a>
     <form class="d-none d-md-flex ms-4">
-        <input class="form-control border-0" type="search" placeholder="Search">
+        <input class="form-control border-0" type="search" placeholder="Tìm kiếm">
     </form>
     <div class="navbar-nav align-items-center ms-auto">
         <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <i class="fa fa-envelope me-lg-2"></i>
-                <span class="d-none d-lg-inline-flex">Message</span>
+                <span class="d-none d-lg-inline-flex">Tin nhắn</span>
             </a>
             <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                 <a href="#" class="dropdown-item">
                     <div class="d-flex align-items-center">
                         <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
                         <div class="ms-2">
-                            <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                            <small>15 minutes ago</small>
+                            <h6 class="fw-normal mb-0">Jhon đã gửi bạn một tin nhắn</h6>
+                            <small>15 phút trước</small>
                         </div>
                     </div>
                 </a>
@@ -30,8 +31,8 @@
                     <div class="d-flex align-items-center">
                         <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
                         <div class="ms-2">
-                            <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                            <small>15 minutes ago</small>
+                            <h6 class="fw-normal mb-0">Jhon đã gửi bạn một tin nhắn</h6>
+                            <small>15 phút trước</small>
                         </div>
                     </div>
                 </a>
@@ -40,37 +41,37 @@
                     <div class="d-flex align-items-center">
                         <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
                         <div class="ms-2">
-                            <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                            <small>15 minutes ago</small>
+                            <h6 class="fw-normal mb-0">Jhon đã gửi bạn một tin nhắn</h6>
+                            <small>15 phút trước</small>
                         </div>
                     </div>
                 </a>
                 <hr class="dropdown-divider">
-                <a href="#" class="dropdown-item text-center">See all message</a>
+                <a href="#" class="dropdown-item text-center">Xem tất cả tin nhắn</a>
             </div>
         </div>
         <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <i class="fa fa-bell me-lg-2"></i>
-                <span class="d-none d-lg-inline-flex">Notificatin</span>
+                <span class="d-none d-lg-inline-flex">Thông báo</span>
             </a>
             <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                 <a href="#" class="dropdown-item">
-                    <h6 class="fw-normal mb-0">Profile updated</h6>
-                    <small>15 minutes ago</small>
+                    <h6 class="fw-normal mb-0">Cập nhật hồ sơ</h6>
+                    <small>15 phút trước</small>
                 </a>
                 <hr class="dropdown-divider">
                 <a href="#" class="dropdown-item">
-                    <h6 class="fw-normal mb-0">New user added</h6>
-                    <small>15 minutes ago</small>
+                    <h6 class="fw-normal mb-0">Người dùng mới đã được thêm vào</h6>
+                    <small>15 phút trước</small>
                 </a>
                 <hr class="dropdown-divider">
                 <a href="#" class="dropdown-item">
-                    <h6 class="fw-normal mb-0">Password changed</h6>
-                    <small>15 minutes ago</small>
+                    <h6 class="fw-normal mb-0">Mật khẩu đã được thay đổi</h6>
+                    <small>15 phút trước</small>
                 </a>
                 <hr class="dropdown-divider">
-                <a href="#" class="dropdown-item text-center">See all notifications</a>
+                <a href="#" class="dropdown-item text-center">Xem tất cả thông báo</a>
             </div>
         </div>
         <div class="nav-item dropdown">
@@ -79,14 +80,15 @@
                 <span class="d-none d-lg-inline-flex" id="emailHeader"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                <a href="#" class="dropdown-item">My Profile</a>
-                <a href="#" class="dropdown-item">Settings</a>
-                <a id="logout" class="dropdown-item" style="cursor: pointer">Log Out</a>
+                <a href="#" class="dropdown-item">Hồ sơ của tôi</a>
+                <a href="#" class="dropdown-item">Cài đặt</a>
+                <a id="logout" class="dropdown-item" style="cursor: pointer">Đăng xuất</a>
             </div>
         </div>
     </div>
 </nav>
-<!-- Navbar End -->
+<!-- Kết thúc Navbar -->
+
 
 
 <script type="module">
@@ -95,11 +97,15 @@
     const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);
     if (userCurrent) {
         const user = JSON.parse(userCurrent);
+        if(!user.roles.includes('ADMIN')){
+            window.location.replace('/403');
+        }
         const userAvatar = user.avatar;
         const email = user.email;
         document.getElementById('userAvatar').src = userAvatar;
         document.getElementById('emailHeader').innerHTML = email;
     } else {
+        window.location.replace('/login');
         document.getElementById('userAvatar').style.display = 'none';
         document.getElementById('emailHeader').style.display = 'none';
     }

@@ -1,4 +1,5 @@
 <!doctype html>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <html class="no-js" lang="zxx">
 <head>
     <meta charset="utf-8">
@@ -43,7 +44,7 @@
 <!-- Register -->
 
 <main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
-    <!-- Login Admin -->
+    <!-- Đăng ký Admin -->
     <form class="form-default" id="register-form">
 
         <div class="login-form">
@@ -52,39 +53,40 @@
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Registration Here</h2>
+            <h2>Đăng Ký Tại Đây</h2>
             <div id="error">
 
             </div>
             <div class="form-input">
-                <label for="firstname">First name</label>
-                <input  type="text" name="name" id="firstname" placeholder="First name">
+                <label for="firstname">Tên</label>
+                <input type="text" name="name" id="firstname" placeholder="Tên">
             </div>
             <div class="form-input">
-                <label for="lastname">Last name</label>
-                <input  type="text" name="name" id="lastname" placeholder="Last name">
+                <label for="lastname">Họ</label>
+                <input type="text" name="name" id="lastname" placeholder="Họ">
             </div>
             <div class="form-input">
-                <label for="email">Email Address</label>
-                <input type="email" name="email" id="email" placeholder="Email Address">
+                <label for="email">Địa chỉ Email</label>
+                <input type="email" name="email" id="email" placeholder="Địa chỉ Email">
             </div>
             <div class="form-input">
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Password">
+                <label for="password">Mật khẩu</label>
+                <input type="password" name="password" id="password" placeholder="Mật khẩu">
             </div>
             <div class="form-input">
-                <label for="confirmpassword">Confirm Password</label>
-                <input type="password" name="password" id="confirmpassword" placeholder="Confirm Password">
+                <label for="confirmpassword">Xác nhận mật khẩu</label>
+                <input type="password" name="password" id="confirmpassword" placeholder="Xác nhận mật khẩu">
             </div>
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="Registration">
+                <input type="submit" name="submit" value="Đăng Ký">
             </div>
-            <!-- Forget Password -->
-            <a href="login" class="registration">login</a>
+            <!-- Quên mật khẩu -->
+            <a href="login" class="registration">Đăng nhập</a>
         </div>
     </form>
-    <!-- /end login form -->
+    <!-- /kết thúc form đăng ký -->
 </main>
+
 
 <script type="module">
 
