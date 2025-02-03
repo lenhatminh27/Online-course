@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!doctype html>
 <html class="no-js" lang="zxx">
 <head>
@@ -41,35 +42,36 @@
 
 
 <main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
-    <!-- Login Admin -->
+    <!-- Đăng nhập Admin -->
     <form class="form-default" id="login-form">
         <div class="login-form">
             <!-- logo-login -->
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Login Here</h2>
-            <!-- Error message container -->
+            <h2>Đăng Nhập Tại Đây</h2>
+            <!-- Container thông báo lỗi -->
             <div id="error-message" class="error-message" style="color: red; margin-bottom: 10px;"></div>
             <div class="form-input">
                 <label for="email">Email</label>
                 <input type="email" name="email" id="email" placeholder="Email">
             </div>
             <div class="form-input">
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Password">
+                <label for="password">Mật khẩu</label>
+                <input type="password" name="password" id="password" placeholder="Mật khẩu">
             </div>
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="login">
+                <input type="submit" name="submit" value="Đăng nhập">
             </div>
-            <!-- Forget Password -->
-            <a href="#" class="forget">Forget Password</a>
-            <!-- Registration -->
-            <a href="register" class="registration">Registration</a>
+            <!-- Quên mật khẩu -->
+            <a href="#" class="forget">Quên mật khẩu</a>
+            <!-- Đăng ký -->
+            <a href="register" class="registration">Đăng ký</a>
         </div>
     </form>
-    <!-- /end login form -->
+    <!-- /kết thúc form đăng nhập -->
 </main>
+
 
 
 <script type="module">

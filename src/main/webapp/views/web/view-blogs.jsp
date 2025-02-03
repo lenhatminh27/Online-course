@@ -240,6 +240,7 @@
     <!-- Header End -->
     <main>
         <!--? slider Area Start-->
+        <!--? Khu vực Slider Bắt đầu-->
         <section class="slider-area slider-area2">
             <div class="slider-active">
                 <!-- Single Slider -->
@@ -248,54 +249,32 @@
                         <div class="row">
                             <div class="col-xl-8 col-lg-11 col-md-12">
                                 <div class="hero__caption hero__caption2">
-                                    <h1 data-animation="bounceIn" data-delay="0.2s">Company insights</h1>
-                                    <!-- breadcrumb Start-->
+                                    <h1 data-animation="bounceIn" data-delay="0.2s">Thông tin công ty</h1>
+                                    <!-- breadcrumb Bắt đầu-->
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
-                                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                                            <li class="breadcrumb-item"><a href="#">Blog</a></li> 
+                                            <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
+                                            <li class="breadcrumb-item"><a href="#">Blog</a></li>
                                         </ol>
                                     </nav>
-                                    <!-- breadcrumb End -->
+                                    <!-- breadcrumb Kết thúc -->
                                 </div>
                             </div>
                         </div>
-                    </div>          
+                    </div>
                 </div>
             </div>
         </section>
+        <!--? Khu vực Slider Kết thúc-->
+
         <!--? Blog Area Start-->
         <section class="blog_area section-padding">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-8 mb-5 mb-lg-0">
                         <div class="blog_left_sidebar" id="blogs">
-
-
-<%--
-<%--                            <nav class="blog-pagination justify-content-center d-flex">--%>
-<%--                                <ul class="pagination">--%>
-<%--                                    <li class="page-item">--%>
-<%--                                        <a href="#" class="page-link" aria-label="Previous">--%>
-<%--                                            <i class="ti-angle-left"></i>--%>
-<%--                                        </a>--%>
-<%--                                    </li>--%>
-<%--                                    <li class="page-item">--%>
-<%--                                        <a href="#" class="page-link">1</a>--%>
-<%--                                    </li>--%>
-<%--                                    <li class="page-item active">--%>
-<%--                                        <a href="#" class="page-link">2</a>--%>
-<%--                                    </li>--%>
-<%--                                    <li class="page-item">--%>
-<%--                                        <a href="#" class="page-link" aria-label="Next">--%>
-<%--                                            <i class="ti-angle-right"></i>--%>
-<%--                                        </a>--%>
-<%--                                    </li>--%>
-<%--                                </ul>--%>
-<%--                            </nav>--%>
                         </div>
                         <div id="pagination">
-
                         </div>
                     </div>
                     <div class="col-lg-4">

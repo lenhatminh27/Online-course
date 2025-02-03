@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<%@ page contentType="text/html; charset=UTF-8" %>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,6 +77,10 @@
             background-color: #f9f9f9;
         }
 
+        .ck-editor__editable {
+            min-height: 300px !important;
+        }
+
         input:focus, textarea:focus {
             border-color: #007BFF;
             outline: none;
@@ -127,31 +131,29 @@
     <%@include file="../../common/admin/header.jsp" %>
 
     <div class="container">
-        <h2>Create New Blog</h2>
+        <h2>Tạo Blog Mới</h2>
         <div id="errorMessage"></div>
         <div id="successMessage"></div>
         <form id="createBlogForm">
             <div class="form-section">
-                <label for="title">Title</label>
-                <input type="text" id="title" name="title" placeholder="Enter blog title" required>
+                <label for="title">Tiêu đề</label>
+                <input type="text" id="title" name="title" placeholder="Nhập tiêu đề blog" required>
             </div>
 
             <div class="form-section">
-                <label for="content">Content</label>
-                <textarea id="content" name="content" placeholder="Enter blog content"
-                          style="display: none;"></textarea>
+                <label for="content">Nội dung</label>
+                <textarea id="content" name="content" placeholder="Nhập nội dung blog" style="display: none;"></textarea>
             </div>
 
             <div class="form-section">
-                <label for="tags">Tags (comma-separated)</label>
-                <input type="text" id="tags" name="tags" placeholder="e.g., Java, Spring, Hibernate" required>
+                <label for="tags">Thẻ (cách nhau bằng dấu phẩy)</label>
+                <input type="text" id="tags" name="tags" placeholder="ví dụ: Java, Spring, Hibernate" required>
             </div>
 
-            <button type="submit">Submit</button>
+            <button type="submit">Gửi</button>
         </form>
-
-
     </div>
+
     <!-- Footer Start -->
     <%@include file="../../common/admin/footer.jsp" %>
     <!-- Footer End -->
