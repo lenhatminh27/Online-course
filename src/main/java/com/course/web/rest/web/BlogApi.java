@@ -1,7 +1,9 @@
 package com.course.web.rest.web;
 
+import com.course.common.constants.PageConstant;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
+import com.course.core.repository.data.Sort;
 import com.course.dao.AccountDAO;
 import com.course.dao.BlogDAO;
 import com.course.dao.TagDAO;
@@ -9,8 +11,10 @@ import com.course.dao.impl.AccountDaoImpl;
 import com.course.dao.impl.BlogDAOImpl;
 import com.course.dao.impl.TagDAOImpl;
 import com.course.dto.request.BlogCreateRequest;
+import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.ErrorResponse;
+import com.course.dto.response.PageResponse;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -25,10 +29,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serial;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @WebServlet("/api/blogs/*")
-
 public class BlogApi extends BaseServlet {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -45,14 +49,56 @@ public class BlogApi extends BaseServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+
+        if (pathInfo != null && pathInfo.equals("/recent")) {
+            handleGetRecentBlogs(resp);
+            return;
+        }
+        String pageStr = req.getParameter("page");
+        String search = req.getParameter("search");
+        int page;
+        try {
+            page = (pageStr != null) ? Integer.parseInt(pageStr) : PageConstant.PAGE_CURRENT;
+        } catch (NumberFormatException e) {
+            page = PageConstant.PAGE_CURRENT;
+        }
+        String tagsParam = req.getParameter("tags");
+        List<String> tags = new ArrayList<>();
+        if (tagsParam != null && !tagsParam.trim().isEmpty()) {
+            tags = Arrays.asList(tagsParam.split(","));
+        }
+        Sort sort = Sort.by(Sort.Order.desc("createAt"));
+        BlogFilterRequest blogFilterRequest = new BlogFilterRequest(tags, sort, search, page);
+        try {
+            PageResponse<BlogResponse> blogResponse = blogService.getBlogs(blogFilterRequest);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(blogResponse));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    private void handleGetRecentBlogs(HttpServletResponse resp) throws IOException {
+        try {
+            List<BlogResponse> recentBlogs = blogService.getTopBlogRecent();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(recentBlogs));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+
+    @Override
     @IsAuthenticated
     @HasPermission("CREATE_BLOG")
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
         BlogCreateRequest blogCreateRequest = gson.fromJson(req.getReader(), BlogCreateRequest.class);
         List<String> errors = new ArrayList<>();
-        List<String> errors2 = new ArrayList<>();
 
         if (ObjectUtils.isEmpty(blogCreateRequest)) {
             errors.add("Request can not null");
@@ -91,7 +137,5 @@ public class BlogApi extends BaseServlet {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
-
-
     }
 }

@@ -34,7 +34,6 @@ public class AccountEntity implements Serializable {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -50,6 +49,4 @@ public class AccountEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<RoleEntity> roles = new ArrayList<>();
-
-
 }

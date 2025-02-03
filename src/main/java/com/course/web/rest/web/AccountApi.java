@@ -25,14 +25,14 @@ public class AccountApi extends BaseServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private final transient Gson gson = new Gson();
 
     private final AccountService accountService;
 
     public AccountApi() {
-        AccountDAO acccountDao = new AccountDaoImpl();
+        AccountDAO accountDao = new AccountDaoImpl();
         RoleDAO roleDAO = new RoleDAOImpl();
-        this.accountService = new AccountServiceImpl(acccountDao, roleDAO);
+        this.accountService = new AccountServiceImpl(accountDao, roleDAO);
     }
 
 

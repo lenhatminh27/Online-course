@@ -2,13 +2,10 @@ package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
 import com.course.dao.TagDAO;
-import com.course.entity.PermissionEntity;
 import com.course.entity.TagEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TagDAOImpl implements TagDAO {
@@ -48,6 +45,19 @@ public class TagDAOImpl implements TagDAO {
             }
             e.printStackTrace();
             throw new RuntimeException("Failed to save all tags", e);
+        }
+    }
+
+    @Override
+    public List<TagEntity> findTagsRecent() {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM TagEntity t ORDER BY t.name ASC";
+            return session.createQuery(hql, TagEntity.class)
+                    .setMaxResults(10)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch tags by names", e);
         }
     }
 }
