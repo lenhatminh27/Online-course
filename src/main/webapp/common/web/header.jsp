@@ -56,7 +56,7 @@
                                                       border-radius: 50%;">
                                             </li>
 
-                                            <li id="userInfo" class="user-info">
+                                            <li class="user-info">
                                                 <button id="logout">Đăng xuất</button>
                                             </li>
 

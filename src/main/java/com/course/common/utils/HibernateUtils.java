@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class HibernateUtils {
 
-    private static final SessionFactory sessionFactory;
+    public static final SessionFactory sessionFactory;
 
     static {
         try {

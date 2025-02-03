@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "account_profile")
@@ -45,6 +46,9 @@ public class AccountProfileEntity implements Serializable {
 
     @Column(name = "date_of_birth")
     private LocalDateTime dateOfBirth;
+
+    @Column(name = "avatar")
+    private String avatar;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
