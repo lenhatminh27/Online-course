@@ -64,11 +64,11 @@
                 <!-- Menu bên trái -->
                 <div class="col-3">
                     <div class="list-group">
-                        <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
+                        <a href="/profile" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
                             Cập nhật hồ sơ
                         </a>
-                        <a href="#history" class="list-group-item list-group-item-action" data-bs-toggle="tab">
-                            Lịch sử hoạt động
+                        <a href="/change-password" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                            Thay đổi mật khẩu
                         </a>
                         <a href="logout.jsp" class="list-group-item list-group-item-action text-danger">
                             Đăng xuất

@@ -19,4 +19,9 @@ public class PasswordUtils {
             throw new RuntimeException("Error hashing password", e);
         }
     }
+
+    public static boolean verifyPassword(String rawPassword, String hashedPassword) {
+        String hashedRawPassword = hashPassword(rawPassword);
+        return hashedRawPassword.equals(hashedPassword);
+    }
 }
