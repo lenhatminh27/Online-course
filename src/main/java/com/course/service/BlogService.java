@@ -12,4 +12,5 @@ public interface BlogService {
     boolean existTitle(String title);
     PageResponse<BlogResponse> getBlogs(BlogFilterRequest filterRequest);
     List<BlogResponse> getTopBlogRecent();
+    void likeBlog(Long blogId);
 }
