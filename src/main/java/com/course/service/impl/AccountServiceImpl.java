@@ -1,8 +1,10 @@
 package com.course.service.impl;
 
+import com.course.common.utils.PasswordUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.AccountDAO;
 import com.course.dao.RoleDAO;
+import com.course.dto.request.ChangePasswordRequest;
 import com.course.dto.request.RegisterRequest;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.ErrorResponse;
@@ -77,4 +79,19 @@ public class AccountServiceImpl implements AccountService {
         accountDAO.saveAccountProfile(accountProfileEntity);
     }
 
+    @Override
+    public void updatePassword(ChangePasswordRequest changePasswordRequest) {
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        AccountEntity accountEntity = accountDAO.findByEmail(email);
+
+        if (!PasswordUtils.verifyPassword(changePasswordRequest.getCurrentPassword(), accountEntity.getPasswordHash())) {
+            throw new RuntimeException("Mật khẩu hiện tại không đúng");
+        }
+
+        String hashedNewPassword = PasswordUtils.hashPassword(changePasswordRequest.getNewPassword());
+        accountEntity.setPasswordHash(hashedNewPassword);
+        accountEntity.setUpdatedAt(LocalDateTime.now());
+
+        accountDAO.update(accountEntity);
+    }
 }

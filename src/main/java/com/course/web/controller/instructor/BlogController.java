@@ -19,7 +19,6 @@ public class BlogController extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Action is required");
             return;
         }
-
         switch (action) {
             case "create":
                 req.getRequestDispatcher("/views/instructor/create-blog.jsp").forward(req, resp);
