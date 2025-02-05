@@ -13,4 +13,5 @@ public interface BlogService {
     PageResponse<BlogResponse> getBlogs(BlogFilterRequest filterRequest);
     List<BlogResponse> getTopBlogRecent();
     void likeBlog(Long blogId);
+    void deleteLikeBlog(Long blogId);
 }

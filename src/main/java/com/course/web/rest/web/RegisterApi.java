@@ -45,6 +45,7 @@ public class RegisterApi extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         Gson gson = new Gson();
+        AccountDAO accountDAO = new AccountDaoImpl();
         try {
             RegisterRequest registerRequest = gson.fromJson(req.getReader(), RegisterRequest.class);
             List<String> errors = new ArrayList<>();
@@ -66,16 +67,33 @@ public class RegisterApi extends HttpServlet {
             if (ObjectUtils.isEmpty(registerRequest.getPassword())) {
                 errors.add("password is empty");
             }
+
+            if (!accountDAO.isValidEmail(registerRequest.getEmail())) {
+                List<String> error = new ArrayList<>();
+                error.add("Email không hợp lệ!");
+                ErrorResponse errorResponse = new ErrorResponse(error);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+                return;
+            }
+
+            if (!registerRequest.getConfirmPassword().equals(registerRequest.getPassword())) {
+                List<String> error = new ArrayList<>();
+                error.add("Mật khẩu không trùng khớp!");
+                ErrorResponse errorResponse = new ErrorResponse(error);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+                return;
+            }
+
             if (errors.size() > 0) {
                 ErrorResponse errorResponse = new ErrorResponse(errors);
                 ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
                 return;
             }
             accountService.registerAccount(registerRequest, resp);
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_CREATED, gson.toJson("Registration successful"));
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_CREATED, gson.toJson("Đăng ký thành công!"));
         } catch (Exception e) {
             e.printStackTrace();
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("An error occurred"));
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Có lỗi xảy ra!"));
         }
     }
 }

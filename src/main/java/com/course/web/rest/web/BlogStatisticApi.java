@@ -48,17 +48,46 @@ public class BlogStatisticApi extends BaseServlet {
                 Long id = Long.parseLong(pathInfo.substring(1));
                 handleLikeBlog(resp, id);
             } catch (NumberFormatException e) {
-                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Invalid ID format"));
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Định dạng ID không hợp lệ"));
             }
             return;
         }
-        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Invalid endpoint"));
+        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Điểm cuối không hợp lệ"));
     }
-
 
     private void handleLikeBlog(HttpServletResponse resp, Long id) throws IOException {
         try{
             blogService.likeBlog(id);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson(""));
+        }
+        catch (NotFoundException e){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson(e.getMessage()));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo(); // Get the path after /api/blogs-statistic/
+        if (pathInfo != null && pathInfo.startsWith("/")) {
+            try {
+                Long id = Long.parseLong(pathInfo.substring(1));
+                handleDeleteLikeBlog(resp, id);
+            } catch (NumberFormatException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Định dạng ID không hợp lệ"));
+            }
+            return;
+        }
+        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Điểm cuối không hợp lệ"));
+    }
+
+    private void handleDeleteLikeBlog(HttpServletResponse resp, Long id) throws ServletException, IOException {
+        try{
+            blogService.deleteLikeBlog(id);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson(""));
         }
         catch (NotFoundException e){

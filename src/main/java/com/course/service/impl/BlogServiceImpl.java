@@ -88,12 +88,25 @@ public class BlogServiceImpl implements BlogService {
     public void likeBlog(Long blogId) {
         AccountEntity currentAccount = getAuthenticatedAccount();
         BlogStatisticEntity blogStatistic = blogStatisticDAO.findById(blogId);
-        if(blogStatistic != null) {
+        if (blogStatistic != null) {
             blogStatistic.setLikes(blogStatistic.getLikes() + 1);
             blogStatistic.setAccounts(List.of(currentAccount));
             blogStatisticDAO.updateBlogStatistic(blogStatistic);
+        } else {
+            throw new NotFoundException("Không tìm thấy id của bài viết");
         }
-        else{
+    }
+
+    @Override
+    public void deleteLikeBlog(Long blogId) {
+        AccountEntity currentAccount = getAuthenticatedAccount();
+        BlogStatisticEntity blogStatistic = blogStatisticDAO.findById(blogId);
+        if (blogStatistic != null) {
+                blogStatistic.setLikes(Math.max(0,blogStatistic.getLikes() - 1));
+                blogStatistic.getAccounts().remove(currentAccount);
+                blogStatistic.setAccounts(null);
+                blogStatisticDAO.updateBlogStatistic(blogStatistic);
+        } else {
             throw new NotFoundException("Không tìm thấy id của bài viết");
         }
     }
@@ -142,5 +155,8 @@ public class BlogServiceImpl implements BlogService {
                 blogEntity.getCreateAt().toString()
         );
     }
+
+
+
 }
 
