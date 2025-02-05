@@ -16,5 +16,8 @@ public interface BlogDAO {
     PageResponse<BlogEntity> getBlogsByPage(BlogFilterRequest blogFilter);
 
     List<BlogEntity> getTopBlogsRecent();
+
+    BlogEntity findBlogById(long id);
+
 }
 
