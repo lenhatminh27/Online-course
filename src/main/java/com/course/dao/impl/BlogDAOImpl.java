@@ -6,6 +6,7 @@ import com.course.core.repository.specification.HibernateQueryHelper;
 import com.course.dao.BlogDAO;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.PageResponse;
+import com.course.entity.BlogCommentEntity;
 import com.course.entity.BlogEntity;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -115,6 +116,19 @@ public class BlogDAOImpl implements BlogDAO {
             return blogs;
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch top recent blogs", e);
+        }
+    }
+
+    @Override
+    public BlogEntity findBlogById(long id) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM BlogEntity b WHERE b.id = :id";
+            return session.createQuery(hql, BlogEntity.class)
+                    .setParameter("id", id)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
