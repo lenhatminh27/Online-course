@@ -11,7 +11,7 @@
   </div>
   <div class="w3-bar-block">
     <a href="/instructor" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Trang chủ</a>
-    <a href="#showcase" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Khóa học</a>
+    <a href="/instructor/blogs?action=create" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Khóa học</a>
     <a href="/instructor/blogs" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Blog</a>
   </div>
 </nav>

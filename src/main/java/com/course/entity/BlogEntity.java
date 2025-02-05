@@ -35,9 +35,6 @@ public class BlogEntity {
 
     @Column(name = "create_by")
     private String createBy;
-
-    @Column(name = "views")
-    private Long views;
     
     @Column(name = "create_at", updatable = false)
     @CreationTimestamp

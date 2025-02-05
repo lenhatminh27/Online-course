@@ -55,7 +55,7 @@ public class AccountServiceImpl implements AccountService {
         Gson gson = new Gson();
         if (accountDAO.existsByEmail(registerRequest.getEmail())) {
             List<String> error = new ArrayList<>();
-            error.add("Email already exists");
+            error.add("Email đã tồn tại!");
             ErrorResponse errorResponse = new ErrorResponse(error);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
             return;
