@@ -6,15 +6,18 @@ import com.course.common.utils.ResponseUtils;
 import com.course.core.repository.data.Sort;
 import com.course.dao.AccountDAO;
 import com.course.dao.BlogDAO;
+import com.course.dao.BlogStatisticDAO;
 import com.course.dao.TagDAO;
 import com.course.dao.impl.AccountDaoImpl;
 import com.course.dao.impl.BlogDAOImpl;
+import com.course.dao.impl.BlogStatisticDAOImpl;
 import com.course.dao.impl.TagDAOImpl;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
+import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -45,7 +48,8 @@ public class BlogApi extends BaseServlet {
         BlogDAO blogDAO = new BlogDAOImpl();
         AccountDAO accountDAO = new AccountDaoImpl();
         TagDAO tagDAO = new TagDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO);
+        BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
+        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO);
     }
 
     @Override
@@ -138,4 +142,6 @@ public class BlogApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
     }
+
+
 }

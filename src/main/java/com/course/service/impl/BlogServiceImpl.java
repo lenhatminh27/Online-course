@@ -3,6 +3,7 @@ package com.course.service.impl;
 import com.course.common.utils.StringUtils;
 import com.course.dao.AccountDAO;
 import com.course.dao.BlogDAO;
+import com.course.dao.BlogStatisticDAO;
 import com.course.dao.TagDAO;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
@@ -12,7 +13,9 @@ import com.course.dto.response.PageResponse;
 import com.course.dto.response.TagResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.BlogEntity;
+import com.course.entity.BlogStatisticEntity;
 import com.course.entity.TagEntity;
+import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogService;
 
@@ -26,11 +29,13 @@ public class BlogServiceImpl implements BlogService {
     private final BlogDAO blogDAO;
     private final AccountDAO accountDAO;
     private final TagDAO tagDAO;
+    private final BlogStatisticDAO blogStatisticDAO;
 
-    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO) {
+    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO, BlogStatisticDAO blogStatisticDAO) {
         this.blogDAO = blogDAO;
         this.accountDAO = accountDAO;
         this.tagDAO = tagDAO;
+        this.blogStatisticDAO = blogStatisticDAO;
     }
 
     @Override
@@ -48,8 +53,13 @@ public class BlogServiceImpl implements BlogService {
         blogEntity.setContent(blogCreateRequest.getContent());
         blogEntity.setCreateBy(account.getEmail());
         blogEntity.setUpdatedAt(LocalDateTime.now());
-
-        return convertToBlogResponse(blogDAO.createBlog(blogEntity));
+        BlogEntity blogSave = blogDAO.createBlog(blogEntity);
+        BlogStatisticEntity bsEntity = new BlogStatisticEntity();
+        bsEntity.setBlog(blogSave);
+        bsEntity.setLikes(0L);
+        bsEntity.setViews(0L);
+        this.blogStatisticDAO.createBlogStatistic(bsEntity);
+        return convertToBlogResponse(blogSave);
     }
 
     @Override
@@ -72,6 +82,33 @@ public class BlogServiceImpl implements BlogService {
         return blogDAO.getTopBlogsRecent().stream()
                 .map(this::convertToBlogResponse)
                 .toList();
+    }
+
+    @Override
+    public void likeBlog(Long blogId) {
+        AccountEntity currentAccount = getAuthenticatedAccount();
+        BlogStatisticEntity blogStatistic = blogStatisticDAO.findById(blogId);
+        if (blogStatistic != null) {
+            blogStatistic.setLikes(blogStatistic.getLikes() + 1);
+            blogStatistic.setAccounts(List.of(currentAccount));
+            blogStatisticDAO.updateBlogStatistic(blogStatistic);
+        } else {
+            throw new NotFoundException("Không tìm thấy id của bài viết");
+        }
+    }
+
+    @Override
+    public void deleteLikeBlog(Long blogId) {
+        AccountEntity currentAccount = getAuthenticatedAccount();
+        BlogStatisticEntity blogStatistic = blogStatisticDAO.findById(blogId);
+        if (blogStatistic != null) {
+                blogStatistic.setLikes(Math.max(0,blogStatistic.getLikes() - 1));
+                blogStatistic.getAccounts().remove(currentAccount);
+                blogStatistic.setAccounts(null);
+                blogStatisticDAO.updateBlogStatistic(blogStatistic);
+        } else {
+            throw new NotFoundException("Không tìm thấy id của bài viết");
+        }
     }
 
     private AccountEntity getAuthenticatedAccount() {
@@ -118,5 +155,8 @@ public class BlogServiceImpl implements BlogService {
                 blogEntity.getCreateAt().toString()
         );
     }
+
+
+
 }
 

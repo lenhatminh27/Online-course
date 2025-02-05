@@ -14,4 +14,7 @@ public interface AccountDAO {
     AccountEntity update(AccountEntity account);
 
     AccountProfileEntity saveAccountProfile(AccountProfileEntity accountProfile);
+
+    public boolean isValidEmail(String email);
+
 }

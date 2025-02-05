@@ -87,4 +87,14 @@ public class AccountDaoImpl implements AccountDAO {
         }
     }
 
+    public boolean isValidEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        // Regex để kiểm tra email chuẩn xác hơn
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(regex);
+    }
+
+
 }

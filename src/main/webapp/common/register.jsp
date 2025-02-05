@@ -112,7 +112,7 @@
             if (!lastName) errors.push('Last name is required');
             if (!email) errors.push('Email is required');
             if (!password) errors.push('Password is required');
-            if (password !== confirmPassword) errors.push('Passwords do not match');
+            if (password !== confirmPassword) errors.push('Mật khẩu không trùng khớp!');
 
             if (errors.length > 0) {
                 errorMessageDiv.textContent = errors.join(', ');
