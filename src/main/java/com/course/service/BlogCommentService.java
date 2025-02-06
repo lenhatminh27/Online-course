@@ -6,4 +6,6 @@ import com.course.dto.response.BlogCommentResponse;
 
 public interface BlogCommentService {
     BlogCommentResponse createBlogComment(BlogCommentCreateRequest blogCommentCreateRequest);
+
+    BlogCommentResponse updateBlogComment(BlogCommentUpdateRequest blogCommentUpdateRequest);
 }
