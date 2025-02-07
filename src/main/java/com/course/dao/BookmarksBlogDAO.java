@@ -1,7 +1,5 @@
 package com.course.dao;
 
-import com.course.dto.request.BookmarksBlogRequest;
-import com.course.entity.BlogEntity;
 import com.course.entity.BookmarksBlogEntity;
 
 public interface BookmarksBlogDAO {

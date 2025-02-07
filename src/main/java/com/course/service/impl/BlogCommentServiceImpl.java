@@ -1,6 +1,5 @@
 package com.course.service.impl;
 
-import com.course.common.utils.ResponseUtils;
 import com.course.dao.AccountDAO;
 import com.course.dao.BlogCommentDAO;
 import com.course.dao.BlogDAO;
@@ -12,9 +11,9 @@ import com.course.entity.AccountEntity;
 import com.course.entity.BlogCommentEntity;
 import com.course.entity.BlogEntity;
 import com.course.exceptions.ForbiddenException;
+import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogCommentService;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,6 +61,20 @@ public class BlogCommentServiceImpl implements BlogCommentService {
         blogComment.setContent(blogCommentUpdateRequest.getContent());
         blogCommentDAO.updateBlogComment(blogComment);
         return convertToBlogCommentResponse(blogComment);
+    }
+
+    @Override
+    public List<BlogCommentResponse> getListCommentByBlogSlug(String slug) {
+        BlogEntity blogEntity = blogDAO.findBlogBySlug(slug);
+        if (blogEntity == null) {
+            return new ArrayList<>();
+        }
+        List<BlogCommentEntity> list = blogCommentDAO.findListCommentByBlogSlug(slug);
+        List<BlogCommentResponse> responseList = new ArrayList<>();
+        for (BlogCommentEntity blogCommentEntity : list) {
+            responseList.add(convertToBlogCommentResponse(blogCommentEntity));
+        }
+        return responseList;
     }
 
     private BlogCommentResponse convertToBlogCommentResponse(BlogCommentEntity blogCommentEntity) {

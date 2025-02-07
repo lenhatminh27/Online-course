@@ -51,4 +51,19 @@ public class BlogStatisticDAOImpl implements BlogStatisticDAO {
             throw new RuntimeException("Failed to find blog by ID: " + id, e);
         }
     }
+
+    @Override
+    public boolean existsByIdAccount(Long accountId, Long blogId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(a) FROM BlogStatisticEntity b JOIN b.accounts a WHERE a.id = :accountId AND b.id = :blogId";
+            Long count = session.createQuery(hql, Long.class)
+                    .setParameter("accountId", accountId)
+                    .setParameter("blogId", blogId)
+                    .uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to check if account exists in blog statistics", e);
+        }
+    }
 }

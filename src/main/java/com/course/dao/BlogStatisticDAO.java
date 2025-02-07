@@ -9,4 +9,6 @@ public interface BlogStatisticDAO {
     BlogStatisticEntity updateBlogStatistic(BlogStatisticEntity blogStatistic);
 
     BlogStatisticEntity findById(Long id);
+
+    boolean existsByIdAccount(Long id, Long blogId);
 }

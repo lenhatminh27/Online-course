@@ -7,6 +7,7 @@ import com.course.entity.BlogEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.Collections;
 import java.util.List;
 
 public class BlogCommentDAOImpl implements BlogCommentDAO {
@@ -43,13 +44,39 @@ public class BlogCommentDAOImpl implements BlogCommentDAO {
     @Override
     public List<BlogCommentEntity> findAllChildrenBlogComments(Long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            String hql = "FROM BlogCommentEntity b WHERE b.parentId = :id";
+            String hql = "FROM BlogCommentEntity b WHERE b.parentComment.id = :id";
             return session.createQuery(hql, BlogCommentEntity.class)
                     .setParameter("id", id)
                     .getResultList();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Long findNumberCommentOfBlog(Long blogId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(b.id) FROM BlogCommentEntity b WHERE b.blog.id = :blogId";
+            return session.createQuery(hql, Long.class)
+                    .setParameter("blogId", blogId)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+
+    @Override
+    public List<BlogCommentEntity> findListCommentByBlogSlug(String slug) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM BlogCommentEntity b WHERE b.blog.slug = :slug ORDER BY b.createAt DESC";
+            return session.createQuery(hql, BlogCommentEntity.class)
+                    .setParameter("slug", slug)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 
