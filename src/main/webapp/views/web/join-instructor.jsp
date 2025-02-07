@@ -71,7 +71,33 @@
                     <li>Nền tảng có quyền chấm dứt hợp tác nếu phát hiện vi phạm chính sách nghiêm trọng.</li>
                     <li>Giảng viên có thể yêu cầu chấm dứt hợp tác bằng cách gửi thông báo trước 30 ngày.</li>
                 </ul>
-                <h3>5. Cam kết:</h3>
+                <h3>5. Bảo mật thông tin:</h3>
+                <ul>
+                    <li>Giảng viên phải bảo mật mọi thông tin cá nhân và dữ liệu của học viên mà họ tiếp cận được trong khi thực hiện nhiệm vụ.</li>
+                    <li>Không được chia sẻ thông tin cá nhân của học viên với bên thứ ba không được phép.</li>
+                </ul>
+                <h3>6. Yêu cầu kỹ thuật:</h3>
+                <ul>
+                    <li>Giảng viên phải sử dụng thiết bị và phần mềm đáp ứng các tiêu chuẩn kỹ thuật do nền tảng yêu cầu.</li>
+                    <li>Cần đảm bảo kết nối internet ổn định để duy trì chất lượng giảng dạy không bị gián đoạn.</li>
+                    <li>Phải tuân thủ các quy định về bảo mật kỹ thuật nhằm bảo vệ thông tin cá nhân và dữ liệu của học viên.</li>
+                </ul>
+                <h3>7. Phát triển chuyên môn liên tục:</h3>
+                <ul>
+                    <li>Giảng viên cam kết tham gia vào các khóa đào tạo và hội thảo để nâng cao kỹ năng giảng dạy.</li>
+                    <li>Giảng viên phải cập nhật kiến thức chuyên môn theo định kỳ để đảm bảo nội dung giảng dạy luôn cập nhật và chính xác.</li>
+                </ul>
+                <h3>8. Xử lý phản hồi từ học viên:</h3>
+                <ul>
+                    <li>Giảng viên phải xem xét và phản hồi đối với tất cả phản hồi từ học viên một cách nghiêm túc và kịp thời.</li>
+                    <li>Nền tảng cung cấp hệ thống để giảng viên có thể quản lý và trả lời phản hồi một cách hiệu quả.</li>
+                </ul>
+                <h3>9. Giải quyết tranh chấp:</h3>
+                <ul>
+                    <li>Trong trường hợp xảy ra tranh chấp giữa giảng viên và học viên hoặc nền tảng, các bên cam kết thực hiện giải quyết một cách công bằng và khách quan.</li>
+                    <li>Nền tảng có quy định và cơ chế để hỗ trợ giải quyết tranh chấp, bao gồm cả trọng tài và hòa giải nếu cần.</li>
+                </ul>
+                <h3>10. Cam kết:</h3>
                 <ul>
                     <li>Giảng viên cam kết tuân thủ các điều khoản, chính sách và hợp tác minh bạch.</li>
                 </ul>
@@ -79,9 +105,7 @@
                     <input type="checkbox" id="agree-terms">
                     <label for="agree-terms">Tôi đã đọc và đồng ý với các điều khoản trên.</label>
                 </div>
-                <button name="button" type="submit" class="genric-btn danger">Tôi đồng ý với các điều khoản và hợp đồng
-                    trên
-                </button>
+                <button name="button" type="submit" class="genric-btn danger">Xác nhận</button>
             </form>
 
         </div>
@@ -89,8 +113,8 @@
 </main>
 <%@include file="../../common/web/footer.jsp" %>
 <script type="module">
-    import { environment, STORAGE_KEY, avatarDefault } from "../../assets/config/env.js";
-    import { apiRequestWithToken } from "../../assets/config/service.js";
+    import {environment, STORAGE_KEY, avatarDefault} from "../../assets/config/env.js";
+    import {apiRequestWithToken} from "../../assets/config/service.js";
 
     document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById("to-instructor");
