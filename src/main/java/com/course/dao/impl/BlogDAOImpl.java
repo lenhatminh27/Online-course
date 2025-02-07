@@ -131,4 +131,14 @@ public class BlogDAOImpl implements BlogDAO {
             return null;
         }
     }
+
+    @Override
+    public BlogEntity getBlogByBlogId(Long blogId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            return session.get(BlogEntity.class, blogId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi lấy bài viết bằng blogId", e);
+        }
+    }
 }
