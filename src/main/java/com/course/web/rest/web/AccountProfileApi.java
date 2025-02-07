@@ -58,7 +58,7 @@ public class AccountProfileApi extends BaseServlet {
         resp.setCharacterEncoding("UTF-8");
 
         try {
-            AccountProfileRequest body = gson.fromJson(req.getReader(), AccountProfileRequest.class);
+            AccountProfileRequest   body = gson.fromJson(req.getReader(), AccountProfileRequest.class);
             List<String> errors = new ArrayList<>();
             if (ObjectUtils.isEmpty(body.getLastName())) {
                 errors.add("Họ phải được yêu cầu");

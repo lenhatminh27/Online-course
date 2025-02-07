@@ -18,6 +18,6 @@ public interface BlogDAO {
     List<BlogEntity> getTopBlogsRecent();
 
     BlogEntity findBlogById(long id);
-
+    BlogEntity getBlogByBlogId(Long blogId);
 }
 
