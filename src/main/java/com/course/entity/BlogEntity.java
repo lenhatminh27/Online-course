@@ -44,6 +44,9 @@ public class BlogEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @OneToOne(mappedBy = "blog", fetch = FetchType.LAZY)
+    private BlogStatisticEntity blogStatistic;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private AccountEntity account;

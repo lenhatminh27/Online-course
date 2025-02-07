@@ -10,4 +10,6 @@ public interface PermissionDAO {
     List<Long> getPermissionByRoleID(Long roleID);
 
     List<PermissionEntity> findAllByIds(List<Long> permissionIDs);
+
+    PermissionEntity findById(Long permissionID);
 }

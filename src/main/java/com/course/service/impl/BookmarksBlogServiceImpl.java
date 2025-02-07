@@ -31,18 +31,14 @@ public class BookmarksBlogServiceImpl implements BookmarksBlogService {
         if (bookmarksBlogDAO.existsBookmarkBlogId(bookmarksBlogRequest.getBlogId(), accountCurrent.getId())) {
             throw new NotFoundException("Không tìm thấy bài viết có id = " + bookmarksBlogRequest.getBlogId() + "!");
         }
-
-        BlogEntity blog = blogDAO.getBlogByBlogId(bookmarksBlogRequest.getBlogId());
+        BlogEntity blog = blogDAO.findBlogById(bookmarksBlogRequest.getBlogId());
         if (blog == null) {
             throw new NotFoundException("Bài viết không tồn tại!");
         }
-
         BookmarksBlogEntity newBookmark = new BookmarksBlogEntity();
         newBookmark.setAccount(accountCurrent);
         newBookmark.setBlog(blog);
         bookmarksBlogDAO.save(newBookmark);
-
-        // Trả về response
     }
 }
 

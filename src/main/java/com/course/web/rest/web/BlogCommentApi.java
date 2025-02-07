@@ -12,13 +12,10 @@ import com.course.dto.request.BlogCommentCreateRequest;
 import com.course.dto.request.BlogCommentUpdateRequest;
 import com.course.dto.response.BlogCommentResponse;
 import com.course.dto.response.ErrorResponse;
-import com.course.entity.AccountEntity;
-import com.course.entity.BlogCommentEntity;
 import com.course.exceptions.ForbiddenException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
-import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogCommentService;
 import com.course.service.impl.BlogCommentServiceImpl;
 import com.google.gson.Gson;
@@ -54,6 +51,24 @@ public class BlogCommentApi extends BaseServlet {
         blogCommentService = new BlogCommentServiceImpl(blogDAO, accountDAO, blogCommentDAO);
     }
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.startsWith("/")) {
+            try {
+                String slug = pathInfo.substring(1);
+                List<BlogCommentResponse> listComment = blogCommentService.getListCommentByBlogSlug(slug);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(listComment));
+            }
+            catch (Exception e){
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server error"));
+            }
+            return;
+        }
+        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Điểm cuối không hợp lệ"));
+    }
 
     @Override
     @IsAuthenticated

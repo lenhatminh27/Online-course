@@ -91,8 +91,11 @@ public class BlogDAOImpl implements BlogDAO {
                     BlogEntity.class
             );
             List<BlogEntity> blogs = query.getResultList();
-            blogs.forEach(blog -> Hibernate.initialize(blog.getTags()));
-            blogs.forEach(blog -> Hibernate.initialize(blog.getAccount()));
+            blogs.forEach(blog -> {
+                Hibernate.initialize(blog.getTags());
+                Hibernate.initialize(blog.getAccount());
+                Hibernate.initialize(blog.getBlogStatistic());
+            });
             Query<Long> countQuery = HibernateQueryHelper.buildCountQuery(session, baseHql, parameters, "b");
             long totalElements = countQuery.uniqueResult();
             int totalPages = (int) Math.ceil((double) totalElements / blogFilter.getSize());
@@ -111,8 +114,11 @@ public class BlogDAOImpl implements BlogDAO {
             Query<BlogEntity> query = session.createQuery(hql, BlogEntity.class)
                     .setMaxResults(4);
             List<BlogEntity> blogs = query.getResultList();
-            blogs.forEach(blog -> Hibernate.initialize(blog.getTags()));
-            blogs.forEach(blog -> Hibernate.initialize(blog.getAccount()));
+            blogs.forEach(blog -> {
+                Hibernate.initialize(blog.getTags());
+                Hibernate.initialize(blog.getAccount());
+                Hibernate.initialize(blog.getBlogStatistic());
+            });;
             return blogs;
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch top recent blogs", e);
@@ -123,9 +129,13 @@ public class BlogDAOImpl implements BlogDAO {
     public BlogEntity findBlogById(long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             String hql = "FROM BlogEntity b WHERE b.id = :id";
-            return session.createQuery(hql, BlogEntity.class)
+            BlogEntity blog = session.createQuery(hql, BlogEntity.class)
                     .setParameter("id", id)
                     .uniqueResult();
+            Hibernate.initialize(blog.getTags());
+            Hibernate.initialize(blog.getAccount());
+            Hibernate.initialize(blog.getBlogStatistic());
+            return blog;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -133,12 +143,19 @@ public class BlogDAOImpl implements BlogDAO {
     }
 
     @Override
-    public BlogEntity getBlogByBlogId(Long blogId) {
+    public BlogEntity findBlogBySlug(String slug) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            return session.get(BlogEntity.class, blogId);
+            String hql = "FROM BlogEntity b WHERE b.slug = :slug";
+            Query<BlogEntity> query = session.createQuery(hql, BlogEntity.class)
+                    .setParameter("slug", slug);
+            BlogEntity blog = query.uniqueResult();
+            Hibernate.initialize(blog.getTags());
+            Hibernate.initialize(blog.getAccount());
+            Hibernate.initialize(blog.getBlogStatistic());
+            return blog;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Lỗi khi lấy bài viết bằng blogId", e);
+            return null;
         }
     }
 }

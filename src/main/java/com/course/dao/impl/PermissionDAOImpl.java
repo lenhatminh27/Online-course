@@ -51,5 +51,15 @@ public class PermissionDAOImpl implements PermissionDAO {
             return new ArrayList<>();
         }
     }
+
+    @Override
+    public PermissionEntity findById(Long id) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            return session.get(PermissionEntity.class, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
 
