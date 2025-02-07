@@ -12,10 +12,11 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BlogCommentUpdateRequest implements Serializable {
+
+public class BookmarksBlogRequest implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private String content;
+    private Long blogId;
 }

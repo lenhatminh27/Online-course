@@ -4,14 +4,8 @@ import com.course.common.constants.PageConstant;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.core.repository.data.Sort;
-import com.course.dao.AccountDAO;
-import com.course.dao.BlogDAO;
-import com.course.dao.BlogStatisticDAO;
-import com.course.dao.TagDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.BlogDAOImpl;
-import com.course.dao.impl.BlogStatisticDAOImpl;
-import com.course.dao.impl.TagDAOImpl;
+import com.course.dao.*;
+import com.course.dao.impl.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.BlogResponse;
@@ -49,7 +43,9 @@ public class BlogApi extends BaseServlet {
         AccountDAO accountDAO = new AccountDaoImpl();
         TagDAO tagDAO = new TagDAOImpl();
         BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO);
+        BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
+        BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
+        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO);
     }
 
     @Override

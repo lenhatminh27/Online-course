@@ -1,14 +1,8 @@
 package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.BlogDAO;
-import com.course.dao.BlogStatisticDAO;
-import com.course.dao.TagDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.BlogDAOImpl;
-import com.course.dao.impl.BlogStatisticDAOImpl;
-import com.course.dao.impl.TagDAOImpl;
+import com.course.dao.*;
+import com.course.dao.impl.*;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -36,7 +30,9 @@ public class BlogStatisticApi extends BaseServlet {
         AccountDAO accountDAO = new AccountDaoImpl();
         TagDAO tagDAO = new TagDAOImpl();
         BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO);
+        BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
+        BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
+        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO);
     }
 
     @Override

@@ -19,5 +19,6 @@ public interface BlogDAO {
 
     BlogEntity findBlogById(long id);
 
+    BlogEntity findBlogBySlug(String slug);
 }
 

@@ -42,6 +42,9 @@ function apiRequest(url, options = {}) {
             console.log('Catch block triggered:', error);
             if (error.response) {
                 switch (error.response.status) {
+                    case 404:
+                        window.location.assign('/404');
+                        break;
                     case 403:
                         window.location.assign('/403');
                         break;

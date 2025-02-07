@@ -1,10 +1,8 @@
 package com.course.service.impl;
 
+import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.StringUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.BlogDAO;
-import com.course.dao.BlogStatisticDAO;
-import com.course.dao.TagDAO;
+import com.course.dao.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.AccountResponse;
@@ -16,6 +14,7 @@ import com.course.entity.BlogEntity;
 import com.course.entity.BlogStatisticEntity;
 import com.course.entity.TagEntity;
 import com.course.exceptions.NotFoundException;
+import com.course.security.context.AuthenticationContext;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogService;
 
@@ -30,12 +29,16 @@ public class BlogServiceImpl implements BlogService {
     private final AccountDAO accountDAO;
     private final TagDAO tagDAO;
     private final BlogStatisticDAO blogStatisticDAO;
+    private final BlogCommentDAO blogCommentDAO;
+    private final BookmarksBlogDAO bookmarksBlogDAO;
 
-    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO, BlogStatisticDAO blogStatisticDAO) {
+    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO, BlogStatisticDAO blogStatisticDAO, BlogCommentDAO blogCommentDAO, BookmarksBlogDAO bookmarksBlogDAO) {
         this.blogDAO = blogDAO;
         this.accountDAO = accountDAO;
         this.tagDAO = tagDAO;
         this.blogStatisticDAO = blogStatisticDAO;
+        this.blogCommentDAO = blogCommentDAO;
+        this.bookmarksBlogDAO = bookmarksBlogDAO;
     }
 
     @Override
@@ -111,6 +114,31 @@ public class BlogServiceImpl implements BlogService {
         }
     }
 
+    @Override
+    public BlogResponse findBlogBySlug(String slug) {
+        BlogEntity blogEntity = blogDAO.findBlogBySlug(slug);
+        if (ObjectUtils.isEmpty(blogEntity)) {
+            throw new NotFoundException("Không tìm thấy slug của bài viết");
+        }
+        BlogResponse blogResponse = convertToBlogResponse(blogEntity);
+        BlogStatisticEntity blogStatistic = blogEntity.getBlogStatistic();
+        AuthenticationContext context = AuthenticationContextHolder.getContext();
+        if (ObjectUtils.isEmpty(context)){
+            blogResponse.setIsLike(false);
+            blogResponse.setIsBookmark(false);
+        }
+        else{
+            AccountEntity accountCurrent = getAuthenticatedAccount();
+            blogResponse.setIsLike(blogStatisticDAO.existsByIdAccount(accountCurrent.getId(), blogEntity.getId()));
+            blogResponse.setIsBookmark(bookmarksBlogDAO.existsBookmarkBlogId(blogEntity.getId(), accountCurrent.getId()));
+        }
+        blogResponse.setLikesCount(blogStatistic.getLikes());
+        blogResponse.setViewsCount(blogStatistic.getViews());
+        blogResponse.setCommentsCount(blogCommentDAO.findNumberCommentOfBlog(blogEntity.getId()));
+        blogResponse.setIsBookmark(false);
+        return blogResponse;
+    }
+
     private AccountEntity getAuthenticatedAccount() {
         String email = AuthenticationContextHolder.getContext().getEmail();
         return accountDAO.findByEmail(email);
@@ -155,8 +183,6 @@ public class BlogServiceImpl implements BlogService {
                 blogEntity.getCreateAt().toString()
         );
     }
-
-
 
 }
 

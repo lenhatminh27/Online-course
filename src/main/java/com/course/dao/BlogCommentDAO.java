@@ -11,4 +11,10 @@ public interface BlogCommentDAO {
     BlogCommentEntity findBlogCommentById(Long id);
 
     List<BlogCommentEntity> findAllChildrenBlogComments(Long id);
+
+    void updateBlogComment(BlogCommentEntity blogComment);
+
+    Long findNumberCommentOfBlog(Long id);
+
+    List<BlogCommentEntity> findListCommentByBlogSlug(String slug);
 }
