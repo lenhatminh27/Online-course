@@ -12,6 +12,7 @@ import com.course.dto.request.BlogCommentCreateRequest;
 import com.course.dto.request.BlogCommentUpdateRequest;
 import com.course.dto.response.BlogCommentResponse;
 import com.course.dto.response.ErrorResponse;
+import com.course.entity.BlogCommentEntity;
 import com.course.exceptions.ForbiddenException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -147,6 +148,38 @@ public class BlogCommentApi extends BaseServlet {
         catch (Exception e) {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("DELETE_COMMENT_BLOG")
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo(); // lấy đường dẫn của comment
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của comment không được để trống"));
+            return;
+        }
+
+        Long commentId; // chuyển commentId sang dạng Long
+        try {
+            commentId = Long.parseLong(pathInfo.substring(1));
+        } catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của comment không hợp lệ"));
+            return;
+        }
+
+        // thực hiện việc xóa comment
+        try {
+            blogCommentService.deleteBlogComment(commentId);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("Xóa comment thành công"));
+        } catch (ForbiddenException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
         }
     }
 }

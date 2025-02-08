@@ -17,4 +17,6 @@ public interface BlogCommentDAO {
     Long findNumberCommentOfBlog(Long id);
 
     List<BlogCommentEntity> findListCommentByBlogSlug(String slug);
+
+    void deleteBlogComment(BlogCommentEntity blogComment);
 }
