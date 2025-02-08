@@ -2,6 +2,7 @@ package com.course.dao;
 
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.PageResponse;
+import com.course.entity.BlogCommentEntity;
 import com.course.entity.BlogEntity;
 
 import java.util.List;

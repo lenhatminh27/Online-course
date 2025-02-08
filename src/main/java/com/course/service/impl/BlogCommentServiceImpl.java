@@ -10,6 +10,7 @@ import com.course.dto.response.BlogCommentResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.BlogCommentEntity;
 import com.course.entity.BlogEntity;
+import com.course.entity.enums.ERole;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
@@ -76,6 +77,29 @@ public class BlogCommentServiceImpl implements BlogCommentService {
         }
         return responseList;
     }
+
+    @Override
+    public void deleteBlogComment(Long blogCommentId) {
+
+
+        // Lấy thông tin tài khoản hiện tại từ context
+        AccountEntity account = accountDAO.findByEmail(AuthenticationContextHolder.getContext().getEmail());
+
+        // Tìm comment theo ID
+        BlogCommentEntity blogComment = blogCommentDAO.findBlogCommentById(blogCommentId);
+        if (blogComment == null) {
+            throw new ForbiddenException("Comment không tồn tại");
+        }
+
+        // Kiểm tra quyền xóa: chỉ chủ sở hữu bình luận hoặc admin mới được xóa
+        if (!AuthenticationContextHolder.getContext().getAuthorities().contains("ADMIN") && !account.getId().equals(blogComment.getAccount().getId())) {
+            throw new ForbiddenException("Bạn không có quyền xóa comment này");
+        }
+
+        // Xóa bình luận gốc
+        blogCommentDAO.deleteBlogComment(blogComment);
+    }
+
 
     private BlogCommentResponse convertToBlogCommentResponse(BlogCommentEntity blogCommentEntity) {
         AccountResponse accountResponse = convertToAccountResponse(blogCommentEntity.getAccount());

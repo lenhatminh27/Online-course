@@ -11,4 +11,6 @@ public interface BlogCommentService {
     BlogCommentResponse updateBlogComment(BlogCommentUpdateRequest blogCommentUpdateRequest);
 
     List<BlogCommentResponse> getListCommentByBlogSlug(String slug);
+
+    void deleteBlogComment(Long commentId);
 }

@@ -95,4 +95,20 @@ public class BlogCommentDAOImpl implements BlogCommentDAO {
             throw new RuntimeException("Failed to update blog comment", e);
         }
     }
+
+    @Override
+    public void deleteBlogComment(BlogCommentEntity blogComment) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.delete(blogComment);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Xóa comment thất bại", e);
+        }
+    }
 }
