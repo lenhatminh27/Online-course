@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-<!-- ? Preloader Start -->
+<!-- Preloader Start -->
 <div id="preloader-active">
     <div class="preloader d-flex align-items-center justify-content-center">
         <div class="preloader-inner position-relative">
@@ -38,14 +38,11 @@
         </div>
     </div>
 </div>
-<!-- Preloader Start-->
+<!-- Preloader End -->
 
-
-<!-- Register -->
-
+<!-- Main content -->
 <main class="login-body" style="background: linear-gradient(to bottom, #e6e0ea, #b8c2ed);">
-    <!-- Đăng ký Admin -->
-    <form class="form-default" id="register-form">
+    <form class="form-default" id="reset-password-form">
 
         <div class="login-form">
 
@@ -53,114 +50,91 @@
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Đăng Ký Tại Đây</h2>
-            <div id="error">
-
-            </div>
-            <div class="form-input">
-                <label for="firstname">Tên</label>
-                <input type="text" name="name" id="firstname" placeholder="Tên">
-            </div>
-            <div class="form-input">
-                <label for="lastname">Họ</label>
-                <input type="text" name="name" id="lastname" placeholder="Họ">
-            </div>
-            <div class="form-input">
-                <label for="email">Địa chỉ Email</label>
-                <input type="email" name="email" id="email" placeholder="Địa chỉ Email">
-            </div>
+            <h2>Mật khẩu mới</h2>
+            <span id="message" style="color: green; margin-bottom: 10px"></span>
+            <div id="errorMessage" style="color: red; margin-bottom: 10px"></div>
             <div class="form-input">
                 <label for="password">Mật khẩu</label>
-                <input type="password" name="password" id="password" placeholder="Mật khẩu">
+                <input type="password" name="password" id="password" placeholder="Nhập mật khẩu" required>
             </div>
             <div class="form-input">
-                <label for="confirmpassword">Xác nhận mật khẩu</label>
-                <input type="password" name="password" id="confirmpassword" placeholder="Xác nhận mật khẩu">
+                <label for="confirmPassword">Xác nhận mật khẩu</label>
+                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Xác nhận mật khẩu"
+                       required>
             </div>
+
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="Đăng Ký">
+                <input type="submit" name="submit" value="Cập nhật mật khẩu">
             </div>
-            <!-- Quên mật khẩu -->
+            <!-- Quay lại đăng nhập -->
             <a href="login" class="registration">Đăng nhập</a>
         </div>
     </form>
-    <!-- /kết thúc form đăng ký -->
 </main>
-
 
 <script type="module">
 
-    import {environment} from '../assets/config/env.js';
+    import {environment} from "../assets/config/env.js";
+    import {apiRequestWithToken} from "../assets/config/service.js";
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const registerForm = document.getElementById('register-form');
-        const errorMessageDiv = document.querySelector('#error');
-        errorMessageDiv.style.color = 'red';
+    document.addEventListener('DOMContentLoaded', function () {
+        async function resetPassword(event) {
+            event.preventDefault();
+            const formData = new FormData(document.querySelector('form'));
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
 
-        registerForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const firstName = document.getElementById('firstname').value;
-            const lastName = document.getElementById('lastname').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmpassword').value;
-
-            // Validate the inputs
-            let errors = [];
-            if (!firstName) errors.push('First name is required');
-            if (!lastName) errors.push('Last name is required');
-            if (!email) errors.push('Email is required');
-            if (!password) errors.push('Password is required');
-            if (password !== confirmPassword) errors.push('Mật khẩu không trùng khớp!');
-
-            if (errors.length > 0) {
-                errorMessageDiv.textContent = errors.join(', ');
+            if (!password || !confirmPassword) {
+                document.getElementById('errorMessage').textContent = "Mật khẩu không được để trống!";
                 return;
             }
 
-            const data = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                password: password,
+            if (password !== confirmPassword) {
+                document.getElementById('errorMessage').textContent = "Mật khẩu không trùng khớp!";
+                return;
+            }
+
+            const payload = {
+                token,
+                newPassword: password,
                 confirmPassword: confirmPassword
             };
 
             try {
-                const response = await fetch(environment.apiUrl + '/register', {
-                    method: 'POST',
+                const response = await fetch(environment.apiUrl + "/api/reset-password", {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(payload)
                 });
 
-                if (response.ok) {
-                    window.location.href = '/login';
-                } else {
+                if (!response.ok) {
+                    const message = document.getElementById('message');
+                    message.textContent = "";
                     const errorData = await response.json();
-                    let errorMess = "";
-                    for (const x of errorData.error) {
-                        errorMess += x;
-                    }
-                    errorMessageDiv.textContent = errorMess;
+                    document.getElementById('errorMessage').textContent = errorData;
+                    return;
                 }
+
+                document.getElementById('message').textContent = "Đặt lại mật khẩu thành công!";
+                document.getElementById('errorMessage').textContent = "";
+
+                setTimeout(() => {
+                    window.location.assign('/login');
+                }, 2000);
+
             } catch (error) {
-                errorMessageDiv.textContent = 'An error occurred. Please try again later.';
+                document.getElementById('errorMessage').textContent = error.message;
+                document.getElementById('message').textContent = "";
             }
-        });
+        }
+
+        document.querySelector('form').addEventListener('submit', resetPassword);
     });
 </script>
-
-
-
-
-
-
-
-
-
 
 
 <script src="../assets/js/vendor/modernizr-3.5.0.min.js"></script>

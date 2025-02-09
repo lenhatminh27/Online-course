@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.text.Normalizer;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -14,7 +15,7 @@ public final class StringUtils {
         return str != null && !str.isBlank();
     }
 
-    public static String toSlug(String str){
+    public static String toSlug(String str) {
         String slug = deAccent(str);
         slug = slug.replaceAll("[:,\".><?';:{}\\[\\]]", "");
         slug = slug.replace(" ", "-").toLowerCase();
@@ -44,7 +45,17 @@ public final class StringUtils {
         return str.toLowerCase();
     }
 
+    public static String generate(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        Random random = new Random();
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            result.append(characters.charAt(index));
+        }
 
+        return result.toString();
+    }
 
     public static void main(String[] args) {
         String input = "Đây là một chuỗi+// thử nghiệm: Làm thế nào để tạo slug?";

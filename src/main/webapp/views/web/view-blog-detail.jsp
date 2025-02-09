@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
           integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         * {
             box-sizing: border-box;
@@ -75,6 +76,15 @@
         .like-info:hover i {
             color: red; /* Changes color on hover */
         }
+
+        .my-btn {
+            border: none;
+            background-color: transparent;
+        }
+        .my-btn i{
+            color: black !important;
+        }
+
 
     </style>
 </head>
@@ -213,31 +223,31 @@
             }
         }
 
-        function displayCommentResponse(comments) {
-            const commentArea = document.querySelector('#comments-area');
-            commentArea.innerHTML = `<h4>` + comments.length + ` Comments</h4>`;
+        function createCommentHTML(comment, isChild = false) {
+            var childCommentsHTML = "";
 
-            comments.forEach(comment => {
-                const commentHTML = createCommentHTML(comment);
-                commentArea.innerHTML += commentHTML;
-            });
-        }
+            // Process child comments recursively
+            if (comment.childrenComments && comment.childrenComments.length > 0) {
+                var childWrapper = '<div class="replies">'; // Ensures sibling comments are properly grouped
+                for (var i = 0; i < comment.childrenComments.length; i++) {
+                    childWrapper += createCommentHTML(comment.childrenComments[i], true);
+                }
+                childWrapper += '</div>';
+                childCommentsHTML = childWrapper;
+            }
 
-        function createCommentHTML(comment) {
-            let childCommentsHTML = "";
-            // if (comment.childrenComments && comment.childrenComments.length > 0) {
-            //     comment.childrenComments.forEach(function(child) {
-            //         childCommentsHTML += createCommentHTML(child); // Gọi đệ quy
-            //     });
-            // }
-            return (
-                '<div class="comment-list">' +
-                '<div class="single-comment justify-content-between d-flex">' +
+            var singleStyle = isChild ? ' style="border-left: 1px solid #8963ff; margin-left: 30px; padding-left: 20px"' : '';
+            var replyFormId = 'reply-form-' + comment.id;
+            var replyLinkId = 'reply-link-' + comment.id;
+            var updateFormId = 'update-form-' + comment.id;
+
+            let htmls =  '<div class="comment-list" style="margin-left: 30px; margin-top: 20px; padding-bottom: 0px">' +
+                '<div class="single-comment justify-content-between d-flex" ' + singleStyle + '>' +
                 '<div class="user justify-content-between d-flex">' +
-                '<div class="thumb">' +
-                '<img src=' + avatarDefault + ' alt="User">' +
+                '<div style="margin-right: 10px" class="thumb">' +
+                '<img style="width: 30px" src="' + avatarDefault + '" alt="User">' +
                 '</div>' +
-                '<div class="desc">' +
+                '<div style="border-radius: 10px; background-color: #f2f4f7; padding-left: 10px; padding-top: 5px" class="desc">' +
                 '<div class="d-flex justify-content-between">' +
                 '<div class="d-flex align-items-center">' +
                 '<h5>' +
@@ -246,16 +256,265 @@
                 '<p class="date">' + new Date(comment.createdAt).toLocaleString() + '</p>' +
                 '</div>' +
                 '<div class="reply-btn">' +
-                '<a href="#" class="btn-reply text-uppercase" onclick="replyToComment(' + comment.id + ')">Reply</a>' +
+                '<a href="#" class="btn-reply text-uppercase" id="' + replyLinkId + '">Reply</a>' +
+                '</div>' ;
+
+             const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);
+             if (userCurrent) {
+                 const user = JSON.parse(userCurrent);
+                 if (user.email === comment.accountResponse?.email) {
+                     htmls += '<div class="dropdown">' +
+                                 '<button class="my-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+                                    '<i class="fa-solid fa-ellipsis-vertical"></i>' +
+                                 '</button>' +
+                                 '<ul class="dropdown-menu">' +
+                                     '<li><a class="dropdown-item-update" onclick="">Cập nhật bình luận</a></li>' +
+                                     '<input type="hidden" id="update-comment-content-' + comment.id + '" value="' + comment.content + '">' +
+                                     '<li><a class="dropdown-item-delete">Xóa bình luận</a></li>' +
+                                     '<input type="hidden" id="delete-comment-' + comment.id + '" value="' + comment.id + '">' +
+                     '</ul>' +
+                             '</div>';
+                 }
+             }
+                htmls +=
+                '</div>' +
+                '<p style="color: #70777f" class="comment">' + comment.content + '</p>' +
                 '</div>' +
                 '</div>' +
-                '<p class="comment">' + comment.content + '</p>' +
                 '</div>' +
+                '<div id="' + replyFormId + '" class="reply-form" style="margin-top: 10px; display: none;">' +
+                '<input type="text" id="accountReply' + comment.id + '" placeholder="Write a reply..." ' +
+                'style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">' +
+                '<button id="post-btn-' + comment.id + '" ' +
+                'style="padding: 8px 16px; border-radius: 5px; background-color: #4CAF50; color: white; border: none;">Gửi</button>' +
                 '</div>' +
+                '<div id="' + updateFormId + '" class="update-form" style="margin-top: 10px; display: none;">' +
+                '<input type="text" id="accountUpdate' + comment.id + '" placeholder="Write a reply..." ' +
+                'style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">' +
+                '<button id="update-btn-' + comment.id + '" ' +
+                'style="padding: 8px 16px; border-radius: 5px; background-color: #4CAF50; color: white; border: none;">Cập nhật</button>' +
                 '</div>' +
-                childCommentsHTML + // Hiển thị bình luận con
-                '</div>'
-            );
+                childCommentsHTML + // Ensuring child comments render correctly
+                '</div>';
+                return htmls;
+        }
+
+        function attachUpdateCommentEventListeners() {
+            var updateLinks = document.querySelectorAll('.dropdown-item-update'); // Target update comment button
+
+            updateLinks.forEach(function (link) {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    var dropdownMenu = link.closest('.dropdown'); // Find the closest dropdown container
+                    var commentInput = dropdownMenu.querySelector('input[id^="update-comment-content-"]'); // Get the hidden input
+
+                    if (!commentInput) {
+                        console.error("Comment input not found!");
+                        return;
+                    }
+
+                    var commentId = commentInput.id.replace('update-comment-content-', ''); // Extract the numeric ID
+                    var replyFormId = 'update-form-' + commentId;
+                    var replyForm = document.getElementById(replyFormId);
+
+                    if (replyForm) {
+                        replyForm.style.display = (replyForm.style.display === 'none' || !replyForm.style.display) ? 'block' : 'none';
+
+                        var updateInput = replyForm.querySelector('input[type="text"]');
+                        if (updateInput) {
+                            updateInput.value = commentInput.value; // Correctly set the value
+                        }
+                    }
+                });
+            });
+        }
+
+        function attachUpdateEventListeners() {
+            document.querySelectorAll('button[id^="update-btn-"]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var commentId = this.id.replace('update-btn-', '');
+                    var replyFormId = 'update-form-' + commentId;
+                    var replyInput = document.getElementById(replyFormId).querySelector('input[type="text"]');
+                    updateComment(commentId, replyInput.value);
+                    replyInput.value = ""; // Clear the input after sending
+                });
+            });
+        }
+
+        async function updateComment(comment, content) {
+            if (!content) {
+                alert('Vui lòng nhập comment.');
+                return;
+            }
+
+            const blogId = document.getElementById('blogId').value;
+            console.log(blogId)
+            const data = {
+                content: content,
+                id: comment
+            };
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + '/api/blog-comment', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                if (response) {
+                    document.getElementById("comment").value = "";
+                    await loadComment(slug);
+                }
+            } catch (error) {
+                console.log(error.data)
+            }
+        }
+
+        function deleteCommentEventListeners() {
+            var deleteLinks = document.querySelectorAll('.dropdown-item-delete'); // Select delete buttons
+
+            deleteLinks.forEach(function (link) {
+                link.addEventListener('click', async function (event) {
+                    event.preventDefault();
+
+                    var dropdownMenu = link.closest('.dropdown'); // Find dropdown container
+                    var commentInput = dropdownMenu.querySelector('input[id^="delete-comment-"]'); // Find hidden input
+
+                    if (!commentInput) {
+                        console.error("Comment input not found!");
+                        return;
+                    }
+
+                    var commentId = commentInput.value; // Extract the comment ID
+                    var confirmDelete = confirm("Bạn có chắc chắn muốn xóa bình luận này?");
+
+                    if (!confirmDelete) return; // Stop if user cancels
+
+                    try {
+                        // OPTIONAL: Send DELETE request to API
+                        await deleteCommentFromServer(commentId);
+
+                        // Remove the comment from the DOM
+                        var commentElement = document.getElementById('comment-' + commentId);
+                        if (commentElement) {
+                            commentElement.remove();
+                        }
+                    } catch (error) {
+                        console.error("Lỗi khi xóa bình luận:", error);
+                    }
+                });
+            });
+        }
+
+        async function deleteCommentFromServer(commentId) {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + '/api/blog-comment/' + commentId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (response) {
+                    console.log("Bình luận đã được xóa thành công.");
+                    await loadComment(slug);
+                } else {
+                    console.error("Xóa bình luận thất bại.");
+                    await loadComment(slug);
+                }
+            } catch (error) {
+                console.error("Lỗi API khi xóa bình luận:", error);
+            }
+        }
+
+
+        function attachReplyEventListeners() {
+            var replyLinks = document.querySelectorAll('[id^="reply-link-"]');
+            replyLinks.forEach(function (link) {
+                var replyFormId = 'reply-form-' + link.id.replace('reply-link-', '');
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    console.log(link.id)
+                    console.log(replyFormId)
+                    var replyForm = document.getElementById(replyFormId);
+                    replyForm.style.display = (replyForm.style.display === 'none' || !replyForm.style.display) ? 'block' : 'none';
+                });
+            });
+        }
+
+        function attachPostReplyEventListeners() {
+            document.querySelectorAll('button[id^="post-btn-"]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var commentId = this.id.replace('post-btn-', '');
+                    var replyFormId = 'reply-form-' + commentId;
+                    var replyInput = document.getElementById(replyFormId).querySelector('input[type="text"]');
+                    postReply(commentId, replyInput.value);
+                    replyInput.value = ""; // Clear the input after sending
+                });
+            });
+        }
+
+        async function postReply(commentId, content) {
+            if (!content) {
+                alert('Vui lòng nhập comment.');
+                return;
+            }
+
+            const blogId = document.getElementById('blogId').value;
+            console.log(blogId)
+            const data = {
+                content: content,
+                blogId: blogId,
+                parentId: commentId
+            };
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + '/api/blog-comment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                if (response) {
+                    document.getElementById("comment").value = "";
+                    await loadComment(slug);
+                }
+            } catch (error) {
+                console.log(error.data)
+            }
+        }
+
+        function countChildren(comment) {
+            let count = 0
+            if (comment.childrenComments.length !== 0) {
+                count += comment.childrenComments.length;
+                for (let i = 0; i < comment.childrenComments.length; i++) {
+                    count += countChildren(comment.childrenComments[i])
+                }
+                return count
+            }
+            return 0
+        }
+
+        function displayCommentResponse(comments) {
+            const commentArea = document.querySelector('#comments-area');
+            let count = comments.length;
+            comments.forEach(comment => {
+                count += countChildren(comment)
+            })
+            commentArea.innerHTML = `<h4>` + count + `
+            Comments </h4>`;
+
+            comments.forEach(comment => {
+                const commentHTML = createCommentHTML(comment);
+                commentArea.innerHTML += commentHTML;
+            });
+            attachReplyEventListeners();
+            attachPostReplyEventListeners();
+            attachUpdateCommentEventListeners();
+            attachUpdateEventListeners();
+            deleteCommentEventListeners()
 
         }
 
@@ -398,7 +657,7 @@
             const id = document.querySelector('#blogId')?.value;
             console.log("Blog ID:", id);
 
-            if (id){
+            if (id) {
                 try {
                     const response = await apiRequestWithToken(
                         environment.apiUrl + "/api/blog-comment/" + id,
@@ -407,7 +666,7 @@
                             headers: {
                                 "Content-Type": "application/json",
                             },
-                            body: JSON.stringify({ content: commentInput, blogId: id}),
+                            body: JSON.stringify({content: commentInput, blogId: id}),
                         }
                     );
                     if (response) {
@@ -420,8 +679,9 @@
                 }
             }
         });
-    });
 
+
+    });
 
 </script>
 
@@ -464,6 +724,9 @@
 <!-- Jquery Plugins, main Jquery -->
 <script src="../../assets/js/plugins.js"></script>
 <script src="../../assets/js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 
 </body>
 </html>

@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-<!-- ? Preloader Start -->
+<!-- Preloader Start -->
 <div id="preloader-active">
     <div class="preloader d-flex align-items-center justify-content-center">
         <div class="preloader-inner position-relative">
@@ -38,14 +38,11 @@
         </div>
     </div>
 </div>
-<!-- Preloader Start-->
+<!-- Preloader End -->
 
-
-<!-- Register -->
-
+<!-- Main content -->
 <main class="login-body" style="background: linear-gradient(to bottom, #e6e0ea, #b8c2ed);">
-    <!-- Đăng ký Admin -->
-    <form class="form-default" id="register-form">
+    <form class="form-default" id="send-email-form">
 
         <div class="login-form">
 
@@ -53,114 +50,73 @@
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Đăng Ký Tại Đây</h2>
-            <div id="error">
-
-            </div>
+            <h2>Tìm tài khoản của bạn</h2>
+            <span id="message" style="color: green; margin-bottom: 10px"></span>
+            <div id="errorMessage" style="color: red; margin-bottom: 10px"></div>
             <div class="form-input">
-                <label for="firstname">Tên</label>
-                <input type="text" name="name" id="firstname" placeholder="Tên">
-            </div>
-            <div class="form-input">
-                <label for="lastname">Họ</label>
-                <input type="text" name="name" id="lastname" placeholder="Họ">
-            </div>
-            <div class="form-input">
-                <label for="email">Địa chỉ Email</label>
-                <input type="email" name="email" id="email" placeholder="Địa chỉ Email">
-            </div>
-            <div class="form-input">
-                <label for="password">Mật khẩu</label>
-                <input type="password" name="password" id="password" placeholder="Mật khẩu">
-            </div>
-            <div class="form-input">
-                <label for="confirmpassword">Xác nhận mật khẩu</label>
-                <input type="password" name="password" id="confirmpassword" placeholder="Xác nhận mật khẩu">
+                <label for="email">Vui lòng nhập email để tìm kiếm tài khoản của bạn</label>
+                <input type="email" name="email" id="email" placeholder="Nhập email" required>
             </div>
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="Đăng Ký">
+                <input type="submit" name="submit" value="Tìm kiếm">
             </div>
-            <!-- Quên mật khẩu -->
+            <!-- Quay lại đăng nhập -->
             <a href="login" class="registration">Đăng nhập</a>
         </div>
     </form>
-    <!-- /kết thúc form đăng ký -->
 </main>
-
 
 <script type="module">
 
-    import {environment} from '../assets/config/env.js';
+    import {environment} from "../assets/config/env.js";
+    import {apiRequestWithToken} from "../assets/config/service.js";
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const registerForm = document.getElementById('register-form');
-        const errorMessageDiv = document.querySelector('#error');
-        errorMessageDiv.style.color = 'red';
+    document.addEventListener('DOMContentLoaded', function () {
+        async function sendEmail(event) {
+            event.preventDefault();
+            const formData = new FormData(document.querySelector('form'));
+            const email = formData.get('email')
 
-        registerForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const firstName = document.getElementById('firstname').value;
-            const lastName = document.getElementById('lastname').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmpassword').value;
-
-            // Validate the inputs
-            let errors = [];
-            if (!firstName) errors.push('First name is required');
-            if (!lastName) errors.push('Last name is required');
-            if (!email) errors.push('Email is required');
-            if (!password) errors.push('Password is required');
-            if (password !== confirmPassword) errors.push('Mật khẩu không trùng khớp!');
-
-            if (errors.length > 0) {
-                errorMessageDiv.textContent = errors.join(', ');
+            if (!email) {
+                document.getElementById('errorMessage').textContent = "Vui lòng nhập email!";
                 return;
             }
 
-            const data = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                password: password,
-                confirmPassword: confirmPassword
-            };
+            const payload = {email};
 
             try {
-                const response = await fetch(environment.apiUrl + '/register', {
+                const response = await fetch(environment.apiUrl + "/api/send-reset-password-email", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(payload),
                 });
 
-                if (response.ok) {
-                    window.location.href = '/login';
-                } else {
+                if (!response.ok) {
+                    const message = document.getElementById('message');
+                    message.textContent = "";
                     const errorData = await response.json();
-                    let errorMess = "";
-                    for (const x of errorData.error) {
-                        errorMess += x;
-                    }
-                    errorMessageDiv.textContent = errorMess;
+                    errorMessage.textContent = errorData;
+                    return;
                 }
+
+                const message = document.getElementById('message');
+                message.textContent = "Yêu cầu thay đổi mật khẩu đã được gửi tới email của bạn";
+                document.getElementById('errorMessage').textContent = "";
+
             } catch (error) {
-                errorMessageDiv.textContent = 'An error occurred. Please try again later.';
+                const message = document.getElementById('message');
+                message.textContent = "";
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = error.message;
+                console.error('Error:', error);
             }
-        });
+        }
+
+        document.querySelector('form').addEventListener('submit', sendEmail);
     });
 </script>
-
-
-
-
-
-
-
-
-
 
 
 <script src="../assets/js/vendor/modernizr-3.5.0.min.js"></script>

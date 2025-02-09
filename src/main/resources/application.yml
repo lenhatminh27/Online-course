@@ -4,3 +4,14 @@ security:
     accessExpiration: 900          # Access token valid for 15 minutes (in seconds)
     refreshExpiration: 259200      # Refresh token valid for 3 days (in seconds)
     rememberMeExpiration: 2592000  # Remember me token valid for 30 days (in seconds)
+
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  username: leminhducqvbn@gmail.com
+  password: igis ykhd bkll fbjk
+mail:
+  smtp:
+    auth: true
+    starttls:
+      enable: true
