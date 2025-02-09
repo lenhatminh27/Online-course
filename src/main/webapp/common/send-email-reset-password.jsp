@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="../assets/css/slick.css">
     <link rel="stylesheet" href="../assets/css/nice-select.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body>
 <!-- Preloader Start -->
@@ -102,9 +104,11 @@
                 }
 
                 const message = document.getElementById('message');
-                message.textContent = "Yêu cầu thay đổi mật khẩu đã được gửi tới email của bạn";
-                document.getElementById('errorMessage').textContent = "";
-
+                Swal.fire({
+                    title: "Yêu cầu thay đổi mật khẩu đã được gửi tới email của bạn!",
+                    icon: "success",
+                    draggable: true
+                });
             } catch (error) {
                 const message = document.getElementById('message');
                 message.textContent = "";

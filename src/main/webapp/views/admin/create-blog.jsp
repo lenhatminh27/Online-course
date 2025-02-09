@@ -33,6 +33,7 @@
 
     <!-- Template Stylesheet -->
     <link href="../../assets/admin/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
 
         {
@@ -210,8 +211,11 @@
             body: JSON.stringify(blogData)
         })
             .then(response => {
-                console.log('Blog created successfully', response);
-                successMessage.textContent = 'Blog created successfully';
+                Swal.fire({
+                    title: "Tạo bài viết thành công!",
+                    icon: "success",
+                    draggable: true
+                });
 
                 // Clear form fields after success
                 document.getElementById('createBlogForm').reset();
