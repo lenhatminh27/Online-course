@@ -15,4 +15,5 @@ public interface BlogService {
     void likeBlog(Long blogId);
     void deleteLikeBlog(Long blogId);
     BlogResponse findBlogBySlug(String slug);
+    PageResponse<BlogResponse> getBlogsByInstructor(BlogFilterRequest filterRequest);
 }

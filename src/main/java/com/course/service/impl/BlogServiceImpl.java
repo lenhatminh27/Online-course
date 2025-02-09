@@ -13,7 +13,10 @@ import com.course.entity.AccountEntity;
 import com.course.entity.BlogEntity;
 import com.course.entity.BlogStatisticEntity;
 import com.course.entity.TagEntity;
+import com.course.exceptions.AuthenticationException;
+import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
+import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContext;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogService;
@@ -121,22 +124,25 @@ public class BlogServiceImpl implements BlogService {
             throw new NotFoundException("Không tìm thấy slug của bài viết");
         }
         BlogResponse blogResponse = convertToBlogResponse(blogEntity);
-        BlogStatisticEntity blogStatistic = blogEntity.getBlogStatistic();
-        AuthenticationContext context = AuthenticationContextHolder.getContext();
-        if (ObjectUtils.isEmpty(context)){
-            blogResponse.setIsLike(false);
-            blogResponse.setIsBookmark(false);
-        }
-        else{
-            AccountEntity accountCurrent = getAuthenticatedAccount();
-            blogResponse.setIsLike(blogStatisticDAO.existsByIdAccount(accountCurrent.getId(), blogEntity.getId()));
-            blogResponse.setIsBookmark(bookmarksBlogDAO.existsBookmarkBlogId(blogEntity.getId(), accountCurrent.getId()));
-        }
-        blogResponse.setLikesCount(blogStatistic.getLikes());
-        blogResponse.setViewsCount(blogStatistic.getViews());
-        blogResponse.setCommentsCount(blogCommentDAO.findNumberCommentOfBlog(blogEntity.getId()));
-        blogResponse.setIsBookmark(false);
         return blogResponse;
+    }
+
+    @Override
+    public PageResponse<BlogResponse> getBlogsByInstructor(BlogFilterRequest filterRequest) {
+        AuthenticationContext context = AuthenticationContextHolder.getContext();
+        if(ObjectUtils.isEmpty(context)) {
+            throw new AuthenticationException("Người dùng chưa đăng nhập");
+        }
+        if(!context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR)){
+            throw new ForbiddenException("Không được phép truy cập");
+        }
+        AccountEntity accountCurrent = getAuthenticatedAccount();
+        filterRequest.setIdOwner(accountCurrent.getId());
+        PageResponse<BlogEntity> pageResponse = blogDAO.getBlogsByPage(filterRequest);
+        List<BlogResponse> blogs = pageResponse.getData().stream()
+                .map(this::convertToBlogResponse)
+                .toList();
+        return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), blogs);
     }
 
     private AccountEntity getAuthenticatedAccount() {
@@ -173,7 +179,7 @@ public class BlogServiceImpl implements BlogService {
         AccountEntity author = blogEntity.getAccount();
         AccountResponse accountResponse = new AccountResponse(author.getEmail(), author.getAvatar());
 
-        return new BlogResponse(
+        BlogResponse blogResponse = new BlogResponse(
                 blogEntity.getId(),
                 blogEntity.getTitle(),
                 blogEntity.getSlug(),
@@ -182,6 +188,24 @@ public class BlogServiceImpl implements BlogService {
                 tagResponses,
                 blogEntity.getCreateAt().toString()
         );
+        BlogStatisticEntity blogStatistic = blogEntity.getBlogStatistic();
+        AuthenticationContext context = AuthenticationContextHolder.getContext();
+        if (ObjectUtils.isEmpty(context)){
+            blogResponse.setIsLike(false);
+            blogResponse.setIsBookmark(false);
+        }
+        else{
+            AccountEntity accountCurrent = getAuthenticatedAccount();
+            blogResponse.setIsLike(blogStatisticDAO.existsByIdAccount(accountCurrent.getId(), blogEntity.getId()));
+            blogResponse.setIsBookmark(bookmarksBlogDAO.existsBookmarkBlogId(blogEntity.getId(), accountCurrent.getId()));
+        }
+        if (!ObjectUtils.isEmpty(blogStatistic)){
+            blogResponse.setLikesCount(blogStatistic.getLikes());
+            blogResponse.setViewsCount(blogStatistic.getViews());
+        }
+        blogResponse.setCommentsCount(blogCommentDAO.findNumberCommentOfBlog(blogEntity.getId()));
+        blogResponse.setIsBookmark(false);
+        return blogResponse;
     }
 
 }

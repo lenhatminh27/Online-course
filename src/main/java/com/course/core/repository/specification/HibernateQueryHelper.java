@@ -61,11 +61,12 @@ public class HibernateQueryHelper {
 
     // Helper method to dynamically determine the alias for a field
     private static String getAliasForField(String field) {
-        // Define the mapping of field names to their respective aliases
         Map<String, String> fieldAliasMap = new HashMap<>();
         fieldAliasMap.put("createAt", "b.");  // BlogEntity createdAt
-        fieldAliasMap.put("email", "a.");      // Account email
-        return fieldAliasMap.get(field);
+        fieldAliasMap.put("updatedAt", "b.");  // BlogEntity updatedAt
+        fieldAliasMap.put("views", "bs.");  // BlogEntity views
+        fieldAliasMap.put("likes", "bs.");  // BlogStatisticEntity likes
+        return fieldAliasMap.getOrDefault(field, "b.");
     }
 
 

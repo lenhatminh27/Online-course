@@ -364,6 +364,11 @@
                     body: JSON.stringify(data)
                 })
                 if (response) {
+                    Swal.fire({
+                        title: "Cập nhật bình luận thành công!",
+                        icon: "success",
+                        draggable: true
+                    });
                     document.getElementById("comment").value = "";
                     await loadComment(slug);
                 }
