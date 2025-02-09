@@ -1,5 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <!doctype html>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <html class="no-js" lang="zxx">
 <head>
     <meta charset="utf-8">
@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-<!-- ? Preloader Start -->
+<!-- Preloader Start -->
 <div id="preloader-active">
     <div class="preloader d-flex align-items-center justify-content-center">
         <div class="preloader-inner position-relative">
@@ -38,115 +38,103 @@
         </div>
     </div>
 </div>
-<!-- Preloader Start-->
+<!-- Preloader End -->
 
-
+<!-- Main content -->
 <main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
-    <!-- Đăng nhập Admin -->
-    <form class="form-default" id="login-form">
+    <form class="form-default" id="reset-password-form">
+
         <div class="login-form">
+
             <!-- logo-login -->
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Đăng Nhập Tại Đây</h2>
-            <!-- Container thông báo lỗi -->
-            <div id="error-message" class="error-message" style="color: red; margin-bottom: 10px;"></div>
-            <div class="form-input">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" placeholder="Email">
-            </div>
+            <h2>Mật khẩu mới</h2>
+            <span id="message" style="color: green; margin-bottom: 10px"></span>
+            <div id="errorMessage" style="color: red; margin-bottom: 10px"></div>
             <div class="form-input">
                 <label for="password">Mật khẩu</label>
-                <input type="password" name="password" id="password" placeholder="Mật khẩu">
+                <input type="password" name="password" id="password" placeholder="Nhập mật khẩu" required>
             </div>
+            <div class="form-input">
+                <label for="confirmPassword">Xác nhận mật khẩu</label>
+                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Xác nhận mật khẩu"
+                       required>
+            </div>
+
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="Đăng nhập">
+                <input type="submit" name="submit" value="Cập nhật mật khẩu">
             </div>
-            <!-- Quên mật khẩu -->
-            <a href="send-reset-password-mail" class="forget">Quên mật khẩu</a>
-            <!-- Đăng ký -->
-            <a href="register" class="registration">Đăng ký</a>
+            <!-- Quay lại đăng nhập -->
+            <a href="login" class="registration">Đăng nhập</a>
         </div>
     </form>
-    <!-- /kết thúc form đăng nhập -->
 </main>
 
-
-
 <script type="module">
-    import { apiRequestWithToken } from  '../assets/config/service.js';
-    import { environment, STORAGE_KEY, avatarDefault } from  '../assets/config/env.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginForm = document.getElementById('login-form');
-        const errorMessageDiv = document.getElementById('error-message');
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorMessageDiv.textContent = '';
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const data = {
-                email: email,
-                password: password,
+    import {environment} from "../assets/config/env.js";
+    import {apiRequestWithToken} from "../assets/config/service.js";
+
+    document.addEventListener('DOMContentLoaded', function () {
+        async function resetPassword(event) {
+            event.preventDefault();
+            const formData = new FormData(document.querySelector('form'));
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+
+            if (!password || !confirmPassword) {
+                document.getElementById('errorMessage').textContent = "Mật khẩu không được để trống!";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById('errorMessage').textContent = "Mật khẩu không trùng khớp!";
+                return;
+            }
+
+            const payload = {
+                token,
+                newPassword: password,
+                confirmPassword: confirmPassword
             };
+
             try {
-                const response = await fetch(environment.apiUrl + '/auth', {
-                    method: 'POST',
+                const response = await fetch(environment.apiUrl + "/api/reset-password", {
+                    method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(payload)
                 });
-                if (response.ok) {
-                    const responseData = await response.json();
-                    localStorage.setItem(STORAGE_KEY.accessToken, responseData.accessToken);
-                    localStorage.setItem(STORAGE_KEY.refreshToken, responseData.refreshToken);
-                    callApiAfterLogin();
-                } else {
+
+                if (!response.ok) {
+                    const message = document.getElementById('message');
+                    message.textContent = "";
                     const errorData = await response.json();
-                    errorMessageDiv.textContent = errorData;
+                    document.getElementById('errorMessage').textContent = errorData;
+                    return;
                 }
-            } catch (error) {
-                console.error('Login failed:', error);
-                errorMessageDiv.textContent = 'Failed to connect to the server. Please try again later.';
-            }
-        });
 
-        async function callApiAfterLogin() {
-            try {
-                const response = await apiRequestWithToken(environment.apiUrl + '/api/accounts', {
-                    method: 'GET',
-                });
-                console.log('API response after login:', response);
-                const userCurrent = {
-                    email: response.email,
-                    avatar: getAvatarUrl(response.avatar),
-                    roles: response.roles
-                }
-                localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
-                if(response.roles.includes('ADMIN')){
-                    window.location.href = '/admin';
-                }
-                else{
-                    window.location.href = '/home';
-                }
+                document.getElementById('message').textContent = "Đặt lại mật khẩu thành công!";
+                document.getElementById('errorMessage').textContent = "";
+
+                setTimeout(() => {
+                    window.location.assign('/login');
+                }, 2000);
+
             } catch (error) {
-                console.error('Error making authenticated API request:', error);
+                document.getElementById('errorMessage').textContent = error.message;
+                document.getElementById('message').textContent = "";
             }
         }
 
-        function getAvatarUrl(avatar) {
-            const isAvatarPresent = !!avatar;
-            if (isAvatarPresent) {
-                return typeof avatar === 'string' ? avatar : avatarDefault;
-            } else {
-                return avatarDefault;
-            }
-        }
+        document.querySelector('form').addEventListener('submit', resetPassword);
     });
 </script>
-
 
 
 <script src="../assets/js/vendor/modernizr-3.5.0.min.js"></script>
