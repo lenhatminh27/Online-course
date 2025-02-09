@@ -31,6 +31,7 @@
 
     <!-- Template Stylesheet -->
     <link href="../../assets/admin/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -186,7 +187,11 @@
                     }
                 })
                     .then(data => {
-                        alert("Update permission oke");
+                        Swal.fire({
+                            title: "Cập nhật quyền thành công!",
+                            icon: "success",
+                            draggable: true
+                        });
                     })
                     .catch(error => {
                         console.error('Error submitting data:', error);
