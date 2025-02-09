@@ -43,7 +43,7 @@
 
 <!-- Register -->
 
-<main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
+<main class="login-body" style="background: linear-gradient(to bottom, #e6e0ea, #b8c2ed);">
     <!-- Đăng ký Admin -->
     <form class="form-default" id="register-form">
 

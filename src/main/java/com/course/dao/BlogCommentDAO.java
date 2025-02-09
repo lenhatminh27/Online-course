@@ -12,6 +12,8 @@ public interface BlogCommentDAO {
 
     List<BlogCommentEntity> findAllChildrenBlogComments(Long id);
 
+    List<BlogCommentEntity> findListNoParentCommentByBlogSlug(String slug);
+
     void updateBlogComment(BlogCommentEntity blogComment);
 
     Long findNumberCommentOfBlog(Long id);

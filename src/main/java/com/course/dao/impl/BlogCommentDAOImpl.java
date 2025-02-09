@@ -3,7 +3,6 @@ package com.course.dao.impl;
 import com.course.common.utils.HibernateUtils;
 import com.course.dao.BlogCommentDAO;
 import com.course.entity.BlogCommentEntity;
-import com.course.entity.BlogEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -78,7 +77,23 @@ public class BlogCommentDAOImpl implements BlogCommentDAO {
             e.printStackTrace();
             return Collections.emptyList();
         }
+
     }
+
+    @Override
+    public List<BlogCommentEntity> findListNoParentCommentByBlogSlug(String slug) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            // Adjusted HQL to check for null in the parentComment field
+            String hql = "FROM BlogCommentEntity b WHERE b.blog.slug = :slug AND b.parentComment IS NULL ORDER BY b.createAt DESC";
+            return session.createQuery(hql, BlogCommentEntity.class)
+                    .setParameter("slug", slug)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
 
     @Override
     public void updateBlogComment(BlogCommentEntity blogComment) {

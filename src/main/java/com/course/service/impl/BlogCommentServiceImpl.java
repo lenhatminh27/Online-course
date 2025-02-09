@@ -70,7 +70,7 @@ public class BlogCommentServiceImpl implements BlogCommentService {
         if (blogEntity == null) {
             return new ArrayList<>();
         }
-        List<BlogCommentEntity> list = blogCommentDAO.findListCommentByBlogSlug(slug);
+        List<BlogCommentEntity> list = blogCommentDAO.findListNoParentCommentByBlogSlug(slug);
         List<BlogCommentResponse> responseList = new ArrayList<>();
         for (BlogCommentEntity blogCommentEntity : list) {
             responseList.add(convertToBlogCommentResponse(blogCommentEntity));
