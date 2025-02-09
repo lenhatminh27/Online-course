@@ -27,6 +27,7 @@
           integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -363,6 +364,11 @@
                     body: JSON.stringify(data)
                 })
                 if (response) {
+                    Swal.fire({
+                        title: "Cập nhật bình luận thành công!",
+                        icon: "success",
+                        draggable: true
+                    });
                     document.getElementById("comment").value = "";
                     await loadComment(slug);
                 }
@@ -375,37 +381,40 @@
             var deleteLinks = document.querySelectorAll('.dropdown-item-delete'); // Select delete buttons
 
             deleteLinks.forEach(function (link) {
-                link.addEventListener('click', async function (event) {
+                link.addEventListener('click', function (event) {
                     event.preventDefault();
-
                     var dropdownMenu = link.closest('.dropdown'); // Find dropdown container
                     var commentInput = dropdownMenu.querySelector('input[id^="delete-comment-"]'); // Find hidden input
-
                     if (!commentInput) {
                         console.error("Comment input not found!");
                         return;
                     }
-
                     var commentId = commentInput.value; // Extract the comment ID
-                    var confirmDelete = confirm("Bạn có chắc chắn muốn xóa bình luận này?");
-
-                    if (!confirmDelete) return; // Stop if user cancels
-
-                    try {
-                        // OPTIONAL: Send DELETE request to API
-                        await deleteCommentFromServer(commentId);
-
-                        // Remove the comment from the DOM
-                        var commentElement = document.getElementById('comment-' + commentId);
-                        if (commentElement) {
-                            commentElement.remove();
+                    Swal.fire({
+                        title: "Bạn có chắc muốn xóa bình luận không?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Có",
+                        cancelButtonText: "Hủy",
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                await deleteCommentFromServer(commentId); // Send request to delete comment
+                                var commentElement = document.getElementById('comment-' + commentId);
+                                if (commentElement) {
+                                    commentElement.remove();
+                                }
+                                Swal.fire("Xóa thành công!", "Bình luận đã được xóa.", "success");
+                            } catch (error) {
+                                console.error("Lỗi khi xóa bình luận:", error);
+                                Swal.fire("Lỗi!", "Không thể xóa bình luận. Vui lòng thử lại!", "error");
+                            }
                         }
-                    } catch (error) {
-                        console.error("Lỗi khi xóa bình luận:", error);
-                    }
+                    });
                 });
             });
         }
+
 
         async function deleteCommentFromServer(commentId) {
             try {
@@ -684,7 +693,6 @@
     });
 
 </script>
-
 
 <script src="../../assets/js/vendor/modernizr-3.5.0.min.js"></script>
 <!-- Jquery, Popper, Bootstrap -->

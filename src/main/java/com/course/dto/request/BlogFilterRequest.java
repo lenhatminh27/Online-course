@@ -21,10 +21,13 @@ public class BlogFilterRequest extends FilterRequest {
 
     private Sort sort;
 
-    public BlogFilterRequest(List<String> tags, Sort sort,String search, int page) {
+    private Long idOwner;
+
+    public BlogFilterRequest(List<String> tags, Sort sort,String search, int page, Long idOwner) {
         super(search, page);
         this.tags = tags;
         this.sort = sort;
+        this.idOwner = idOwner;
     }
 
 }

@@ -69,7 +69,7 @@ public class BlogDAOImpl implements BlogDAO {
     @Override
     public PageResponse<BlogEntity> getBlogsByPage(BlogFilterRequest blogFilter) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            String baseHql = "FROM BlogEntity b JOIN FETCH b.account a WHERE 1=1";
+            String baseHql = "FROM BlogEntity b JOIN FETCH b.account a LEFT JOIN FETCH b.blogStatistic bs WHERE 1=1";
             Map<String, Object> parameters = new HashMap<>();
 
             if (!ObjectUtils.isEmpty(blogFilter.getSearch())) {
@@ -81,6 +81,11 @@ public class BlogDAOImpl implements BlogDAO {
             if (!ObjectUtils.isEmpty(blogFilter.getTags())) {
                 baseHql += " AND EXISTS (SELECT 1 FROM b.tags t WHERE t.name IN (:tags))";
                 parameters.put("tags", blogFilter.getTags());
+            }
+
+            if (!ObjectUtils.isEmpty(blogFilter.getIdOwner())) {
+                baseHql += " AND b.account.id = :idOwner";
+                parameters.put("idOwner", blogFilter.getIdOwner());
             }
             Query<BlogEntity> query = HibernateQueryHelper.buildQuery(
                     session,

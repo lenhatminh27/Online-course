@@ -11,7 +11,8 @@ import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
-import com.course.exceptions.NotFoundException;
+import com.course.exceptions.AuthenticationException;
+import com.course.exceptions.ForbiddenException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -71,8 +72,31 @@ public class BlogApi extends BaseServlet {
         if (tagsParam != null && !tagsParam.trim().isEmpty()) {
             tags = Arrays.asList(tagsParam.split(","));
         }
-        Sort sort = Sort.by(Sort.Order.desc("createAt"));
-        BlogFilterRequest blogFilterRequest = new BlogFilterRequest(tags, sort, search, page);
+        String sort = req.getParameter("sort");
+        List<Sort.Order> orders = new ArrayList<>();
+        if(!ObjectUtils.isEmpty(sort)) {
+            if(sort.equalsIgnoreCase("newest")) {
+                orders.add(new Sort.Order(Sort.Direction.DESC, "createAt"));
+            }
+            if(sort.equalsIgnoreCase("oldest")) {
+                orders.add(new Sort.Order(Sort.Direction.ASC, "createAt"));
+            }
+            if(sort.equalsIgnoreCase("views")) {
+                orders.add(new Sort.Order(Sort.Direction.DESC, "views"));
+            }
+            if(sort.equalsIgnoreCase("likes")) {
+                orders.add(new Sort.Order(Sort.Direction.DESC, "likes"));
+            }
+        }
+        Sort sortT = null;
+        if(!ObjectUtils.isEmpty(orders)) {
+            sortT = Sort.by(orders);
+        }
+        BlogFilterRequest blogFilterRequest = new BlogFilterRequest(tags, sortT, search, page, null);
+        if (pathInfo != null && pathInfo.equals("/instructor")) {
+            handleGetInstuctorBlogs(resp, blogFilterRequest);
+            return;
+        }
         try {
             PageResponse<BlogResponse> blogResponse = blogService.getBlogs(blogFilterRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(blogResponse));
@@ -87,6 +111,24 @@ public class BlogApi extends BaseServlet {
             List<BlogResponse> recentBlogs = blogService.getTopBlogRecent();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(recentBlogs));
         } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+
+    }
+
+    private void handleGetInstuctorBlogs(HttpServletResponse resp, BlogFilterRequest blogFilterRequest) throws IOException {
+        try {
+            PageResponse<BlogResponse> blogsByInstructor = blogService.getBlogsByInstructor(blogFilterRequest);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(blogsByInstructor));
+        }
+        catch (AuthenticationException e){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+        }
+        catch (ForbiddenException e){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+        }
+        catch (Exception e) {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
