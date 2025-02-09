@@ -41,7 +41,7 @@
 <!-- Preloader End -->
 
 <!-- Main content -->
-<main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
+<main class="login-body" style="background: linear-gradient(to bottom, #e6e0ea, #b8c2ed);">
     <form class="form-default" id="reset-password-form">
 
         <div class="login-form">
