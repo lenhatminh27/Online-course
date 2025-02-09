@@ -112,7 +112,7 @@
 
     <%@include file="../../common/instructor/header.jsp" %>
     <div class="container">
-        <h2>Create New Blog</h2>
+        <h2>Tao Blog Moi</h2>
         <div id="errorMessage"></div>
         <div id="successMessage"></div>
         <form id="createBlogForm">
@@ -132,7 +132,7 @@
                 <input type="text" id="tags" name="tags" placeholder="e.g., Java, Spring, Hibernate" required>
             </div>
 
-            <button type="submit">Submit</button>
+            <button type="submit">Tao Blog</button>
         </form>
 
 

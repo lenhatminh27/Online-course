@@ -1,5 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <!doctype html>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <html class="no-js" lang="zxx">
 <head>
     <meta charset="utf-8">
@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-<!-- ? Preloader Start -->
+<!-- Preloader Start -->
 <div id="preloader-active">
     <div class="preloader d-flex align-items-center justify-content-center">
         <div class="preloader-inner position-relative">
@@ -38,115 +38,85 @@
         </div>
     </div>
 </div>
-<!-- Preloader Start-->
+<!-- Preloader End -->
 
-
+<!-- Main content -->
 <main class="login-body" data-vide-bg="assets/img/login-bg.mp4">
-    <!-- Đăng nhập Admin -->
-    <form class="form-default" id="login-form">
+    <form class="form-default" id="send-email-form">
+
         <div class="login-form">
+
             <!-- logo-login -->
             <div class="logo-login">
                 <a href="index.html"><img src="assets/img/logo/loder.png" alt=""></a>
             </div>
-            <h2>Đăng Nhập Tại Đây</h2>
-            <!-- Container thông báo lỗi -->
-            <div id="error-message" class="error-message" style="color: red; margin-bottom: 10px;"></div>
+            <h2>Tìm tài khoản của bạn</h2>
+            <span id="message" style="color: green; margin-bottom: 10px"></span>
+            <div id="errorMessage" style="color: red; margin-bottom: 10px"></div>
             <div class="form-input">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" placeholder="Email">
-            </div>
-            <div class="form-input">
-                <label for="password">Mật khẩu</label>
-                <input type="password" name="password" id="password" placeholder="Mật khẩu">
+                <label for="email">Vui lòng nhập email để tìm kiếm tài khoản của bạn</label>
+                <input type="email" name="email" id="email" placeholder="Nhập email" required>
             </div>
             <div class="form-input pt-30">
-                <input type="submit" name="submit" value="Đăng nhập">
+                <input type="submit" name="submit" value="Tìm kiếm">
             </div>
-            <!-- Quên mật khẩu -->
-            <a href="send-reset-password-mail" class="forget">Quên mật khẩu</a>
-            <!-- Đăng ký -->
-            <a href="register" class="registration">Đăng ký</a>
+            <!-- Quay lại đăng nhập -->
+            <a href="login" class="registration">Đăng nhập</a>
         </div>
     </form>
-    <!-- /kết thúc form đăng nhập -->
 </main>
 
-
-
 <script type="module">
-    import { apiRequestWithToken } from  '../assets/config/service.js';
-    import { environment, STORAGE_KEY, avatarDefault } from  '../assets/config/env.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginForm = document.getElementById('login-form');
-        const errorMessageDiv = document.getElementById('error-message');
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorMessageDiv.textContent = '';
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const data = {
-                email: email,
-                password: password,
-            };
+    import {environment} from "../assets/config/env.js";
+    import {apiRequestWithToken} from "../assets/config/service.js";
+
+    document.addEventListener('DOMContentLoaded', function () {
+        async function sendEmail(event) {
+            event.preventDefault();
+            const formData = new FormData(document.querySelector('form'));
+            const email = formData.get('email')
+
+            if (!email) {
+                document.getElementById('errorMessage').textContent = "Vui lòng nhập email!";
+                return;
+            }
+
+            const payload = {email};
+
             try {
-                const response = await fetch(environment.apiUrl + '/auth', {
+                const response = await fetch(environment.apiUrl + "/api/send-reset-password-email", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(payload),
                 });
-                if (response.ok) {
-                    const responseData = await response.json();
-                    localStorage.setItem(STORAGE_KEY.accessToken, responseData.accessToken);
-                    localStorage.setItem(STORAGE_KEY.refreshToken, responseData.refreshToken);
-                    callApiAfterLogin();
-                } else {
+
+                if (!response.ok) {
+                    const message = document.getElementById('message');
+                    message.textContent = "";
                     const errorData = await response.json();
-                    errorMessageDiv.textContent = errorData;
+                    errorMessage.textContent = errorData;
+                    return;
                 }
-            } catch (error) {
-                console.error('Login failed:', error);
-                errorMessageDiv.textContent = 'Failed to connect to the server. Please try again later.';
-            }
-        });
 
-        async function callApiAfterLogin() {
-            try {
-                const response = await apiRequestWithToken(environment.apiUrl + '/api/accounts', {
-                    method: 'GET',
-                });
-                console.log('API response after login:', response);
-                const userCurrent = {
-                    email: response.email,
-                    avatar: getAvatarUrl(response.avatar),
-                    roles: response.roles
-                }
-                localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
-                if(response.roles.includes('ADMIN')){
-                    window.location.href = '/admin';
-                }
-                else{
-                    window.location.href = '/home';
-                }
+                const message = document.getElementById('message');
+                message.textContent = "Yêu cầu thay đổi mật khẩu đã được gửi tới email của bạn";
+                document.getElementById('errorMessage').textContent = "";
+
             } catch (error) {
-                console.error('Error making authenticated API request:', error);
+                const message = document.getElementById('message');
+                message.textContent = "";
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = error.message;
+                console.error('Error:', error);
             }
         }
 
-        function getAvatarUrl(avatar) {
-            const isAvatarPresent = !!avatar;
-            if (isAvatarPresent) {
-                return typeof avatar === 'string' ? avatar : avatarDefault;
-            } else {
-                return avatarDefault;
-            }
-        }
+        document.querySelector('form').addEventListener('submit', sendEmail);
     });
 </script>
-
 
 
 <script src="../assets/js/vendor/modernizr-3.5.0.min.js"></script>

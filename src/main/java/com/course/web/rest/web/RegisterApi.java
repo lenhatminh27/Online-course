@@ -3,13 +3,17 @@ package com.course.web.rest.web;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.AccountDAO;
+import com.course.dao.PasswordResetTokenDAO;
 import com.course.dao.RoleDAO;
 import com.course.dao.impl.AccountDaoImpl;
+import com.course.dao.impl.PasswordResetTokenDAOImpl;
 import com.course.dao.impl.RoleDAOImpl;
 import com.course.dto.request.RegisterRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.service.AccountService;
+import com.course.service.EmailService;
 import com.course.service.impl.AccountServiceImpl;
+import com.course.service.impl.EmailServiceImpl;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,7 +36,9 @@ public class RegisterApi extends HttpServlet {
     public RegisterApi() {
         AccountDAO accountDAO = new AccountDaoImpl();
         RoleDAO roleDAO = new RoleDAOImpl();
-        this.accountService = new AccountServiceImpl(accountDAO, roleDAO);
+        PasswordResetTokenDAO passwordResetTokenDAO = new PasswordResetTokenDAOImpl();
+        EmailService emailService = new EmailServiceImpl();
+        this.accountService = new AccountServiceImpl(accountDAO, roleDAO, passwordResetTokenDAO, emailService);
     }
 
     @Override
