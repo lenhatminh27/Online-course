@@ -32,14 +32,16 @@ public class BlogServiceImpl implements BlogService {
     private final BlogStatisticDAO blogStatisticDAO;
     private final BlogCommentDAO blogCommentDAO;
     private final BookmarksBlogDAO bookmarksBlogDAO;
+    private final SearchHistoryDAO searchHistoryDAO;
 
-    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO, BlogStatisticDAO blogStatisticDAO, BlogCommentDAO blogCommentDAO, BookmarksBlogDAO bookmarksBlogDAO) {
+    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO, BlogStatisticDAO blogStatisticDAO, BlogCommentDAO blogCommentDAO, BookmarksBlogDAO bookmarksBlogDAO, SearchHistoryDAO searchHistoryDAO) {
         this.blogDAO = blogDAO;
         this.accountDAO = accountDAO;
         this.tagDAO = tagDAO;
         this.blogStatisticDAO = blogStatisticDAO;
         this.blogCommentDAO = blogCommentDAO;
         this.bookmarksBlogDAO = bookmarksBlogDAO;
+        this.searchHistoryDAO = searchHistoryDAO;
     }
 
     @Override
@@ -73,6 +75,14 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public PageResponse<BlogResponse> getBlogs(BlogFilterRequest filterRequest) {
+        AccountEntity account = getAuthenticatedAccount();
+        if (!ObjectUtils.isEmpty(account) && !ObjectUtils.isEmpty(filterRequest.getSearch())) {
+            SearchHistoryEntity searchHistory = new SearchHistoryEntity();
+            searchHistory.setAccount(account);
+            searchHistory.setContent(filterRequest.getSearch());
+            searchHistory.setCreatedAt(LocalDateTime.now());
+            searchHistoryDAO.save(searchHistory);
+        }
         PageResponse<BlogEntity> pageResponse = blogDAO.getBlogsByPage(filterRequest);
         List<BlogResponse> blogs = pageResponse.getData().stream()
                 .map(this::convertToBlogResponse)
@@ -106,10 +116,10 @@ public class BlogServiceImpl implements BlogService {
         AccountEntity currentAccount = getAuthenticatedAccount();
         BlogStatisticEntity blogStatistic = blogStatisticDAO.findById(blogId);
         if (blogStatistic != null) {
-                blogStatistic.setLikes(Math.max(0,blogStatistic.getLikes() - 1));
-                blogStatistic.getAccounts().remove(currentAccount);
-                blogStatistic.setAccounts(null);
-                blogStatisticDAO.updateBlogStatistic(blogStatistic);
+            blogStatistic.setLikes(Math.max(0, blogStatistic.getLikes() - 1));
+            blogStatistic.getAccounts().remove(currentAccount);
+            blogStatistic.setAccounts(null);
+            blogStatisticDAO.updateBlogStatistic(blogStatistic);
         } else {
             throw new NotFoundException("Không tìm thấy id của bài viết");
         }
@@ -128,10 +138,10 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public PageResponse<BlogResponse> getBlogsByInstructor(BlogFilterRequest filterRequest) {
         AuthenticationContext context = AuthenticationContextHolder.getContext();
-        if(ObjectUtils.isEmpty(context)) {
+        if (ObjectUtils.isEmpty(context)) {
             throw new AuthenticationException("Người dùng chưa đăng nhập");
         }
-        if(!context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR)){
+        if (!context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR)) {
             throw new ForbiddenException("Không được phép truy cập");
         }
         AccountEntity accountCurrent = getAuthenticatedAccount();
@@ -155,6 +165,9 @@ public class BlogServiceImpl implements BlogService {
     }
 
     private AccountEntity getAuthenticatedAccount() {
+        if (AuthenticationContextHolder.getContext() == null) {
+            return null;
+        }
         String email = AuthenticationContextHolder.getContext().getEmail();
         return accountDAO.findByEmail(email);
     }
@@ -243,16 +256,15 @@ public class BlogServiceImpl implements BlogService {
         );
         BlogStatisticEntity blogStatistic = blogEntity.getBlogStatistic();
         AuthenticationContext context = AuthenticationContextHolder.getContext();
-        if (ObjectUtils.isEmpty(context)){
+        if (ObjectUtils.isEmpty(context)) {
             blogResponse.setIsLike(false);
             blogResponse.setIsBookmark(false);
-        }
-        else{
+        } else {
             AccountEntity accountCurrent = getAuthenticatedAccount();
             blogResponse.setIsLike(blogStatisticDAO.existsByIdAccount(accountCurrent.getId(), blogEntity.getId()));
             blogResponse.setIsBookmark(bookmarksBlogDAO.existsBookmarkBlogId(blogEntity.getId(), accountCurrent.getId()));
         }
-        if (!ObjectUtils.isEmpty(blogStatistic)){
+        if (!ObjectUtils.isEmpty(blogStatistic)) {
             blogResponse.setLikesCount(blogStatistic.getLikes());
             blogResponse.setViewsCount(blogStatistic.getViews());
         }
