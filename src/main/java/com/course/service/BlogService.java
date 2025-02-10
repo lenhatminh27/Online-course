@@ -2,6 +2,7 @@ package com.course.service;
 
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
+import com.course.dto.request.BlogUpdateRequest;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.PageResponse;
 
@@ -17,4 +18,5 @@ public interface BlogService {
     BlogResponse findBlogBySlug(String slug);
     PageResponse<BlogResponse> getBlogsByInstructor(BlogFilterRequest filterRequest);
     void viewBlog(Long blogId);
+    void updateBlog(Long blogId, BlogUpdateRequest blogUpdateRequest);
 }

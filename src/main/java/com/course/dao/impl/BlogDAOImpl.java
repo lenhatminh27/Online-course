@@ -164,4 +164,21 @@ public class BlogDAOImpl implements BlogDAO {
         }
     }
 
+    @Override
+    public void updateBlog(BlogEntity blog) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.update(blog);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Update Blog thất bại", e);
+        }
+
+    }
+
 }

@@ -21,5 +21,7 @@ public interface BlogDAO {
     BlogEntity findBlogById(long id);
 
     BlogEntity findBlogBySlug(String slug);
+
+    void updateBlog(BlogEntity blog);
 }
 
