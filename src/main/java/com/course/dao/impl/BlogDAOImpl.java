@@ -181,4 +181,17 @@ public class BlogDAOImpl implements BlogDAO {
 
     }
 
+    @Override
+    public void deleteBlog(Long id) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            Transaction transaction = null;
+            String hql = "DELETE FROM BlogEntity b WHERE b.id = :blogId";
+            transaction = session.beginTransaction();
+            session.createQuery(hql).setParameter("blogId", id).executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
