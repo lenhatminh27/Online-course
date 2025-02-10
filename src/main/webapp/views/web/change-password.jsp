@@ -71,8 +71,8 @@
                            data-bs-toggle="tab">
                             Thay đổi mật khẩu
                         </a>
-                        <a href="logout.jsp" class="list-group-item list-group-item-action text-danger">
-                            Đăng xuất
+                        <a href="/boomarks" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                            Xem các bài viết đã đánh dấu
                         </a>
                     </div>
                 </div>

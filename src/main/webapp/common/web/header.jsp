@@ -51,9 +51,11 @@
 
                                             <!-- Hiển thị thông tin người dùng khi đã đăng nhập -->
                                             <li id="userInfo" class="user-info">
-                                                <img id="userAvatar" src="" alt="Ảnh đại diện"
-                                                     style="width: 40px; height: 40px; object-fit: cover;
+                                                <a href="/profile">
+                                                    <img id="userAvatar" src="" alt="Ảnh đại diện"
+                                                         style="width: 40px; height: 40px; object-fit: cover;
                                                       border-radius: 50%;">
+                                                </a>
                                             </li>
 
                                             <li class="user-info">

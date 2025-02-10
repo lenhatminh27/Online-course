@@ -11,4 +11,5 @@ public class BadRequestException extends RuntimeException {
     public BadRequestException(ErrorResponse error) {
         this.error = error;
     }
+
 }

@@ -6,12 +6,10 @@ import com.course.dao.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.request.BlogUpdateRequest;
-import com.course.dto.response.AccountResponse;
-import com.course.dto.response.BlogResponse;
-import com.course.dto.response.PageResponse;
-import com.course.dto.response.TagResponse;
+import com.course.dto.response.*;
 import com.course.entity.*;
 import com.course.exceptions.AuthenticationException;
+import com.course.exceptions.BadRequestException;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
@@ -20,6 +18,7 @@ import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -196,11 +195,19 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public void updateBlog(Long blogId, BlogUpdateRequest blogUpdateRequest) {
         AccountEntity account = accountDAO.findByEmail(AuthenticationContextHolder.getContext().getEmail());
-        String slug = generateSlug(blogUpdateRequest.getTitle(), account.getId());
+        String title = blogUpdateRequest.getTitle();
+        String slug = generateSlug(title, account.getId());
 
         List<TagEntity> tags = getOrCreateTags(blogUpdateRequest.getTagName());
 
         BlogEntity blog = blogDAO.findBlogById(blogId);
+
+        if (!title.equals(blog.getTitle())){
+            if (blogDAO.existTitle(title)){
+                ErrorResponse error = new ErrorResponse(List.of("Tiêu đề đã tồn tại"));
+                throw new BadRequestException(error);
+            }
+        }
 
         if (blog == null) {
             throw new ForbiddenException("blog không tồn tại.");
@@ -210,7 +217,7 @@ public class BlogServiceImpl implements BlogService {
         }
         blog.setSlug(slug);
         blog.setTags(tags);
-        blog.setTitle(blogUpdateRequest.getTitle());
+        blog.setTitle(title);
         blog.setContent(blogUpdateRequest.getContent());
         blogDAO.updateBlog(blog);
     }
@@ -269,7 +276,6 @@ public class BlogServiceImpl implements BlogService {
             blogResponse.setViewsCount(blogStatistic.getViews());
         }
         blogResponse.setCommentsCount(blogCommentDAO.findNumberCommentOfBlog(blogEntity.getId()));
-        blogResponse.setIsBookmark(false);
         return blogResponse;
     }
 
