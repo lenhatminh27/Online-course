@@ -10,10 +10,7 @@ import com.course.dto.response.AccountResponse;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.PageResponse;
 import com.course.dto.response.TagResponse;
-import com.course.entity.AccountEntity;
-import com.course.entity.BlogEntity;
-import com.course.entity.BlogStatisticEntity;
-import com.course.entity.TagEntity;
+import com.course.entity.*;
 import com.course.exceptions.AuthenticationException;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
@@ -195,7 +192,7 @@ public class BlogServiceImpl implements BlogService {
         if (blog == null) {
             throw new ForbiddenException("blog không tồn tại.");
         }
-        if (!AuthenticationContextHolder.getContext().getAuthorities().contains("ADMIN") && !account.getId().equals(blog.getAccount().getId())) {
+        if (!AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN) && !account.getId().equals(blog.getAccount().getId())) {
             throw new ForbiddenException("Bạn không có quyền cập nhật blog này");
         }
         blog.setSlug(slug);
@@ -203,6 +200,28 @@ public class BlogServiceImpl implements BlogService {
         blog.setTitle(blogUpdateRequest.getTitle());
         blog.setContent(blogUpdateRequest.getContent());
         blogDAO.updateBlog(blog);
+    }
+
+    @Override
+    public void deleteBlog(Long blogId) {
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        AccountEntity account = accountDAO.findByEmail(email);
+        BlogEntity blog = blogDAO.findBlogById(blogId);
+        if (blog == null) {
+            throw new ForbiddenException("Blog không tồn tại!");
+        }
+        if (!AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN) && !account.getId().equals(blog.getAccount().getId())) {
+            throw new ForbiddenException("Bạn không có quyền xoá blog này!");
+        }
+        List<BlogCommentEntity> listBlogComments = blogCommentDAO.findListNoParentCommentByBlogSlug(blog.getSlug());
+        if (!listBlogComments.isEmpty()) {
+            for (BlogCommentEntity blogComment : listBlogComments) {
+                blogCommentDAO.deleteBlogComment(blogComment);
+            }
+        }
+        blogStatisticDAO.deleteBlogStatisticByBlogId(blogId);
+        bookmarksBlogDAO.deleteAllBookmarksBlogByBlogId(blogId);
+        blogDAO.deleteBlog(blogId);
     }
 
     private BlogResponse convertToBlogResponse(BlogEntity blogEntity) {

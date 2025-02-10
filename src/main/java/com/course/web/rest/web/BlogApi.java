@@ -230,4 +230,33 @@ public class BlogApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Lỗi Server"));
         }
     }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("DELETE_BLOG")
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của blog không được để trống"));
+            return;
+        }
+        Long BlogId;
+        try {
+            BlogId = Long.parseLong(pathInfo.substring(1));
+        } catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của blog không hợp lệ"));
+            return;
+        }
+        try {
+            blogService.deleteBlog(BlogId);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("Xóa blog thành công"));
+        } catch (ForbiddenException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Lỗi Server"));
+        }
+    }
 }
