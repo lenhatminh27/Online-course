@@ -211,15 +211,32 @@
                 const response = await apiRequestWithToken(environment.apiUrl + '/api/blog-post/' + slug, {
                     method: 'GET',
                 });
-
                 if (response) {
                     displayBlogDetails(response);
+                    increaseViews(response);
                 }
             } catch (error) {
                 console.log(error.response?.status);
                 if (error.response?.status === 404) {
                     window.location.assign('/404');
                 }
+                console.log(error.data);
+            }
+        }
+
+        function increaseViews(blog) {
+            try {
+                const response = fetch(environment.apiUrl + '/api/view-blog/' + blog.id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if(response.ok) {
+                    alert("")
+                }
+            } catch (error) {
+                console.log(error.response?.status);
                 console.log(error.data);
             }
         }
@@ -560,6 +577,15 @@
             authorLink.innerHTML += " " + (blog.accountResponse?.email || "Unknown");
             liAuthor.appendChild(authorLink);
             ulElement.appendChild(liAuthor);
+
+            let liViews = document.createElement("li")
+            let viewLink = document.createElement("a");
+            let viewIcon = document.createElement("i");
+            viewIcon.className = "fa-solid fa-eye";
+            viewLink.appendChild(viewIcon);
+            viewLink.innerHTML += " " + blog.viewsCount + " Views";
+            liViews.appendChild(viewLink);
+            ulElement.appendChild(liViews);
 
             let liComments = document.createElement("li");
             let commentLink = document.createElement("a");

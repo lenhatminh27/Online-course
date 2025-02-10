@@ -8,6 +8,7 @@ import com.course.dao.*;
 import com.course.dao.impl.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
+import com.course.dto.request.BlogUpdateRequest;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
@@ -181,5 +182,52 @@ public class BlogApi extends BaseServlet {
         }
     }
 
+    @Override
+    @IsAuthenticated
+    @HasPermission("UPDATE_BLOG")
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        BlogUpdateRequest blogUpdateRequest = gson.fromJson(req.getReader(), BlogUpdateRequest.class);
+        List<String> errors = new ArrayList<>();
 
+        if (ObjectUtils.isEmpty(blogUpdateRequest.getTitle())) {
+            errors.add("không được để trống tiêu đề.");
+        }
+        if (ObjectUtils.isEmpty(blogUpdateRequest.getContent())) {
+            errors.add("không được để trống nội dung.");
+        }
+        if (ObjectUtils.isEmpty(blogUpdateRequest.getTagName())) {
+            errors.add("không được để trống tag.");
+        }
+        if (!errors.isEmpty()) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setError(errors);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+            return;
+        }
+        String pathInfo = req.getPathInfo(); // lấy đường dẫn của blog
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của blog không được để trống"));
+            return;
+        }
+        Long BlogId; // chuyển blogId sang dạng Long
+        try {
+            BlogId = Long.parseLong(pathInfo.substring(1));
+        } catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của blog không hợp lệ"));
+            return;
+        }
+
+        // update blog
+        try {
+            blogService.updateBlog(BlogId, blogUpdateRequest);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("cập nhật blog thành công"));
+        } catch (ForbiddenException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Lỗi Server"));
+        }
+    }
 }
