@@ -17,7 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet(value = "/api/blogs-statistic/*")
-public class BlogStatisticApi extends BaseServlet {
+public class
+BlogStatisticApi extends BaseServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +33,8 @@ public class BlogStatisticApi extends BaseServlet {
         BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
         BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
         BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO);
+        SearchHistoryDAO searchHistoryDAO = new SearchHistoryDAOImpl();
+        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO,searchHistoryDAO);
     }
 
     @Override

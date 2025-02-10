@@ -47,7 +47,8 @@ public class BlogApi extends BaseServlet {
         BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
         BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
         BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO);
+        SearchHistoryDAO seachHistoryDAO = new SearchHistoryDAOImpl();
+        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO, seachHistoryDAO);
     }
 
     @Override
@@ -75,22 +76,22 @@ public class BlogApi extends BaseServlet {
         }
         String sort = req.getParameter("sort");
         List<Sort.Order> orders = new ArrayList<>();
-        if(!ObjectUtils.isEmpty(sort)) {
-            if(sort.equalsIgnoreCase("newest")) {
+        if (!ObjectUtils.isEmpty(sort)) {
+            if (sort.equalsIgnoreCase("newest")) {
                 orders.add(new Sort.Order(Sort.Direction.DESC, "createAt"));
             }
-            if(sort.equalsIgnoreCase("oldest")) {
+            if (sort.equalsIgnoreCase("oldest")) {
                 orders.add(new Sort.Order(Sort.Direction.ASC, "createAt"));
             }
-            if(sort.equalsIgnoreCase("views")) {
+            if (sort.equalsIgnoreCase("views")) {
                 orders.add(new Sort.Order(Sort.Direction.DESC, "views"));
             }
-            if(sort.equalsIgnoreCase("likes")) {
+            if (sort.equalsIgnoreCase("likes")) {
                 orders.add(new Sort.Order(Sort.Direction.DESC, "likes"));
             }
         }
         Sort sortT = null;
-        if(!ObjectUtils.isEmpty(orders)) {
+        if (!ObjectUtils.isEmpty(orders)) {
             sortT = Sort.by(orders);
         }
         BlogFilterRequest blogFilterRequest = new BlogFilterRequest(tags, sortT, search, page, null);
@@ -122,14 +123,11 @@ public class BlogApi extends BaseServlet {
         try {
             PageResponse<BlogResponse> blogsByInstructor = blogService.getBlogsByInstructor(blogFilterRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(blogsByInstructor));
-        }
-        catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-        }
-        catch (ForbiddenException e){
+        } catch (ForbiddenException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }

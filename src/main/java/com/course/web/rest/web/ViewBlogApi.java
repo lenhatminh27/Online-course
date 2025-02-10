@@ -30,7 +30,8 @@ public class ViewBlogApi extends BaseServlet {
         BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
         BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
         BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO);
+        SearchHistoryDAO searchHistoryDAO = new SearchHistoryDAOImpl();
+        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO, searchHistoryDAO);
     }
 
     @Override
