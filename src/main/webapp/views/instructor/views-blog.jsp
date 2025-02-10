@@ -227,6 +227,25 @@
             background-color: #218838;
         }
 
+
+        /* Nút submit */
+        #updateBlogForm button[type="submit"] {
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #updateBlogForm button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+
     </style>
 
 </head>
@@ -320,6 +339,40 @@
             </div>
         </div>
 
+
+        <div class="modal fade" id="blogModalUpdate" tabindex="-1" aria-labelledby="blogModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="blogUpdateModalLabel">Cập nhật bài viết</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateBlogForm">
+                            <div id="errorMessageUpdate" style="color: red"></div>
+                            <div id="successMessageUpdate" style="color: green"></div>
+                            <div class="form-section">
+                                <label for="title">Tiêu đề</label>
+                                <input type="text" id="titleUpdate" name="title" placeholder="Enter blog title" required>
+                            </div>
+
+                            <div class="form-section">
+                                <label for="content">Nội dung</label>
+                                <textarea id="contentUpdate" name="content" placeholder="Enter blog content"
+                                          style="display: none;"></textarea>
+                            </div>
+
+                            <div class="form-section">
+                                <label for="tags">Tags (comma-separated)</label>
+                                <input type="text" id="tagsUpdate" name="tags" placeholder="e.g., Java, Spring, Hibernate" required>
+                            </div>
+
+                            <button type="submit">Cập nhật Blog</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -342,6 +395,16 @@
         .catch(error => {
             console.error('Error initializing CKEditor:', error);
         });
+
+
+
+    let editorInstanceUpdate;
+
+    ClassicEditor.create(document.querySelector('#contentUpdate'))
+        .then(editor => {
+            editorInstanceUpdate = editor;
+        })
+        .catch(error => console.error('Error initializing CKEditor:', error));
 
     document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -431,14 +494,14 @@
 
             data.forEach(function (blog) {
                 const row = document.createElement('tr');
-
+                let tagsString = blog.tagResponses ? blog.tagResponses.map(tag => tag.name).join(', ') : '';
                 let rowContent = "<td>" + blog.id + "</td>";
                 rowContent += "<td>" + blog.title + "</td>";
                 rowContent += "<td>" + formatDate(blog.createAt) + "</td>";
                 rowContent += "<td>" + blog.likesCount + "</td>";
                 rowContent += "<td>" + blog.viewsCount + "</td>";
                 rowContent += "<td>" +
-                    "<button class='w3-button w3-green edit-btn' data-id='" + blog.id + "'>" +
+                    "<button class='w3-button w3-green edit-btn' data-bs-toggle='modal' data-bs-target='#blogModalUpdate' data-id='" + blog.id + "' data-title='" + blog.title + "' data-content='" + encodeURIComponent(blog.content) + "' data-tags='" + tagsString + "'>" +
                     "<i class='fas fa-edit'></i> Sửa</button> " +
                     "<button class='w3-button w3-red delete-btn' data-id='" + blog.id + "'>" +
                     "<i class='fas fa-trash'></i> Xóa</button>" +
@@ -448,11 +511,12 @@
                 tableBody.appendChild(row);
             });
 
-            // Add event listeners for edit and delete buttons
-            document.querySelectorAll('.edit-btn').forEach(function (button) {
+            document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', function () {
-                    const blogId = this.getAttribute('data-id');
-                    alert("Edit blog ID: " + blogId);
+                    document.getElementById('titleUpdate').value = this.getAttribute('data-title');
+                    editorInstanceUpdate.setData(decodeURIComponent(this.getAttribute('data-content')));
+                    document.getElementById('tagsUpdate').value = this.getAttribute('data-tags');
+                    document.getElementById('updateBlogForm').setAttribute('data-id', this.getAttribute('data-id'));
                 });
             });
 
@@ -503,10 +567,9 @@
                         icon: "success",
                         draggable: true
                     });
-
-                    window.location.reload();
                     document.getElementById('createBlogForm').reset();
                     editorInstance.setData(''); // Clear CKEditor content
+                    loadBlogs(1, searchQuery, tagsQuery, sort);
                 })
                 .catch(error => {
                     console.log(error);
@@ -532,6 +595,59 @@
                         });
                     }
                 });
+        });
+
+        function updateBlogApi(blogId, blogData) {
+            var apiUrl = environment.apiUrl + "/api/blogs/" + blogId;
+
+            apiRequestWithToken(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(blogData)
+            })
+                .then(function (response) {
+                    Swal.fire({
+                        title: "Cập nhật bài viết thành công!",
+                        icon: "success",
+                        draggable: true
+                    });
+                    loadBlogs(1, searchQuery, tagsQuery, sort);
+                })
+                .catch(function (error) {
+                    console.error("Lỗi khi cập nhật bài viết:", error);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Cập nhật thất bại",
+                        text: error.message || "Lỗi hệ thống!",
+                    });
+                });
+        }
+
+        // Xử lý sự kiện submit form cập nhật
+        document.getElementById('updateBlogForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var blogId = this.getAttribute('data-id');
+            var title = document.getElementById('titleUpdate').value.trim();
+            var content = editorInstanceUpdate.getData();
+            var tags = document.getElementById('tagsUpdate').value.split(',').map(function (tag) {
+                return tag.trim();
+            }).filter(function (tag) {
+                return tag;
+            });
+
+            if (!title || !content || tags.length === 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Vui lòng nhập đầy đủ thông tin",
+                });
+                return;
+            }
+
+            var blogData = { title: title, content: content, tagName: tags };
+            updateBlogApi(blogId, blogData);
         });
     });
 </script>

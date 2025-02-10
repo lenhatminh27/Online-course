@@ -5,6 +5,7 @@ import com.course.common.utils.StringUtils;
 import com.course.dao.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
+import com.course.dto.request.BlogUpdateRequest;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.BlogResponse;
 import com.course.dto.response.PageResponse;
@@ -180,6 +181,28 @@ public class BlogServiceImpl implements BlogService {
 
         existingTags.addAll(newTags);
         return existingTags;
+    }
+
+    @Override
+    public void updateBlog(Long blogId, BlogUpdateRequest blogUpdateRequest) {
+        AccountEntity account = accountDAO.findByEmail(AuthenticationContextHolder.getContext().getEmail());
+        String slug = generateSlug(blogUpdateRequest.getTitle(), account.getId());
+
+        List<TagEntity> tags = getOrCreateTags(blogUpdateRequest.getTagName());
+
+        BlogEntity blog = blogDAO.findBlogById(blogId);
+
+        if (blog == null) {
+            throw new ForbiddenException("blog không tồn tại.");
+        }
+        if (!AuthenticationContextHolder.getContext().getAuthorities().contains("ADMIN") && !account.getId().equals(blog.getAccount().getId())) {
+            throw new ForbiddenException("Bạn không có quyền cập nhật blog này");
+        }
+        blog.setSlug(slug);
+        blog.setTags(tags);
+        blog.setTitle(blogUpdateRequest.getTitle());
+        blog.setContent(blogUpdateRequest.getContent());
+        blogDAO.updateBlog(blog);
     }
 
     private BlogResponse convertToBlogResponse(BlogEntity blogEntity) {

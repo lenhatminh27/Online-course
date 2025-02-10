@@ -147,7 +147,7 @@ public class BlogCommentApi extends BaseServlet {
         }
         catch (Exception e) {
             e.printStackTrace();
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi Server");
         }
     }
 
@@ -179,7 +179,7 @@ public class BlogCommentApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Lỗi Server"));
         }
     }
 }
