@@ -19,4 +19,5 @@ public interface BlogService {
     PageResponse<BlogResponse> getBlogsByInstructor(BlogFilterRequest filterRequest);
     void viewBlog(Long blogId);
     void updateBlog(Long blogId, BlogUpdateRequest blogUpdateRequest);
+    void deleteBlog(Long blogId);
 }

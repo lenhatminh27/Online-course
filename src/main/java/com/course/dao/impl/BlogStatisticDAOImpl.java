@@ -66,4 +66,17 @@ public class BlogStatisticDAOImpl implements BlogStatisticDAO {
             throw new RuntimeException("Failed to check if account exists in blog statistics", e);
         }
     }
+
+    @Override
+    public void deleteBlogStatisticByBlogId(Long blogId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            Transaction transaction = null;
+            String hql = "DELETE FROM BlogStatisticEntity b WHERE b.id = :blogId";
+            transaction = session.beginTransaction();
+            session.createQuery(hql).setParameter("blogId", blogId).executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

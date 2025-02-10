@@ -11,4 +11,6 @@ public interface BlogStatisticDAO {
     BlogStatisticEntity findById(Long id);
 
     boolean existsByIdAccount(Long id, Long blogId);
+
+    void deleteBlogStatisticByBlogId(Long blogId);
 }

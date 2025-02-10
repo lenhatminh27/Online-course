@@ -58,6 +58,17 @@ public class BookmarksBlogDAOImpl implements BookmarksBlogDAO {
         }
     }
 
-
+    @Override
+    public void deleteAllBookmarksBlogByBlogId(Long blogId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            Transaction transaction = null;
+            String hql = "DELETE FROM BookmarksBlogEntity b WHERE b.blogId = :blogId";
+            transaction = session.beginTransaction();
+            session.createQuery(hql).setParameter("blogId", blogId).executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

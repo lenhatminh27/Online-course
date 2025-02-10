@@ -523,9 +523,18 @@
             document.querySelectorAll('.delete-btn').forEach(function (button) {
                 button.addEventListener('click', function () {
                     const blogId = this.getAttribute('data-id');
-                    if (confirm("Are you sure you want to delete this blog?")) {
-                        alert("Blog ID " + blogId + " deleted!");
-                    }
+                    Swal.fire({
+                        title: "Bạn có muốn xóa blog này không?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Xóa",
+                        cancelButtonText: "Hủy"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            deleteBlog(blogId);
+                            Swal.fire("Saved!", "", "success");
+                        }
+                    });
                 });
             });
         }
@@ -569,7 +578,7 @@
                     });
                     document.getElementById('createBlogForm').reset();
                     editorInstance.setData(''); // Clear CKEditor content
-                    loadBlogs(1, searchQuery, tagsQuery, sort);
+                    loadBlogs(page, searchQuery, tagsQuery, sort);
                 })
                 .catch(error => {
                     console.log(error);
@@ -613,7 +622,7 @@
                         icon: "success",
                         draggable: true
                     });
-                    loadBlogs(1, searchQuery, tagsQuery, sort);
+                    loadBlogs(page, searchQuery, tagsQuery, sort);
                 })
                 .catch(function (error) {
                     console.error("Lỗi khi cập nhật bài viết:", error);
@@ -623,6 +632,35 @@
                         text: error.message || "Lỗi hệ thống!",
                     });
                 });
+        }
+
+        async function deleteBlog(blogId) {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + '/api/blogs/' + blogId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (response) {
+                    Swal.fire({
+                        title: "Xóa bài viết thành công!",
+                        icon: "success",
+                        draggable: true
+                    });
+                    loadBlogs(page, searchQuery, tagsQuery, sort);
+                }
+                else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Xóa thất bại",
+                        text: error.message || "Lỗi hệ thống!",
+                    });
+                }
+            } catch (error) {
+                console.log(error.response?.status);
+                console.log(error.data);
+            }
         }
 
         // Xử lý sự kiện submit form cập nhật
@@ -650,6 +688,8 @@
             updateBlogApi(blogId, blogData);
         });
     });
+
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
