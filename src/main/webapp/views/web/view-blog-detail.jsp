@@ -232,9 +232,7 @@
                         'Content-Type': 'application/json',
                     },
                 });
-                if(response.ok) {
-                    alert("")
-                }
+
             } catch (error) {
                 console.log(error.response?.status);
                 console.log(error.data);
@@ -274,7 +272,7 @@
                 '<p class="date">' + new Date(comment.createdAt).toLocaleString() + '</p>' +
                 '</div>' +
                 '<div class="reply-btn">' +
-                '<a href="#" class="btn-reply text-uppercase" id="' + replyLinkId + '">Reply</a>' +
+                '<a href="#" class="btn-reply text-uppercase" id="' + replyLinkId + '">Trả lời</a>' +
                 '</div>' ;
 
              const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);
@@ -301,13 +299,13 @@
                 '</div>' +
                 '</div>' +
                 '<div id="' + replyFormId + '" class="reply-form" style="margin-top: 10px; display: none;">' +
-                '<input type="text" id="accountReply' + comment.id + '" placeholder="Write a reply..." ' +
+                '<input type="text" id="accountReply' + comment.id + '" placeholder="Phản hồi ..." ' +
                 'style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">' +
                 '<button id="post-btn-' + comment.id + '" ' +
                 'style="padding: 8px 16px; border-radius: 5px; background-color: #4CAF50; color: white; border: none;">Gửi</button>' +
                 '</div>' +
                 '<div id="' + updateFormId + '" class="update-form" style="margin-top: 10px; display: none;">' +
-                '<input type="text" id="accountUpdate' + comment.id + '" placeholder="Write a reply..." ' +
+                '<input type="text" id="accountUpdate' + comment.id + '" placeholder="Phản hồi..." ' +
                 'style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">' +
                 '<button id="update-btn-' + comment.id + '" ' +
                 'style="padding: 8px 16px; border-radius: 5px; background-color: #4CAF50; color: white; border: none;">Cập nhật</button>' +
@@ -362,7 +360,11 @@
 
         async function updateComment(comment, content) {
             if (!content) {
-                alert('Vui lòng nhập comment.');
+                Swal.fire({
+                    icon: "error",
+                    title: "Trả lời bình luận thất bại!",
+                    text: "Vui lòng nhập bình luận!"
+                });
                 return;
             }
 
@@ -483,7 +485,11 @@
 
         async function postReply(commentId, content) {
             if (!content) {
-                alert('Vui lòng nhập comment.');
+                Swal.fire({
+                    icon: "error",
+                    title: "Trả lời bình luận thất bại!",
+                    text: "Vui lòng nhập nội dung bình luận!"
+                });
                 return;
             }
 
@@ -681,7 +687,11 @@
             event.preventDefault();
             const commentInput = document.getElementById("comment").value.trim();
             if (!commentInput) {
-                alert("Vui lòng nhập nội dung bình luận!");
+                Swal.fire({
+                    icon: "error",
+                    title: "Gửi bình luận thất bại!",
+                    text: "Vui lòng nhập nội dung bình luận!"
+                });
                 return;
             }
             const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);

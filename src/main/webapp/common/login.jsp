@@ -54,11 +54,11 @@
             <div id="error-message" class="error-message" style="color: red; margin-bottom: 10px;"></div>
             <div class="form-input">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email" placeholder="Email">
+                <input type="email" name="email" id="email" placeholder="Email" required>
             </div>
             <div class="form-input">
                 <label for="password">Mật khẩu</label>
-                <input type="password" name="password" id="password" placeholder="Mật khẩu">
+                <input type="password" name="password" id="password" required placeholder="Mật khẩu">
             </div>
             <div class="form-input pt-30">
                 <input type="submit" name="submit" value="Đăng nhập">
@@ -86,10 +86,20 @@
             errorMessageDiv.textContent = '';
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            if (!email) {
+                errorMessageDiv.textContent = 'Vui lòng nhập email!';
+                return;
+            }
+
+            if (!password) {
+                errorMessageDiv.textContent = 'Vui lòng nhập mật khẩu!';
+                return;
+            }
             const data = {
                 email: email,
                 password: password,
             };
+
             try {
                 const response = await fetch(environment.apiUrl + '/auth', {
                     method: 'POST',

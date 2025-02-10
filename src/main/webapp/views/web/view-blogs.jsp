@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="../../assets/css/nice-select.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         * {
             box-sizing: border-box;
@@ -249,6 +250,19 @@
         .search-suggestion:hover {
             background-color: #f1f1f1;
         }
+
+        .bookmark-icon {
+            font-size: 18px;
+            color: #bbb;
+            cursor: pointer;
+            margin-left: auto;
+            transition: color 0.3s ease;
+        }
+
+        .bookmark-icon:hover {
+            color: #5CB85C;
+        }
+
     </style>
 </head>
 <body>
@@ -361,10 +375,12 @@
         const tagsQuery = urlParams.has('tags') ? urlParams.get('tags') : '';
 
         document.querySelector("#blogs").addEventListener("click", function (event) {
-            let article = event.target.closest(".article");
+            let article = event.target.closest(".article__preview-link"); // Ensure we get the correct container
             if (article) {
                 let slug = article.getAttribute("data-slug");
-                window.location.href = "/blog/" + slug;
+                if (slug) {
+                    window.location.href = "/blog/" + slug;
+                }
             }
         });
 
@@ -472,8 +488,8 @@
                 for (let i = 0; i < response.data.length; i++) {
                     let blog = response.data[i];
                     let createDate = new Date(blog.createAt).toLocaleDateString();
-                    let avatar = blog.accountResponse.avatar ? blog.accountResponse.avatar : avatarDefault;
-                    htmls += "<div class='article' data-slug='" + blog.slug + "'>" +
+                    let avatar = avatarDefault;
+                    htmls += "<div class='article' data-slug='" + blog.slug + "' data-id='" + blog.id + "'>" +
                         "<div class='article__meta'>" +
                         "<img src='" + avatar + "' alt='Author Avatar'/>" +
                         "<div class='article__meta__info'>" +
@@ -481,13 +497,19 @@
                         blog.accountResponse.email +
                         "</span>" +
                         "<p class='article__meta__info--date'>" + createDate + "</p>" +
-                        "</div>" +
-                        "</div>" +
-                        "<div class='article__preview-link'>" +
-                        "<h1 class='article__preview-link__title'>" + blog.title + "</h1>" +
-                        "<div class='article__preview-link__footer'>" +
-                        "<span class='article__preview-link__footer--read-more'>Xem thêm...</span>" +
-                        "<div class='article__preview-link__footer__tags'>";
+                        "</div>";
+                        if(blog.isBookmark){
+                            htmls += '<i class="fa-solid fa-bookmark bookmark-icon"></i>';
+                        }
+                        else{
+                            htmls += '<i class="fa-regular fa-bookmark bookmark-icon"></i>';
+                        }
+                        htmls += "</div>" +
+                            "<div class='article__preview-link' data-slug='" + blog.slug + "'>" + // Thêm data-slug vào đây
+                            "<h1 class='article__preview-link__title'>" + blog.title + "</h1>" +
+                            "<div class='article__preview-link__footer'>" +
+                            "<span class='article__preview-link__footer--read-more'>Xem thêm...</span>" +
+                            "<div class='article__preview-link__footer__tags'>";
 
                     for (let j = 0; j < blog.tagResponses.length; j++) {
                         let tag = blog.tagResponses[j];
@@ -522,6 +544,67 @@
                 console.error('Error occurred:', error);
             }
         }
+
+        async function addBookmark(id, iconElement) {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + "/api/bookmarks", {
+                    method: "POST",
+                    body: JSON.stringify({ blogId: id }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.success) {
+                    iconElement.classList.remove("fa-regular");
+                    iconElement.classList.add("fa-solid");
+                    iconElement.id = "deleteBookMark";
+                }
+            } catch (error) {
+                console.error("Lỗi khi thêm bookmark:", error);
+            }
+        }
+
+        async function removeBookmark(id, iconElement) {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + "/api/bookmarks/" + id, {
+                    method: "DELETE",
+                    body: JSON.stringify({ blogId: id }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.success) {
+                    iconElement.classList.remove("fa-solid");
+                    iconElement.classList.add("fa-regular");
+                    iconElement.id = "addBookMark";
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa bookmark:", error);
+            }
+        }
+
+
+        document.addEventListener("click", async function (event) {
+            if (event.target.classList.contains("bookmark-icon")) {
+                let article = event.target.closest(".article");
+                if (!article) return;
+
+                let id = article.getAttribute("data-id");
+
+                if (event.target.classList.contains("fa-regular")) {
+                    await addBookmark(id, event.target);
+                    event.target.classList.remove("fa-regular");
+                    event.target.classList.add("fa-solid");
+                } else {
+                    await removeBookmark(id, event.target);
+                    event.target.classList.remove("fa-solid");
+                    event.target.classList.add("fa-regular");
+                }
+                return;
+            }
+        });
 
         let debounceTimer;
 
