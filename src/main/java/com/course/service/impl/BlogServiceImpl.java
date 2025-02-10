@@ -145,6 +145,17 @@ public class BlogServiceImpl implements BlogService {
         return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), blogs);
     }
 
+    @Override
+    public void viewBlog(Long blogId) {
+        BlogStatisticEntity blogStatistic = blogStatisticDAO.findById(blogId);
+        if (blogStatistic != null) {
+            blogStatistic.setViews(blogStatistic.getViews() + 1);
+            blogStatisticDAO.updateBlogStatistic(blogStatistic);
+        } else {
+            throw new NotFoundException("Không tìm thấy id của bài viết");
+        }
+    }
+
     private AccountEntity getAuthenticatedAccount() {
         String email = AuthenticationContextHolder.getContext().getEmail();
         return accountDAO.findByEmail(email);
