@@ -2,11 +2,11 @@ package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
 import com.course.dao.BookmarksBlogDAO;
-import com.course.dto.request.BookmarksBlogRequest;
-import com.course.entity.BlogEntity;
 import com.course.entity.BookmarksBlogEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
+import java.util.List;
 
 public class BookmarksBlogDAOImpl implements BookmarksBlogDAO {
 
@@ -62,7 +62,7 @@ public class BookmarksBlogDAOImpl implements BookmarksBlogDAO {
     public void deleteAllBookmarksBlogByBlogId(Long blogId) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             Transaction transaction = null;
-            String hql = "DELETE FROM BookmarksBlogEntity b WHERE b.blogId = :blogId";
+            String hql = "DELETE FROM BookmarksBlogEntity b WHERE b.blog.id = :blogId";
             transaction = session.beginTransaction();
             session.createQuery(hql).setParameter("blogId", blogId).executeUpdate();
             transaction.commit();
@@ -71,4 +71,55 @@ public class BookmarksBlogDAOImpl implements BookmarksBlogDAO {
         }
     }
 
+    @Override
+    public List<BookmarksBlogEntity> getBookmarkedBlogsByUserId(Long accountId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT b FROM BookmarksBlogEntity b " +
+                    "JOIN FETCH b.blog bl " +  // Load luôn blog
+                    "JOIN FETCH bl.account acc " + // Load luôn account của blog
+                    "WHERE b.account.id = :userId";
+            return session.createQuery(hql, BookmarksBlogEntity.class).setParameter("userId", accountId)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi không lấy được các trang đã đánh dấu", e);
+        }
+    }
+
+    @Override
+    public BookmarksBlogEntity findByBlogIdAndUserId(Long blogId, Long accountId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT b FROM BookmarksBlogEntity b WHERE b.blog.id = :blogId AND b.account.id = :accountId";
+            return session.createQuery(hql, BookmarksBlogEntity.class)
+                    .setParameter("blogId", blogId)
+                    .setParameter("accountId", accountId)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi không lấy được bookmark theo blogId", e);
+        }
+    }
+
+    @Override
+    public void deleteBookmarksBlogByBlogIdAndUserId(Long blogId, Long accountId) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            String hql = "DELETE FROM BookmarksBlogEntity b WHERE b.blog.id = :blogId AND b.account.id = :accountId";
+            int deletedRows = session.createQuery(hql)
+                    .setParameter("blogId", blogId)
+                    .setParameter("accountId", accountId)
+                    .executeUpdate();
+            transaction.commit();
+            if (deletedRows == 0) {
+                System.out.println("Không tìm thấy bookmark để xóa!");
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi xóa bookmark", e);
+        }
+    }
 }

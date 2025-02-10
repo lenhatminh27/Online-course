@@ -13,6 +13,7 @@ import com.course.dto.response.BlogResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
 import com.course.exceptions.AuthenticationException;
+import com.course.exceptions.BadRequestException;
 import com.course.exceptions.ForbiddenException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -142,22 +143,22 @@ public class BlogApi extends BaseServlet {
         List<String> errors = new ArrayList<>();
 
         if (ObjectUtils.isEmpty(blogCreateRequest)) {
-            errors.add("Request can not null");
+            errors.add("Yêu cầu không được để trống");
         }
 
         if (ObjectUtils.isEmpty(blogCreateRequest.getTitle())) {
-            errors.add("Title can not null");
+            errors.add("Tiêu đề không được để trống");
         }
         if (ObjectUtils.isEmpty(blogCreateRequest.getContent())) {
-            errors.add("Content can not null");
+            errors.add("Nội dung không được để trống");
         }
 
         if (ObjectUtils.isEmpty(blogCreateRequest.getTagName())) {
-            errors.add("Tag name can not null");
+            errors.add("Tag không được để trống");
         }
 
         if (blogService.existTitle(blogCreateRequest.getTitle())) {
-            errors.add("Title already exists");
+            errors.add("Tiêu đề đã tồn tại");
         }
 
 
@@ -176,7 +177,7 @@ public class BlogApi extends BaseServlet {
         } catch (Exception e) {
             // Xử lý ngoại lệ và trả về lỗi server
             e.printStackTrace();
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi server");
         }
     }
 
@@ -221,7 +222,11 @@ public class BlogApi extends BaseServlet {
         try {
             blogService.updateBlog(BlogId, blogUpdateRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("cập nhật blog thành công"));
-        } catch (ForbiddenException e) {
+        }
+        catch (BadRequestException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getError()));
+        }
+        catch (ForbiddenException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();

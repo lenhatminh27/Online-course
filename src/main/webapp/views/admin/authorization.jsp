@@ -197,7 +197,11 @@
                         console.error('Error submitting data:', error);
                     });
             } else {
-                alert("Please select a role and permissions.");
+                Swal.fire({
+                    icon: "error",
+                    title: "Cập nhật quyền thất bại!",
+                    text: " Vui lòng chọn quyền!"
+                });
             }
         });
     });

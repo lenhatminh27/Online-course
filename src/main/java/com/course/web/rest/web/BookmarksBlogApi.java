@@ -9,7 +9,7 @@ import com.course.dao.impl.AccountDaoImpl;
 import com.course.dao.impl.BlogDAOImpl;
 import com.course.dao.impl.BookmarksBlogDAOImpl;
 import com.course.dto.request.BookmarksBlogRequest;
-import com.course.dto.response.BlogResponse;
+import com.course.dto.response.BookmarksBlogResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
@@ -82,6 +82,59 @@ public class BookmarksBlogApi extends BaseServlet {
             // Xử lý ngoại lệ và trả về lỗi server
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("BOOKMARK_BLOG")
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        try {
+            // Gọi service để lấy danh sách blog đã bookmark
+            List<BookmarksBlogResponse> bookmarksBlogResponses = bookmarksBlogService.getBookmarkedBlogs();
+
+            // Kiểm tra nếu danh sách rỗng
+            if (ObjectUtils.isEmpty(bookmarksBlogResponses)) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("Không có blog nào được bookmark"));
+                return;
+            }
+
+            // Ghi phản hồi JSON về client
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(bookmarksBlogResponses));
+        } catch (Exception e) {
+            e.printStackTrace(); // Log lỗi để debug
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("BOOKMARK_BLOG")
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        BookmarksBlogRequest bookmarksBlogRequest = gson.fromJson(req.getReader(), BookmarksBlogRequest.class);
+        if (ObjectUtils.isEmpty(bookmarksBlogRequest)) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setError(List.of("BlogId không được null"));
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+            return;
+        }
+
+        try {
+            Long blogId = bookmarksBlogRequest.getBlogId();
+            bookmarksBlogService.deleteBookmark(blogId);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, "");
+        } catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("BlogId không hợp lệ"));
+        } catch (NotFoundException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson("Bookmark không tồn tại"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
         }
     }
 }

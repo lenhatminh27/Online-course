@@ -128,6 +128,8 @@
             const success = await updateToInstructor();
             if (success) {
                 await callApiAfterChangeRole();
+                await refreshToken();
+                window.location.replace("/home");
             }
         });
     });
@@ -166,9 +168,25 @@
                 roles: response.roles || [],
             };
             localStorage.setItem(STORAGE_KEY.userCurrent, JSON.stringify(userCurrent));
-            window.location.assign("/home")
         } catch (error) {
             console.error('Error making authenticated API request:', error);
+        }
+    }
+
+    async function refreshToken() {
+        try {
+            const refreshToken = localStorage.getItem(STORAGE_KEY.refreshToken);
+            const headers = new Headers();
+            headers.append('Authorization', `Bearer ` + refreshToken);
+            const response = await fetch(environment.apiUrl + '/refresh-token', { method: 'GET', headers });
+            if (!response.ok) {
+                throw new Error('Failed to refresh token');
+            }
+            const data = await response.json();
+            localStorage.setItem(STORAGE_KEY.accessToken, data.accessToken);
+            localStorage.setItem(STORAGE_KEY.refreshToken, data.refreshToken);
+        } catch (error) {
+            console.error(error.message);
         }
     }
 

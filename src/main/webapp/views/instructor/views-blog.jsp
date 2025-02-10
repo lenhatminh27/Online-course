@@ -422,6 +422,35 @@
             });
         }
 
+        async function deleteBlog(blogId) {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + '/api/blogs/' + blogId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (response) {
+                    Swal.fire({
+                        title: "Xóa bài viết thành công!",
+                        icon: "success",
+                        draggable: true
+                    });
+                    loadBlogs(page, searchQuery, tagsQuery, sort);
+                }
+                else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Xóa thất bại",
+                        text: error.message || "Lỗi hệ thống!",
+                    });
+                }
+            } catch (error) {
+                console.log(error.response?.status);
+                console.log(error.data);
+            }
+        }
+
         async function loadBlogs(page, searchQuery, tags, sort){
             try {
                 let url = environment.apiUrl + "/api/blogs/instructor?page=" + page;
@@ -431,7 +460,9 @@
                 if (tags) {
                     url += '&tags=' + tags;
                 }
-                if (sort) url += '&sort=' + sort;
+                if (sort){
+                    url += '&sort=' + sort;
+                }
                 const response = await apiRequestWithToken(url, {
                     method: 'GET',
                 });
@@ -440,7 +471,7 @@
                 let paginationHtml = "";
 
                 if (response.page > 1) {
-                    paginationHtml += "<li class='page-item'><a href='#' class='page-link' onclick='updatePage(" + (response.page - 1) + ")'>Previous</a></li>";
+                    paginationHtml += "<li class='page-item'><a href='#' class='page-link' onclick='updatePage(" + (response.page - 1) + ")'>Trước</a></li>";
                 }
 
                 for (let i = 1; i <= response.totalPages; i++) {
@@ -449,7 +480,7 @@
                 }
 
                 if (response.page < response.totalPages) {
-                    paginationHtml += "<li class='page-item'><a href='#' class='page-link' onclick='updatePage2(" + (response.page + 1) + ")'>Next</a></li>";
+                    paginationHtml += "<li class='page-item'><a href='#' class='page-link' onclick='updatePage2(" + (response.page + 1) + ")'>Sau</a></li>";
                 }
 
                 pagination.innerHTML = paginationHtml;
@@ -462,6 +493,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const searchQuery = document.getElementById('search-input').value;
             const tagsQuery = urlParams.get('tags') || '';
+            const sort = urlParams.get('sort') || 'newest';
             urlParams.set('page', page);
             if (searchQuery) {
                 urlParams.set('search', searchQuery);
@@ -473,7 +505,7 @@
                 urlParams.set('sort', sort);
             }
             window.history.pushState({}, '', '?' + urlParams.toString());
-            loadBlogs(page, searchQuery, tagsQuery);
+            loadBlogs(page, searchQuery, tagsQuery, sort);
         };
 
         window.handleSearch2 = function handleSearch(event) {
@@ -486,6 +518,8 @@
             window.history.pushState({}, '', '?' + urlParams.toString());
             loadBlogs(1, searchQuery, tagsQuery, sort);
         };
+
+
 
 
         function loadBlogsData(data) {
@@ -625,43 +659,32 @@
                     loadBlogs(page, searchQuery, tagsQuery, sort);
                 })
                 .catch(function (error) {
-                    console.error("Lỗi khi cập nhật bài viết:", error);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Cập nhật thất bại",
-                        text: error.message || "Lỗi hệ thống!",
-                    });
+                    console.log(error);
+                    if (error.response?.status === 400 && error.data?.error) {
+                        console.error('Validation errors:', error.data.error);
+                        let errorMess = "";
+                        for (const x of error.data.error) {
+                            errorMess += x;
+                        }
+                        errorMessage.textContent = errorMess;
+                        Swal.fire({
+                            icon: "error",
+                            title: "Cập nhật bài viết thất bại",
+                            text: errorMess,
+                        });
+                    }else {
+                        let errorMessage = error.message || 'A network error occurred.';
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Cập nhật bài viết thất bại",
+                            text: errorMessage,
+                        });
+                    }
                 });
         }
 
-        async function deleteBlog(blogId) {
-            try {
-                const response = await apiRequestWithToken(environment.apiUrl + '/api/blogs/' + blogId, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (response) {
-                    Swal.fire({
-                        title: "Xóa bài viết thành công!",
-                        icon: "success",
-                        draggable: true
-                    });
-                    loadBlogs(page, searchQuery, tagsQuery, sort);
-                }
-                else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Xóa thất bại",
-                        text: error.message || "Lỗi hệ thống!",
-                    });
-                }
-            } catch (error) {
-                console.log(error.response?.status);
-                console.log(error.data);
-            }
-        }
+
 
         // Xử lý sự kiện submit form cập nhật
         document.getElementById('updateBlogForm').addEventListener('submit', function (event) {
