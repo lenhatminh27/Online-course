@@ -88,6 +88,9 @@ public class BlogCommentApi extends BaseServlet {
         if (ObjectUtils.isEmpty(blogCommentCreateRequest.getContent())) {
             errors.add("Nội dung không được để trống");
         }
+        if (blogCommentCreateRequest.getContent().length() > 500) {
+            errors.add("Nội dung không được quá 500 ký tự");
+        }
         if (!ObjectUtils.isEmpty(errors)) {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setError(errors);
