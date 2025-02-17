@@ -2,6 +2,7 @@ package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
 import com.course.common.utils.ObjectUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.core.repository.specification.HibernateQueryHelper;
 import com.course.dao.BlogDAO;
 import com.course.dto.request.BlogFilterRequest;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 import static com.course.common.utils.StringUtils.deAccent;
 
+@Repository
 public class BlogDAOImpl implements BlogDAO {
 
     @Override

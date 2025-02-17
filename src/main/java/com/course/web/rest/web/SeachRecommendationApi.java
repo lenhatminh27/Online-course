@@ -1,36 +1,32 @@
 package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.SearchHistoryDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.SearchHistoryDAOImpl;
 import com.course.dto.response.SearchRecommendationResponse;
-import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.SearchHistoryService;
 import com.course.service.impl.SearchHistoryServiceImpl;
 import com.google.gson.Gson;
-import com.google.protobuf.Api;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
+
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
 
 @WebServlet("/api/search-recommendation")
 public class SeachRecommendationApi extends BaseServlet {
 
 
-    private final Gson gson = new Gson();
-    private final SearchHistoryService searchHistoryService;
+    private Gson gson;
+    private SearchHistoryService searchHistoryService;
 
-    public SeachRecommendationApi() {
-        SearchHistoryDAO searchHistoryDAO = new SearchHistoryDAOImpl();
-        AccountDAO accountDAO = new AccountDaoImpl();
-        this.searchHistoryService = new SearchHistoryServiceImpl(searchHistoryDAO, accountDAO);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        searchHistoryService = getBean(SearchHistoryServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

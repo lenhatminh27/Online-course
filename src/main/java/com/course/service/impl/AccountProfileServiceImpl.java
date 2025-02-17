@@ -1,6 +1,7 @@
 package com.course.service.impl;
 
 import com.course.common.utils.ObjectUtils;
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.AccountProfileDAO;
 import com.course.dto.request.AccountProfileRequest;
@@ -9,20 +10,18 @@ import com.course.entity.AccountEntity;
 import com.course.entity.AccountProfileEntity;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.AccountProfileService;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
+@Service
+@RequiredArgsConstructor
 public class AccountProfileServiceImpl implements AccountProfileService {
     private final AccountProfileDAO accountProfileDAO;
     private final AccountDAO accountDAO;
-
-    public AccountProfileServiceImpl(AccountProfileDAO accountProfileDAO, AccountDAO accountDAO) {
-        this.accountProfileDAO = accountProfileDAO;
-        this.accountDAO = accountDAO;
-    }
 
     @Override
     public AccountProfileResponse getAccountProfileByAccount() {

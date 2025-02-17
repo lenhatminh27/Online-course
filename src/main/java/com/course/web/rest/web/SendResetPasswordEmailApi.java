@@ -1,18 +1,11 @@
 package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.PasswordResetTokenDAO;
-import com.course.dao.RoleDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.PasswordResetTokenDAOImpl;
-import com.course.dao.impl.RoleDAOImpl;
 import com.course.dto.request.ForgotPasswordRequest;
 import com.course.service.AccountService;
-import com.course.service.EmailService;
 import com.course.service.impl.AccountServiceImpl;
-import com.course.service.impl.EmailServiceImpl;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,21 +15,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serial;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet("/api/send-reset-password-email")
 public class SendResetPasswordEmailApi extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson;
 
-    private final AccountService accountService;
+    private AccountService accountService;
 
-    public SendResetPasswordEmailApi() {
-        AccountDAO accountDAO = new AccountDaoImpl();
-        RoleDAO roleDAO = new RoleDAOImpl();
-        PasswordResetTokenDAO passwordResetTokenDAO = new PasswordResetTokenDAOImpl();
-        EmailService emailService = new EmailServiceImpl();
-        this.accountService = new AccountServiceImpl(accountDAO, roleDAO, passwordResetTokenDAO, emailService);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        accountService = getBean(AccountServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

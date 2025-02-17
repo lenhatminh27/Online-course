@@ -2,12 +2,6 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.BlogDAO;
-import com.course.dao.BookmarksBlogDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.BlogDAOImpl;
-import com.course.dao.impl.BookmarksBlogDAOImpl;
 import com.course.dto.request.BookmarksBlogRequest;
 import com.course.dto.response.BookmarksBlogResponse;
 import com.course.dto.response.ErrorResponse;
@@ -18,6 +12,7 @@ import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.BookmarksBlogService;
 import com.course.service.impl.BookmarksBlogServiceImpl;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,20 +23,21 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet("/api/bookmarks/*")
 public class BookmarksBlogApi extends BaseServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson;
 
-    private final BookmarksBlogService bookmarksBlogService;
+    private BookmarksBlogService bookmarksBlogService;
 
-    public BookmarksBlogApi() {
-        BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
-        AccountDAO accountDAO = new AccountDaoImpl();
-        BlogDAO blogDAO = new BlogDAOImpl();
-        bookmarksBlogService = new BookmarksBlogServiceImpl(bookmarksBlogDAO, blogDAO, accountDAO);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        bookmarksBlogService = getBean(BookmarksBlogServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

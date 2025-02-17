@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.PermissionDAO;
 import com.course.entity.PermissionEntity;
 import org.hibernate.Session;
@@ -8,6 +9,7 @@ import org.hibernate.Session;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class PermissionDAOImpl implements PermissionDAO {
 
     @Override

@@ -4,6 +4,7 @@ import com.course.common.utils.MessageUtils;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.PasswordUtils;
 import com.course.common.utils.ResponseUtils;
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.RefreshTokenDAO;
 import com.course.dto.request.AuthenticationRequest;
@@ -18,11 +19,14 @@ import com.course.service.AuthenticationService;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Service
+@RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenProvider tokenProvider;
@@ -31,11 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final RefreshTokenDAO refreshTokenDAO;
 
-    public AuthenticationServiceImpl(TokenProvider tokenProvider, AccountDAO authenticationDAO, RefreshTokenDAO refreshTokenDAO) {
-        this.tokenProvider = tokenProvider;
-        this.authenticationDAO = authenticationDAO;
-        this.refreshTokenDAO = refreshTokenDAO;
-    }
+
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {

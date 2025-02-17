@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.BlogCommentDAO;
 import com.course.entity.BlogCommentEntity;
 import org.hibernate.Session;
@@ -9,6 +10,7 @@ import org.hibernate.Transaction;
 import java.util.Collections;
 import java.util.List;
 
+@Repository
 public class BlogCommentDAOImpl implements BlogCommentDAO {
     @Override
     public BlogCommentEntity createBlogComment(BlogCommentEntity blogComment) {

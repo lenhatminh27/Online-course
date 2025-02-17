@@ -21,6 +21,7 @@ import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.BlogService;
 import com.course.service.impl.BlogServiceImpl;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,24 +33,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet("/api/blogs/*")
 public class BlogApi extends BaseServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson;
 
-    private final BlogService blogService;
+    private BlogService blogService;
 
-    public BlogApi() {
-        BlogDAO blogDAO = new BlogDAOImpl();
-        AccountDAO accountDAO = new AccountDaoImpl();
-        TagDAO tagDAO = new TagDAOImpl();
-        BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
-        BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
-        BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
-        SearchHistoryDAO seachHistoryDAO = new SearchHistoryDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO, seachHistoryDAO);
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        blogService = getBean(BlogServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

@@ -1,24 +1,23 @@
 package com.course.service.impl;
 
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.SearchHistoryDAO;
 import com.course.entity.AccountEntity;
 import com.course.entity.SearchHistoryEntity;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.SearchHistoryService;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class SearchHistoryServiceImpl implements SearchHistoryService {
 
     private final SearchHistoryDAO searchHistoryDAO;
     private final AccountDAO accountDAO;
-
-    public SearchHistoryServiceImpl(SearchHistoryDAO searchHistoryDAO, AccountDAO accountDAO) {
-        this.searchHistoryDAO = searchHistoryDAO;
-        this.accountDAO = accountDAO;
-    }
 
 
     @Override

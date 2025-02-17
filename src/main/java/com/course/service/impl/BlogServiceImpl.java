@@ -2,6 +2,7 @@ package com.course.service.impl;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.StringUtils;
+import com.course.core.bean.annotations.Service;
 import com.course.dao.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
@@ -16,13 +17,15 @@ import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContext;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogService;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BlogServiceImpl implements BlogService {
 
     private final BlogDAO blogDAO;
@@ -33,15 +36,6 @@ public class BlogServiceImpl implements BlogService {
     private final BookmarksBlogDAO bookmarksBlogDAO;
     private final SearchHistoryDAO searchHistoryDAO;
 
-    public BlogServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, TagDAO tagDAO, BlogStatisticDAO blogStatisticDAO, BlogCommentDAO blogCommentDAO, BookmarksBlogDAO bookmarksBlogDAO, SearchHistoryDAO searchHistoryDAO) {
-        this.blogDAO = blogDAO;
-        this.accountDAO = accountDAO;
-        this.tagDAO = tagDAO;
-        this.blogStatisticDAO = blogStatisticDAO;
-        this.blogCommentDAO = blogCommentDAO;
-        this.bookmarksBlogDAO = bookmarksBlogDAO;
-        this.searchHistoryDAO = searchHistoryDAO;
-    }
 
     @Override
     public BlogResponse createBlog(BlogCreateRequest blogCreateRequest) {

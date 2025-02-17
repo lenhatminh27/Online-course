@@ -2,6 +2,7 @@ package com.course.security;
 
 import com.course.common.utils.StringUtils;
 import com.course.config.properties.SecurityProperties;
+import com.course.core.bean.annotations.Service;
 import com.course.security.context.AuthenticationContext;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -15,6 +16,7 @@ import java.util.Date;
 
 
 @Slf4j
+@Service
 public class TokenProvider {
 
     private final SecurityProperties securityProperties = SecurityProperties.getInstance();

@@ -2,10 +2,6 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.AccountProfileDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.AccountProfileDAOImpl;
 import com.course.dto.request.AccountProfileRequest;
 import com.course.dto.response.AccountProfileResponse;
 import com.course.dto.response.ErrorResponse;
@@ -14,6 +10,7 @@ import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.AccountProfileService;
 import com.course.service.impl.AccountProfileServiceImpl;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,18 +20,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet("/api/account-profile/*")
 public class AccountProfileApi extends BaseServlet {
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson;
 
-    private final AccountProfileService accountProfileService;
+    private AccountProfileService accountProfileService;
 
-    public AccountProfileApi() {
-        AccountProfileDAO accountProfileDAO = new AccountProfileDAOImpl();
-        AccountDAO accountDAO = new AccountDaoImpl();
-        accountProfileService = new AccountProfileServiceImpl(accountProfileDAO, accountDAO);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        this.accountProfileService = getBean(AccountProfileServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

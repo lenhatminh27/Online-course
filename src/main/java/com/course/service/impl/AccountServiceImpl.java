@@ -3,6 +3,7 @@ package com.course.service.impl;
 import com.course.common.utils.PasswordUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.common.utils.StringUtils;
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.PasswordResetTokenDAO;
 import com.course.dao.RoleDAO;
@@ -22,16 +23,18 @@ import com.course.service.AccountService;
 import com.course.service.EmailService;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static com.course.common.utils.PasswordUtils.hashPassword;
 
 
+@Service
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     private final AccountDAO accountDAO;
@@ -42,12 +45,6 @@ public class AccountServiceImpl implements AccountService {
 
     private final EmailService emailService;
 
-    public AccountServiceImpl(AccountDAO accountDAO, RoleDAO roleDAO, PasswordResetTokenDAO passwordResetTokenDAO, EmailService emailService) {
-        this.accountDAO = accountDAO;
-        this.roleDAO = roleDAO;
-        this.passwordResetTokenDAO = passwordResetTokenDAO;
-        this.emailService = emailService;
-    }
 
 
     @Override

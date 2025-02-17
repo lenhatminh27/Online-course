@@ -1,5 +1,6 @@
 package com.course.service.impl;
 
+import com.course.core.bean.annotations.Service;
 import com.course.dao.PermissionDAO;
 import com.course.dao.RoleDAO;
 import com.course.dto.response.PermissionResponse;
@@ -8,21 +9,21 @@ import com.course.entity.PermissionEntity;
 import com.course.entity.RoleEntity;
 import com.course.exceptions.NotFoundException;
 import com.course.service.AuthorizationService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Service
+@RequiredArgsConstructor
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     private final PermissionDAO permissionDAO;
 
     private final RoleDAO roleDAO;
 
-    public AuthorizationServiceImpl(PermissionDAO permissionDAO, RoleDAO roleDAO) {
-        this.permissionDAO = permissionDAO;
-        this.roleDAO = roleDAO;
-    }
+
 
     @Override
     public List<PermissionResponse> getAllPermissionsByRoleID(Long roleID) {

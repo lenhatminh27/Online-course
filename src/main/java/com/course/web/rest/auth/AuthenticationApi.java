@@ -3,19 +3,16 @@ package com.course.web.rest.auth;
 import com.course.common.utils.MessageUtils;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
-import com.course.dao.RefreshTokenDAO;
-import com.course.dao.impl.AccountDaoImpl;
-import com.course.dao.impl.RefreshTokenDaoImpl;
 import com.course.dto.request.AuthenticationRequest;
 import com.course.dto.response.AuthenticationResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.exceptions.AuthenticationException;
-import com.course.security.TokenProvider;
 import com.course.service.AuthenticationService;
 import com.course.service.impl.AuthenticationServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,21 +23,22 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet("/auth")
 public class AuthenticationApi extends HttpServlet {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson;
 
-    private final AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
-    public AuthenticationApi() {
-        TokenProvider tokenProvider = new TokenProvider();
-        AccountDAO authenticationDAO = new AccountDaoImpl();
-        RefreshTokenDAO refreshTokenDAO = new RefreshTokenDaoImpl();
-        authenticationService = new AuthenticationServiceImpl(tokenProvider, authenticationDAO, refreshTokenDAO);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        authenticationService = getBean(AuthenticationServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override
