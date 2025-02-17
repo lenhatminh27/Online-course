@@ -85,7 +85,27 @@
         .my-btn i{
             color: black !important;
         }
-
+        .comment {
+            overflow-wrap: break-word;
+            padding: 0px 10px;
+        }
+        .dropdown {
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-menu {
+            padding-left: 10px;
+        }
+        .dropdown-item-update{
+            border-bottom: 1px solid #70777f;
+            padding-bottom: 2px;
+        }
+        .dropdown-item-delete{
+            color: red !important;
+        }
+        .fa-ellipsis-vertical{
+            padding-right: 10px;
+        }
 
     </style>
 </head>
@@ -263,7 +283,7 @@
                 '<div style="margin-right: 10px" class="thumb">' +
                 '<img style="width: 30px" src="' + avatarDefault + '" alt="User">' +
                 '</div>' +
-                '<div style="border-radius: 10px; background-color: #f2f4f7; padding-left: 10px; padding-top: 5px" class="desc">' +
+                '<div style="border-radius: 10px; background-color: #f2f4f7; padding-left: 10px; padding-top: 5px; max-width: 500px" class="desc">' +
                 '<div class="d-flex justify-content-between">' +
                 '<div class="d-flex align-items-center">' +
                 '<h5>' +
@@ -691,6 +711,14 @@
                     icon: "error",
                     title: "Gửi bình luận thất bại!",
                     text: "Vui lòng nhập nội dung bình luận!"
+                });
+                return;
+            }
+            if (commentInput.length > 500) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Gửi bình luận thất bại!",
+                    text: "Nội dung bình luận không được quá 500 ký tự!"
                 });
                 return;
             }
