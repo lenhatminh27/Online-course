@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.TagDAO;
 import com.course.entity.TagEntity;
 import org.hibernate.Session;
@@ -8,6 +9,7 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 
+@Repository
 public class TagDAOImpl implements TagDAO {
     @Override
     public List<TagEntity> findAllByTagName(List<String> tagNames) {

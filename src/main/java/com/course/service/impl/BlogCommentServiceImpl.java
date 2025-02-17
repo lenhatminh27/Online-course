@@ -1,5 +1,6 @@
 package com.course.service.impl;
 
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.BlogCommentDAO;
 import com.course.dao.BlogDAO;
@@ -10,16 +11,17 @@ import com.course.dto.response.BlogCommentResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.BlogCommentEntity;
 import com.course.entity.BlogEntity;
-import com.course.entity.enums.ERole;
 import com.course.exceptions.ForbiddenException;
-import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BlogCommentService;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class BlogCommentServiceImpl implements BlogCommentService {
 
     private final BlogDAO blogDAO;
@@ -28,11 +30,7 @@ public class BlogCommentServiceImpl implements BlogCommentService {
 
     private final BlogCommentDAO blogCommentDAO;
 
-    public BlogCommentServiceImpl(BlogDAO blogDAO, AccountDAO accountDAO, BlogCommentDAO blogCommentDAO) {
-        this.blogDAO = blogDAO;
-        this.accountDAO = accountDAO;
-        this.blogCommentDAO = blogCommentDAO;
-    }
+
     @Override
     public BlogCommentResponse createBlogComment(BlogCommentCreateRequest blogCommentCreateRequest) {
         String email = AuthenticationContextHolder.getContext().getEmail();

@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.RoleDAO;
 import com.course.entity.RoleEntity;
 import com.course.entity.enums.ERole;
@@ -10,6 +11,7 @@ import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class RoleDAOImpl implements RoleDAO {
 
     @Override

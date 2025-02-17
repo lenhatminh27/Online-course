@@ -1,11 +1,13 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.BlogStatisticDAO;
 import com.course.entity.BlogStatisticEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+@Repository
 public class BlogStatisticDAOImpl implements BlogStatisticDAO {
 
     @Override

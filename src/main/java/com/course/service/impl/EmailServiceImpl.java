@@ -1,13 +1,17 @@
 package com.course.service.impl;
 
 import com.course.config.properties.MailProperties;
+import com.course.core.bean.annotations.Service;
 import com.course.service.EmailService;
+import lombok.RequiredArgsConstructor;
 
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
     private final MailProperties mailProperties = MailProperties.getInstance();
 

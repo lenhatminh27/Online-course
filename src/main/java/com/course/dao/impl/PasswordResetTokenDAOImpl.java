@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.PasswordResetTokenDAO;
 import com.course.dao.RefreshTokenDAO;
 import com.course.entity.AccountEntity;
@@ -12,6 +13,7 @@ import org.hibernate.query.Query;
 
 import java.time.LocalDateTime;
 
+@Repository
 public class PasswordResetTokenDAOImpl implements PasswordResetTokenDAO {
 
 

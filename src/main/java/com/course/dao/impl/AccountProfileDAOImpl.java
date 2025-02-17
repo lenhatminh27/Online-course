@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.AccountProfileDAO;
 import com.course.entity.AccountEntity;
 import com.course.entity.AccountProfileEntity;
@@ -8,7 +9,7 @@ import com.course.security.context.AuthenticationContextHolder;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-
+@Repository
 public class AccountProfileDAOImpl implements AccountProfileDAO {
 
 

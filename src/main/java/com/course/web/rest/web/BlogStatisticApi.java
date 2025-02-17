@@ -1,14 +1,13 @@
 package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.*;
-import com.course.dao.impl.*;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.BlogService;
 import com.course.service.impl.BlogServiceImpl;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,25 +15,22 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet(value = "/api/blogs-statistic/*")
 public class
 BlogStatisticApi extends BaseServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson ;
 
-    private final BlogService blogService;
+    private BlogService blogService;
 
-    public BlogStatisticApi() {
-        BlogDAO blogDAO = new BlogDAOImpl();
-        AccountDAO accountDAO = new AccountDaoImpl();
-        TagDAO tagDAO = new TagDAOImpl();
-        BlogStatisticDAO blogStatisticDAO = new BlogStatisticDAOImpl();
-        BlogCommentDAO blogCommentDAO = new BlogCommentDAOImpl();
-        BookmarksBlogDAO bookmarksBlogDAO = new BookmarksBlogDAOImpl();
-        SearchHistoryDAO searchHistoryDAO = new SearchHistoryDAOImpl();
-        blogService = new BlogServiceImpl(blogDAO, accountDAO, tagDAO, blogStatisticDAO, blogCommentDAO, bookmarksBlogDAO,searchHistoryDAO);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        blogService = getBean(BlogServiceImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

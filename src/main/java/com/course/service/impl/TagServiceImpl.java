@@ -1,19 +1,20 @@
 package com.course.service.impl;
 
+import com.course.core.bean.annotations.Service;
 import com.course.dao.TagDAO;
 import com.course.dto.response.TagResponse;
 import com.course.entity.TagEntity;
 import com.course.service.TagService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagDAO tagDAO;
 
-    public TagServiceImpl(TagDAO tagDAO) {
-        this.tagDAO = tagDAO;
-    }
 
     @Override
     public List<TagResponse> findTagsRecent() {

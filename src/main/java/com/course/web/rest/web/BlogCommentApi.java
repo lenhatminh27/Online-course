@@ -2,17 +2,14 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.AccountDAO;
 import com.course.dao.BlogCommentDAO;
 import com.course.dao.BlogDAO;
-import com.course.dao.impl.AccountDaoImpl;
 import com.course.dao.impl.BlogCommentDAOImpl;
 import com.course.dao.impl.BlogDAOImpl;
 import com.course.dto.request.BlogCommentCreateRequest;
 import com.course.dto.request.BlogCommentUpdateRequest;
 import com.course.dto.response.BlogCommentResponse;
 import com.course.dto.response.ErrorResponse;
-import com.course.entity.BlogCommentEntity;
 import com.course.exceptions.ForbiddenException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -20,6 +17,7 @@ import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.BlogCommentService;
 import com.course.service.impl.BlogCommentServiceImpl;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,26 +28,27 @@ import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.course.core.bean.BeanListener.BeanContext.getBean;
+
 @WebServlet("/api/blog-comment/*")
 public class BlogCommentApi extends BaseServlet {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Gson gson = new Gson();
+    private Gson gson;
 
-    private final BlogDAO blogDAO;
+    private BlogCommentService blogCommentService;
 
-    private final AccountDAO accountDAO;
+    private BlogCommentDAO blogCommentDAO;
 
-    private final BlogCommentDAO blogCommentDAO;
+    private BlogDAO blogDAO;
 
-    private final BlogCommentService blogCommentService;
-
-    public BlogCommentApi() {
-        blogDAO = new BlogDAOImpl();
-        blogCommentDAO = new BlogCommentDAOImpl();
-        accountDAO = new AccountDaoImpl();
-        blogCommentService = new BlogCommentServiceImpl(blogDAO, accountDAO, blogCommentDAO);
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        blogCommentService = getBean(BlogCommentServiceImpl.class.getSimpleName());
+        blogCommentDAO = getBean(BlogCommentDAOImpl.class.getSimpleName());
+        blogDAO = getBean(BlogDAOImpl.class.getSimpleName());
+        gson = getBean(Gson.class.getSimpleName());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.course.service.impl;
 
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.RoleDAO;
 import com.course.entity.AccountEntity;
@@ -8,19 +9,17 @@ import com.course.entity.RoleEntity;
 import com.course.entity.enums.ERole;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.ToInstructorService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class ToInstructorServiceImpl implements ToInstructorService {
     private final AccountDAO accountDAO;
 
     private final RoleDAO roleDAO;
-
-    public ToInstructorServiceImpl(AccountDAO accountDAO, RoleDAO roleDAO) {
-        this.accountDAO = accountDAO;
-        this.roleDAO = roleDAO;
-    }
 
     @Override
     public void updateRole() {

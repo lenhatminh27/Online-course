@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
 import com.course.dao.RefreshTokenDAO;
 import com.course.entity.AccountEntity;
 import com.course.entity.RefreshTokenEntity;
@@ -9,7 +10,7 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 
-
+@Repository
 public class RefreshTokenDaoImpl implements RefreshTokenDAO {
     @Override
     public RefreshTokenEntity save(RefreshTokenEntity refreshToken) {

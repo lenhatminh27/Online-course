@@ -1,5 +1,6 @@
 package com.course.service.impl;
 
+import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.BlogDAO;
 import com.course.dao.BookmarksBlogDAO;
@@ -11,6 +12,7 @@ import com.course.entity.BookmarksBlogEntity;
 import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.BookmarksBlogService;
+import lombok.RequiredArgsConstructor;
 
 import javax.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
@@ -18,17 +20,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+@Service
+@RequiredArgsConstructor
 public class BookmarksBlogServiceImpl implements BookmarksBlogService {
 
     private final BookmarksBlogDAO bookmarksBlogDAO;
     private final BlogDAO blogDAO;
     private final AccountDAO accountDAO;
 
-    public BookmarksBlogServiceImpl(BookmarksBlogDAO bookmarksBlogDAO, BlogDAO blogDAO, AccountDAO accountDAO) {
-        this.bookmarksBlogDAO = bookmarksBlogDAO;
-        this.blogDAO = blogDAO;
-        this.accountDAO = accountDAO;
-    }
 
     @Override
     public void createBookmarksBlog(BookmarksBlogRequest bookmarksBlogRequest) {
