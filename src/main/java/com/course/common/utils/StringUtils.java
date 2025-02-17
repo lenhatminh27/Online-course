@@ -22,6 +22,14 @@ public final class StringUtils {
         return slug;
     }
 
+    public static String uncapitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return Character.toLowerCase(str.charAt(0)) + str.substring(1);
+    }
+
+
     public static String deAccent(String str) {
         str = str.trim();
         str = str.replaceAll(" +", " ");
