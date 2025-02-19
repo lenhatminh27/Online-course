@@ -15,3 +15,9 @@ mail:
     auth: true
     starttls:
       enable: true
+
+integration:
+  minio:
+    access-key: admin
+    secret-key: admin@2024
+    url: http://localhost:9000
