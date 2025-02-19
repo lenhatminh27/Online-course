@@ -7,7 +7,6 @@ import com.course.core.repository.specification.HibernateQueryHelper;
 import com.course.dao.BlogDAO;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.response.PageResponse;
-import com.course.entity.BlogCommentEntity;
 import com.course.entity.BlogEntity;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
