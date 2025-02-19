@@ -39,7 +39,35 @@ VALUES
     ('UPDATE_COMMENT_BLOG'),
     ('DELETE_COMMENT_BLOG'),
     ('ANSWER_COMMENT_BLOG'),
-    ('BOOKMARK_BLOG');
+    ('BOOKMARK_BLOG'),
+    ('CREATE_COURSE'),
+    ('UPDATE_COURSE'),
+    ('DELETE_COURSE'),
+    ('CREATE_CATEGORY'),
+    ('UPDATE_CATEGORY'),
+    ('DELETE_CATEGORY'),
+    ('CREATE_DISCOUNT'),
+    ('UPDATE_DISCOUNT'),
+    ('DELETE_DISCOUNT'),
+    ('WISHLIST_COURSE'),
+    ('ENROLLMENT_COURSE'),
+    ('RATING_COURSE');
+
+INSERT INTO categories (name, description, parent_id, created_at, updated_at)
+VALUES
+    ('Phát triển', 'Thể loại về phát triển cá nhân và kỹ năng', NULL, NOW(), NOW()),
+    ('Kinh doanh', 'Các khóa học liên quan đến kinh doanh và khởi nghiệp', NULL, NOW(), NOW()),
+    ('Tài chính & Kế toán', 'Thể loại về tài chính, kế toán và đầu tư', NULL, NOW(), NOW()),
+    ('CNTT & Phần mềm', 'Các khóa học về công nghệ thông tin và phần mềm', NULL, NOW(), NOW()),
+    ('Năng suất văn phòng', 'Kỹ năng và công cụ giúp tăng năng suất', NULL, NOW(), NOW()),
+    ('Phát triển cá nhân', 'Những khóa học giúp phát triển bản thân', NULL, NOW(), NOW()),
+    ('Thiết kế', 'Khóa học về thiết kế đồ họa, UI/UX', NULL, NOW(), NOW()),
+    ('Marketing', 'Chiến lược và kỹ thuật tiếp thị', NULL, NOW(), NOW()),
+    ('Phong cách sống', 'Các khóa học về lối sống và sở thích', NULL, NOW(), NOW()),
+    ('Nhiếp ảnh & Video', 'Khóa học về nhiếp ảnh và sản xuất video', NULL, NOW(), NOW()),
+    ('Sức khỏe & Thể dục', 'Các khóa học về sức khỏe và thể chất', NULL, NOW(), NOW()),
+    ('Âm nhạc', 'Khóa học về âm nhạc và nhạc cụ', NULL, NOW(), NOW()),
+    ('Giảng dạy & Học thuật', 'Các khóa học về giảng dạy và giáo dục', NULL, NOW(), NOW());
 
 INSERT INTO role_permission (role_id, permission_id)
 VALUES (1, 1);

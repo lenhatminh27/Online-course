@@ -1,10 +1,7 @@
 package com.course.entity;
 
 import com.course.entity.enums.CourseStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CourseEntity {
 
     @Id
@@ -40,7 +38,7 @@ public class CourseEntity {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private CourseStatus status;
+    private CourseStatus status = CourseStatus.DRAFT;
 
     @Column(name = "created_by")
     private String createdBy;
