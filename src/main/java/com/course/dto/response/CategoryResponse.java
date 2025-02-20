@@ -1,16 +1,16 @@
 package com.course.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryResponse implements Serializable {
@@ -23,6 +23,8 @@ public class CategoryResponse implements Serializable {
     private String name;
 
     private String description;
+
+    private List<CategoryResponse> childrenCategories;
 
     private LocalDateTime createdAt;
 

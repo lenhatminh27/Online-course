@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "categories")
 @Entity
@@ -32,7 +34,11 @@ public class CategoriesEntity {
     @JoinColumn(name = "parent_id")
     private CategoriesEntity parentCategories;
 
-    @Column(name = "created_at")
+    //orphanRemoval = true có nghĩa là nếu một entity con bị xóa khỏi danh sách trong entity cha, nó sẽ tự động bị xóa khỏi database.
+    @OneToMany(mappedBy = "parentCategories", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<CategoriesEntity> childrenCategories = new ArrayList<>();
+
+    @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
