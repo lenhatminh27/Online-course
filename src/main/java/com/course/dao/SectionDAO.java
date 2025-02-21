@@ -15,7 +15,7 @@ public interface SectionDAO {
 
     List<CourseSectionEntity> findByCourse(CourseEntity course);
 
-    boolean existTitle(String title);
+    boolean existTitle(String title, Long courseId);
 
     int countSectionsByCourse(CourseEntity course);
 }

@@ -11,10 +11,14 @@ import com.course.dto.response.LessonResponse;
 import com.course.entity.CourseLessonEntity;
 import com.course.entity.CourseSectionEntity;
 import com.course.exceptions.BadRequestException;
+import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
+import com.course.security.AuthoritiesConstants;
+import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.LessonService;
 import lombok.RequiredArgsConstructor;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,7 @@ public class LessonServiceImpl implements LessonService {
         if (section == null) {
             throw new NotFoundException("Không tìm thấy section id tương ứng");
         }
-        if (lessonDAO.existsByTitle(createLessonRequest.getTitle())){
+        if (lessonDAO.existsByTitle(createLessonRequest.getTitle(), section.getId())){
             List<String> error = new ArrayList<>();
             error.add("Tiêu đề đã tồn tại");
             throw new BadRequestException(new ErrorResponse(error));
@@ -53,14 +57,21 @@ public class LessonServiceImpl implements LessonService {
     }
 
     @Override
+    @Transactional
     public LessonResponse updateLesson(UpdateLessonRequest updateLessonRequest) {
         CourseLessonEntity lesson = lessonDAO.findById(updateLessonRequest.getLessonId());
         if(ObjectUtils.isEmpty(lesson)){
             throw new NotFoundException("Id bài học không tồn tại");
         }
+        String accountCurrent = getAuthenticatedAccount();
+        boolean isAdmin = AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN);
+        boolean isOwner = lesson.getCourseSection().getCourse().getAccountCreated().getEmail().equals(accountCurrent);
+        if (!isAdmin && !isOwner) {
+            throw new ForbiddenException("Không có quyền thay đổi");
+        }
         if(!ObjectUtils.isEmpty(updateLessonRequest.getTitle())){
             if(!lesson.getTitle().equals(updateLessonRequest.getTitle())){
-                if(!lessonDAO.existsByTitle(updateLessonRequest.getTitle())){
+                if(lessonDAO.existsByTitle(updateLessonRequest.getTitle(), lesson.getCourseSection().getId())){
                     List<String> error = new ArrayList<>();
                     error.add("Tiêu đề đã tồn tại");
                     throw new BadRequestException(new ErrorResponse(error));
@@ -82,14 +93,18 @@ public class LessonServiceImpl implements LessonService {
         if(!ObjectUtils.isEmpty(updateLessonRequest.getDuration())){
             lesson.setDuration(updateLessonRequest.getDuration());
         }
-        if(ObjectUtils.isEmpty(updateLessonRequest.getOrderIndex())){
+        if(!ObjectUtils.isEmpty(updateLessonRequest.getOrderIndex())){
             lesson.setOrderIndex(updateLessonRequest.getOrderIndex());
         }
-        if(ObjectUtils.isEmpty(updateLessonRequest.isTrial())){
+        if(!ObjectUtils.isEmpty(updateLessonRequest.isTrial())){
             lesson.setTrial(updateLessonRequest.isTrial());
         }
         CourseLessonEntity courseLesson = lessonDAO.updateLesson(lesson);
         return convertToLessonResponse(courseLesson);
+    }
+
+    private String getAuthenticatedAccount() {
+        return AuthenticationContextHolder.getContext().getEmail();
     }
 
     private LessonResponse convertToLessonResponse(CourseLessonEntity lesson){

@@ -5,6 +5,7 @@ import com.course.core.bean.annotations.Repository;
 import com.course.dao.SectionDAO;
 import com.course.entity.CourseEntity;
 import com.course.entity.CourseSectionEntity;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -51,7 +52,10 @@ public class SectionDAOImpl implements SectionDAO {
     @Override
     public CourseSectionEntity findById(Long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            return session.get(CourseSectionEntity.class, id);
+            CourseSectionEntity section = session.get(CourseSectionEntity.class, id);
+            Hibernate.initialize(section.getCourse());
+            Hibernate.initialize(section.getCourse().getAccountCreated());
+            return section;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -62,9 +66,14 @@ public class SectionDAOImpl implements SectionDAO {
     public List<CourseSectionEntity> findByCourse(CourseEntity course) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             String hql = "SELECT cs FROM CourseSectionEntity cs WHERE cs.course.id = :courseId ORDER BY cs.orderIndex";
-            return session.createQuery(hql, CourseSectionEntity.class)
+            List<CourseSectionEntity> list = session.createQuery(hql, CourseSectionEntity.class)
                     .setParameter("courseId", course.getId())
                     .getResultList();
+            list.forEach(section -> {
+                Hibernate.initialize(section.getCourse());
+                Hibernate.initialize(section.getCourse().getAccountCreated());
+            });
+            return list;
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
@@ -73,11 +82,12 @@ public class SectionDAOImpl implements SectionDAO {
 
 
     @Override
-    public boolean existTitle(String title) {
+    public boolean existTitle(String title, Long courseId) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            String hql = "SELECT COUNT(c) FROM CourseSectionEntity c WHERE c.title = :title";
+            String hql = "SELECT COUNT(c) FROM CourseSectionEntity c WHERE c.title = :title AND c.course.id = :courseId";
             Long count = session.createQuery(hql, Long.class)
                     .setParameter("title", title)
+                    .setParameter("courseId", courseId)
                     .uniqueResult();
             return count != null && count > 0;
         } catch (Exception e) {
@@ -85,6 +95,7 @@ public class SectionDAOImpl implements SectionDAO {
             throw new RuntimeException("Failed to check title existence", e);
         }
     }
+
 
     @Override
     public int countSectionsByCourse(CourseEntity course) {
