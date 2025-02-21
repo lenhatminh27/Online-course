@@ -3,9 +3,11 @@ package com.course.web.rest.web;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dto.request.CreateSectionRequest;
+import com.course.dto.request.UpdateSectionRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.SectionResponse;
 import com.course.exceptions.BadRequestException;
+import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -98,6 +100,46 @@ public class SectionApi extends BaseServlet {
         catch (BadRequestException e){
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getError()));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Có lỗi xảy ra!"));
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("UPDATE_COURSE")
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        try{
+            UpdateSectionRequest updateSectionRequest = gson.fromJson(req.getReader(), UpdateSectionRequest.class);
+            List<String> errors = new ArrayList<>();
+            if (ObjectUtils.isEmpty(updateSectionRequest)) {
+                errors.add("Request không được để trống");
+            }
+            if (ObjectUtils.isEmpty(updateSectionRequest.getSectionId())) {
+                errors.add("Id của phần học không được để trống");
+            }
+            if (!errors.isEmpty()) {
+                ErrorResponse errorResponse = new ErrorResponse(errors);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+                return;
+            }
+            SectionResponse sectionResponse = sectionService.updateSection(updateSectionRequest);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_CREATED, gson.toJson(sectionResponse));
+        } catch (NotFoundException e){
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
+        }
+        catch (BadRequestException e){
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getError()));
+        }
+        catch (ForbiddenException e){
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getMessage()));
         }
         catch (Exception e) {
             e.printStackTrace();

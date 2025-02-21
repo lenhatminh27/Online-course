@@ -10,11 +10,13 @@ public interface LessonDAO {
 
     CourseLessonEntity updateLesson(CourseLessonEntity lesson);
 
-    boolean existsByTitle(String title);
+    boolean existsByTitle(String title, Long sectionId);
 
     CourseLessonEntity findById(Long id);
 
     int countExistSection(CourseSectionEntity section);
 
     List<CourseLessonEntity> findBySection(CourseSectionEntity section);
+
+    void deleteLesson(Long lessonId);
 }

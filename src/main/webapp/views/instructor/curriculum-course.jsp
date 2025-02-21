@@ -8,10 +8,45 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.ckeditor.com/4.20.0/standard/ckeditor.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <style>
         .ck-editor__editable {
             min-height: 300px !important; /* Đặt chiều cao tối thiểu */
         }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+
+        .btn-icon:hover {
+            color: #007bff;
+        }
+
+        .btn-icon {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .list-group-item:hover .btn-icon,
+        h5:hover .btn-icon {
+            opacity: 1;
+        }
+
+
+        input.form-control {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
     </style>
     <script type="module">
         import {environment, STORAGE_KEY, avatarDefault} from '../../assets/config/env.js';
@@ -66,6 +101,8 @@
             }
 
             Alpine.store('curriculum', {
+                hoveredSection: null,
+                hoveredLesson: null,
                 sections: [],
                 showFormSection: false,
                 showFormLesson: {},  // Sử dụng object để lưu trạng thái mở form theo từng section
@@ -83,6 +120,11 @@
                 progress: 0,
                 videoUrl: "",
                 articleEditors: {}, // Lưu các instance CKEditor theo lessonId
+                editingSection: null, // ID của section đang chỉnh sửa
+                editedTitle: "", // Lưu tiêu đề khi chỉnh sửa
+                editedTarget: "",// Lưu mục tiêu học tập khi chỉnh sửa
+                editingLesson: null, // ID của section đang chỉnh sửa
+                editedLessonTitle: "",// Lưu tiêu đề bài học khi chỉnh sửa
 
 
                 toggleLessonForm(sectionId) {
@@ -263,7 +305,6 @@
                 },
 
 
-
                 // Lưu bài viết
                 async saveArticle(lessonId) {
                     const content = CKEDITOR.instances['editor-' + lessonId].getData();
@@ -404,7 +445,109 @@
                     } finally {
                         this.uploading = false;
                     }
+                },
+
+                async saveEditedSection(sectionId) {
+                    if (!this.editedTitle.trim()) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Lỗi",
+                            text: "Tiêu đề không được để trống!",
+                        });
+                        return;
+                    }
+                    try {
+                        const response = await apiRequestWithToken(environment.apiUrl + '/api/section', {
+                            method: "PUT",
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify(
+                                {sectionId: sectionId, title: this.editedTitle, target: this.editedTarget}
+                            )
+
+                        });
+                        if (response) {
+                            await this.loadSections(); // Cập nhật danh sách sections
+                            Swal.fire({
+                                title: "Cập nhật tiêu đề thành công!",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            });
+
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        if (error.response?.status === 400 && error.data?.error) {
+                            console.error('Validation errors:', error.data.error);
+                            let errorMess = "";
+                            for (const x of error.data.error) {
+                                errorMess += x;
+                            }
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo phần học thất bại",
+                                text: errorMess,
+                            });
+                        } else {
+                            let errorMessage = error.message || 'A network error occurred.';
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo phần học thất bại",
+                                text: errorMessage,
+                            });
+                        }
+                    }
+                },
+
+
+                async saveEditedLesson(lessonId) {
+                    if (!this.editedLessonTitle.trim()) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Lỗi",
+                            text: "Tiêu đề không được để trống!",
+                        });
+                        return;
+                    }
+                    try {
+                        const response = await apiRequestWithToken(`/api/lesson`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ title: this.editedLessonTitle.trim(), lessonId: lessonId})
+                        });
+                        if (response) {
+                            await this.loadSections();
+                            Swal.fire({
+                                title: "Cập nhật tiêu đề thành công!",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            });
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        if (error.response?.status === 400 && error.data?.error) {
+                            console.error('Validation errors:', error.data.error);
+                            let errorMess = "";
+                            for (const x of error.data.error) {
+                                errorMess += x;
+                            }
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo phần học thất bại",
+                                text: errorMess,
+                            });
+                        } else {
+                            let errorMessage = error.message || 'A network error occurred.';
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo phần học thất bại",
+                                text: errorMessage,
+                            });
+                        }
+                    }
                 }
+
 
             })
             ;
@@ -490,14 +633,96 @@
 
         <template x-for="section in $store.curriculum.sections" :key="section.id">
             <div class="card p-3 mt-3">
-                <h5 x-text="section.title"></h5>
+                <!-- Hiển thị tiêu đề -->
+                <div>
+                    <!-- Tiêu đề hiển thị khi chưa chỉnh sửa -->
+                    <h5
+                            class="fw-bold"
+                            @mouseover="$store.curriculum.hoveredSection = section.id"
+                            @mouseleave="$store.curriculum.hoveredSection = null"
+                    >
+                        <span x-text="section.title"></span>
+                        <button class="btn-icon"
+                                x-show="$store.curriculum.hoveredSection === section.id"
+                                @click="
+                $store.curriculum.editingSection = section.id;
+                $store.curriculum.editedTitle = section.title;
+                $store.curriculum.editedTarget = section.target;
+            ">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </h5>
+
+
+                    <!-- Form chỉnh sửa tiêu đề -->
+                    <div x-show="$store.curriculum.editingSection === section.id" class="mt-2">
+                        <!-- Tiêu đề -->
+                        <label class="fw-bold mb-1">Tiêu đề</label>
+                        <input type="text" class="form-control border-primary"
+                               x-model="$store.curriculum.editedTitle"
+                               maxlength="80">
+                        <small class="text-muted"
+                               x-text="80 - ($store.curriculum.editedTitle?.length ?? 0) + ' ký tự còn lại'"></small>
+                        <br/>
+                        <!-- Mô tả mục tiêu học tập -->
+                        <label class="fw-bold mt-3 mb-1">Học viên có thể làm những gì khi phần này kết thúc?</label>
+                        <textarea rows="4" class="form-control border-primary"
+                                  x-model="$store.curriculum.editedTarget"
+                                  maxlength="200"></textarea>
+                        <small class="text-muted"
+                               x-text="200 - ($store.curriculum.editedTarget?.length ?? 0) + ' ký tự còn lại'"></small>
+                        <!-- Nút Hủy và Lưu -->
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-light me-2" @click="$store.curriculum.editingSection = null">Hủy
+                            </button>
+                            <button class="btn btn-primary" @click="$store.curriculum.saveEditedSection(section.id)">Lưu
+                                phần
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
 
                 <!-- Danh sách bài giảng -->
                 <ul class="list-group mt-2" x-show="section.lessons.length > 0">
                     <template x-for="lesson in section.lessons" :key="lesson.id">
-                        <li class="list-group-item">
+                        <li class="list-group-item" class="list-group-item"
+                            @mouseover="$store.curriculum.hoveredLesson = lesson.id"
+                            @mouseleave="$store.curriculum.hoveredLesson = null">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span x-text="lesson.title"></span>
+                                <%--                                <span x-text="lesson.title"></span>--%>
+
+                                    <div x-show="$store.curriculum.editingLesson !== lesson.id">
+                                        <span x-text="lesson.title"></span>
+                                        <button class="btn-icon"
+                                                x-show="$store.curriculum.hoveredLesson === lesson.id"
+                                                @click="
+                            $store.curriculum.editingLesson = lesson.id;
+                            $store.curriculum.editedLessonTitle = lesson.title;
+                        ">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                    </div>
+
+                                <!-- Form chỉnh sửa tiêu đề bài học -->
+                                <div x-show="$store.curriculum.editingLesson === lesson.id" class="mt-2" style="width: 100%">
+                                    <label class="fw-bold mb-1">Tiêu đề bài học</label>
+                                    <input type="text" class="form-control border-primary"
+                                           x-model="$store.curriculum.editedLessonTitle"
+                                           maxlength="80">
+                                    <small class="text-muted"
+                                           x-text="80 - ($store.curriculum.editedLessonTitle?.length ?? 0) + ' ký tự còn lại'"></small>
+
+                                    <!-- Nút Hủy và Lưu -->
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button class="btn btn-light me-2"
+                                                @click="$store.curriculum.editingLesson = null">Hủy
+                                        </button>
+                                        <button class="btn btn-primary"
+                                                @click="$store.curriculum.saveEditedLesson(lesson.id)">Lưu bài giảng
+                                        </button>
+                                    </div>
+                                </div>
 
                                 <!-- Nếu bài học chưa có video & bài viết -> Hiển thị "Chọn nội dung" -->
                                 <template x-if="!lesson.videoUrl && !lesson.article">
@@ -638,7 +863,7 @@
         </button>
         <!-- Form thêm phần mới -->
         <div x-show="$store.curriculum.showFormSection" class="mt-3 border p-3 rounded"
-             @click.outside="$store.curriculum.showFormSection = false"  @click.stop>
+             @click.outside="$store.curriculum.showFormSection = false" @click.stop>
             <button class="btn-close float-end" @click="$store.curriculum.showFormSection = false"></button>
             <label class="form-label">Phần mới:</label>
             <input type="text" class="form-control" placeholder="Nhập tiêu đề (tối đa 80 ký tự)"

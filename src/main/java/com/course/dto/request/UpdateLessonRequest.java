@@ -26,6 +26,6 @@ public class UpdateLessonRequest implements Serializable {
 
     private boolean isTrial;
 
-    private int orderIndex;
+    private Integer orderIndex;
 
 }

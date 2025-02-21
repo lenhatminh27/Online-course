@@ -7,6 +7,7 @@ import com.course.dto.request.UpdateLessonRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonResponse;
 import com.course.exceptions.BadRequestException;
+import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -42,7 +43,7 @@ public class LessonApi extends BaseServlet {
 
     @Override
     @IsAuthenticated
-    @HasPermission("CREATE_COURSE")
+    @HasPermission("UPDATE_COURSE")
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -69,6 +70,10 @@ public class LessonApi extends BaseServlet {
         catch (BadRequestException e){
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getError()));
+        }
+        catch (ForbiddenException e){
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
         }
         catch (Exception e) {
             e.printStackTrace();
