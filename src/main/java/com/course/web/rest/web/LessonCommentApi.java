@@ -2,9 +2,8 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.CourseLessonDAO;
-import com.course.dao.LessonCommentDAO;
-import com.course.dao.impl.CourseLessonDAOImpl;
+import com.course.dao.LessonDAO;
+import com.course.dao.impl.LessonDAOImpl;
 import com.course.dto.request.CreateLessonCommentRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonCommentResponse;
@@ -34,14 +33,14 @@ public class LessonCommentApi extends BaseServlet {
 
     private LessonCommentService lessonCommentService;
 
-    private CourseLessonDAO courseLessonDAO;
+    private LessonDAO lessonDAO;
 
     private Gson gson;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         lessonCommentService = getBean(LessonCommentServiceImpl.class.getSimpleName());
-        courseLessonDAO = getBean(CourseLessonDAOImpl.class.getSimpleName());
+        lessonDAO = getBean(LessonDAOImpl.class.getSimpleName());
         gson = getBean(Gson.class.getSimpleName());
     }
 
@@ -65,7 +64,7 @@ public class LessonCommentApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
             return;
         }
-        if (courseLessonDAO.findCourseLessonById(request.getLessonId()) == null) {
+        if (lessonDAO.findById(request.getLessonId()) == null) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson("Lesson không tồn tại"));
             return;
         }
