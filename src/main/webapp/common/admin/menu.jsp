@@ -29,7 +29,16 @@
                     <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Xóa Blog</a>
                 </div>
             </div>
-            <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Bảng</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        class="far fa-file-alt me-2"></i>Thể loại khoá học</a>
+                <div class="dropdown-menu bg-transparent border-0">
+                    <a href="/admin/category" class="dropdown-item"><i class="fa fa-plus me-2"></i>Tạo thể loại</a>
+                    <a href="/admin/blogs?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>Xem thể loại</a>
+                    <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Cập nhật thể loại</a>
+                    <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Xóa thể loại</a>
+                </div>
+            </div>
             <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Biểu đồ</a>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i

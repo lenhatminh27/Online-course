@@ -7,11 +7,24 @@ import com.course.entity.CategoriesEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Repository
 public class CategoryDAOImpl implements CategoryDAO {
+
+    @Override
+    public List<CategoriesEntity> getAllCategories() {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM CategoriesEntity ORDER BY createdAt DESC";
+            return session.createQuery(hql, CategoriesEntity.class)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 
     @Override
     public List<CategoriesEntity> getAllParentCategory() {
