@@ -3,7 +3,7 @@ package com.course.service.impl;
 import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.LessonCommentDAO;
-import com.course.dao.CourseLessonDAO;
+import com.course.dao.LessonDAO;
 import com.course.dto.request.CreateLessonCommentRequest;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.LessonCommentResponse;
@@ -25,7 +25,7 @@ public class LessonCommentServiceImpl implements LessonCommentService {
 
     private final AccountDAO accountDAO;
 
-    private final CourseLessonDAO lessonDAO;
+    private final LessonDAO lessonDAO;
 
     @Override
     public LessonCommentResponse createLessonComment(CreateLessonCommentRequest request) {
@@ -36,7 +36,7 @@ public class LessonCommentServiceImpl implements LessonCommentService {
             parentComment = lessonCommentDAO.findLessonCommentById(request.getParentId());
         }
         LessonCommentEntity lessonCommentEntity = new LessonCommentEntity();
-        lessonCommentEntity.setCourseLesson(lessonDAO.findCourseLessonById(request.getLessonId()));
+        lessonCommentEntity.setCourseLesson(lessonDAO.findById(request.getLessonId()));
         lessonCommentEntity.setAccount(accountEntity);
         lessonCommentEntity.setContent(request.getContent());
         lessonCommentEntity.setCreatedAt(LocalDateTime.now());

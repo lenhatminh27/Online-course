@@ -32,6 +32,13 @@ public class CourseServiceImpl implements CourseService {
     private final AccountDAO accountDAO;
 
     @Override
+    public List<CourseResponse> getAllListCourseByUserCurrent() {
+        AccountEntity accountCurrent = getAuthenticatedAccount();
+        List<CourseEntity> list = courseDAO.findByAccountCreatedId(accountCurrent.getId());
+        return list.stream().map(this::convertToCourseResponse).toList();
+    }
+
+    @Override
     public CourseResponse createCourse(CreateCourseRequest createCourseRequest) {
         AccountEntity account = getAuthenticatedAccount();
         CategoriesEntity categories = categoryDAO.findById(createCourseRequest.getCategoriesId());

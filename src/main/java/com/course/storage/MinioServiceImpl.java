@@ -2,14 +2,16 @@ package com.course.storage;
 
 import com.course.common.utils.ConverterUtils;
 import com.course.core.bean.annotations.Service;
+import com.course.storage.model.ChunkFileArg;
 import com.course.storage.model.DownloadFileArg;
+import com.course.storage.model.MergeFileArg;
 import com.course.storage.model.UploadFileArg;
 import io.minio.*;
 import io.minio.http.Method;
 import jakarta.servlet.http.Part;
 import lombok.SneakyThrows;
 
-import java.io.InputStream;
+import java.io.*;
 
 import static com.course.core.bean.BeanListener.BeanContext.getBean;
 
@@ -81,5 +83,109 @@ public final class MinioServiceImpl implements MinioService {
             throw new RuntimeException("Unable to download file: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    @SneakyThrows
+    public void uploadChunk(String bucket, ChunkFileArg arg) {
+        String pathFile = String.join("/", arg.getPath());
+        minioClient.putObject(PutObjectArgs.builder()
+                .bucket(bucket)
+                .object(pathFile)
+                .stream(arg.getFileStream(), arg.getFileSize(), -1)
+                .build());
+    }
+
+    @SneakyThrows
+    public String mergeTruck(MergeFileArg arg) {
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        String mergedFilePath = tmpDir + File.separator + arg.getFileName();
+        File mergedFile = new File(mergedFilePath);
+        System.out.println("📂 Đường dẫn file merge: " + mergedFilePath);
+
+        // Tạo thư mục tạm nếu chưa tồn tại
+        File parentDir = mergedFile.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            System.out.println("📁 Tạo thư mục tạm: " + created);
+        }
+
+        int chunkIndex = 0;
+        boolean chunkExists = true;
+
+        try (FileOutputStream fos = new FileOutputStream(mergedFile, true);
+             BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+
+            while (chunkExists) {
+                String objectName = "chunks/" + arg.getFileName() + "/chunk_" + chunkIndex;
+
+                try {
+                    // Kiểm tra xem chunk có tồn tại không
+                    minioClient.statObject(StatObjectArgs.builder()
+                            .bucket(BUCKET_NAME)
+                            .object(objectName)
+                            .build());
+
+                    try (InputStream chunkStream = minioClient.getObject(GetObjectArgs.builder()
+                            .bucket(BUCKET_NAME)
+                            .object(objectName)
+                            .build())) {
+
+                        System.out.println("🔄 Đang ghép chunk: " + objectName);
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+                        while ((bytesRead = chunkStream.read(buffer)) != -1) {
+                            bos.write(buffer, 0, bytesRead);
+                        }
+                    }
+                    chunkIndex++;
+                } catch (Exception e) {
+                    // Khi chunk không tồn tại nữa, kết thúc vòng lặp
+                    chunkExists = false;
+                    System.out.println("✅ Không còn chunk nào, hoàn tất ghép file!");
+                }
+            }
+        }
+
+        // Upload file hợp nhất lên MinIO
+        String finalPath = "videos/" + arg.getFileName();
+        try (FileInputStream fis = new FileInputStream(mergedFile)) {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(BUCKET_NAME)
+                            .object(finalPath)
+                            .stream(fis, mergedFile.length(), -1)
+                            .build()
+            );
+            System.out.println("✅ Tải file hợp nhất lên MinIO thành công: " + finalPath);
+        }
+
+        // Xóa các chunk sau khi hợp nhất thành công
+        for (int i = 0; i < chunkIndex; i++) {
+            String chunkObject = "chunks/" + arg.getFileName() + "/chunk_" + i;
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(BUCKET_NAME)
+                    .object(chunkObject)
+                    .build());
+            System.out.println("🗑️ Đã xóa chunk: " + chunkObject);
+        }
+
+        // Xóa file tạm
+        if (mergedFile.delete()) {
+            System.out.println("🗑️ Xóa file tạm sau khi upload thành công: " + mergedFilePath);
+        } else {
+            System.err.println("⚠️ Không thể xóa file tạm: " + mergedFilePath);
+        }
+
+        return minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
+                        .bucket(BUCKET_NAME)
+                        .object(finalPath)
+                        .build()
+        );
+    }
+
+
+
 
 }
