@@ -100,7 +100,6 @@ public class BlogCommentApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson("Blog không tồn tại"));
             return;
         }
-
         try {
             BlogCommentResponse blogCommentResponse = blogCommentService.createBlogComment(blogCommentCreateRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_CREATED, gson.toJson(blogCommentResponse));

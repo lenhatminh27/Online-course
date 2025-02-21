@@ -1,0 +1,59 @@
+package com.course.dao.impl;
+
+import com.course.common.utils.HibernateUtils;
+import com.course.core.bean.annotations.Repository;
+import com.course.dao.LessonCommentDAO;
+import com.course.entity.BlogCommentEntity;
+import com.course.entity.LessonCommentEntity;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.Collections;
+import java.util.List;
+
+@Repository
+public class LessonCommentDAOImpl implements LessonCommentDAO {
+
+    @Override
+    public LessonCommentEntity createLessonComment(LessonCommentEntity lessonComment) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.save(lessonComment);
+            transaction.commit();
+            return lessonComment;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Failed to create lesson comment", e);
+        }
+    }
+
+    @Override
+    public List<LessonCommentEntity> findAllChildrenLessonComments(Long id) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM LessonCommentEntity b WHERE b.parentLessonComment.id = :id";
+            return session.createQuery(hql, LessonCommentEntity.class)
+                    .setParameter("id", id)
+                    .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public LessonCommentEntity findLessonCommentById(Long id) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM LessonCommentEntity b WHERE b.id = :id";
+            return session.createQuery(hql, LessonCommentEntity.class)
+                    .setParameter("id", id)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
