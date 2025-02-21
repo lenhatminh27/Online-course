@@ -220,7 +220,6 @@ exitPage()">
             }
         });
 
-
     });
 
 </script>

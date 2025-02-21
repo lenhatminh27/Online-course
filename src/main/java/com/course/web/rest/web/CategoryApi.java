@@ -18,6 +18,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.regex.Pattern;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class CategoryApi extends BaseServlet {
         }
     }
 
+    private static final String CATEGORY_NAME_REGEX = "^[a-zA-ZÀ-ỹ0-9_\\-\\s]+$";
     @Override
     @IsAuthenticated
     @HasPermission("CREATE_CATEGORY")
@@ -80,7 +82,7 @@ public class CategoryApi extends BaseServlet {
         if (categoryResponse == null) {
             errors.add("Thể loại này đã tồn tại");
         }
-        if (!categoryCreateRequest.getName().trim().matches("^[a-zA-Z0-9_\\-\\s]+$")) {
+        if (!Pattern.matches(CATEGORY_NAME_REGEX, categoryCreateRequest.getName())) {
             errors.add("Tên thể loại chỉ được chứa chữ cái, số, khoảng trắng, dấu gạch ngang (-) hoặc gạch dưới (_)");
         }
         if (!ObjectUtils.isEmpty(errors)) {
