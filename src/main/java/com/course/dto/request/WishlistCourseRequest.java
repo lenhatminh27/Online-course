@@ -13,11 +13,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 
-
-public class BookmarksBlogRequest implements Serializable {
+public class WishlistCourseRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long blogId;
+    private Long courseId;
+
 }
