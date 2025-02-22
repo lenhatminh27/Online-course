@@ -10,4 +10,5 @@ public interface CourseService {
     List<CourseResponse> getAllListCourseByUserCurrent();
 
     CourseResponse createCourse(CreateCourseRequest createCourseRequest);
+
 }
