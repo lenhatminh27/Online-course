@@ -2,6 +2,7 @@ package com.course.service.impl;
 
 import com.course.config.properties.MailProperties;
 import com.course.core.bean.annotations.Service;
+import com.course.core.scheduling.annotations.Async;
 import com.course.service.EmailService;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.Properties;
 public class EmailServiceImpl implements EmailService {
     private final MailProperties mailProperties = MailProperties.getInstance();
 
+    @Async
     public void sendEmail(String toEmail, String subject, String htmlContent) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", String.valueOf(mailProperties.isAuth()));

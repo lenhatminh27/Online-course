@@ -2,18 +2,27 @@ package com.course.core.bean;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.StringUtils;
+import com.course.core.bean.proxy.Proxy;
 import com.course.core.bean.annotations.Bean;
 import com.course.core.bean.annotations.Qualifier;
 import com.course.core.bean.annotations.Repository;
 import com.course.core.bean.annotations.Service;
+import com.course.core.scheduling.AsyncProxy;
+import com.course.core.scheduling.annotations.Async;
+import com.course.core.scheduling.annotations.EnableAsync;
 import jakarta.servlet.ServletContext;
 import lombok.*;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @RequiredArgsConstructor
 public class BeanFactory {
@@ -87,16 +96,13 @@ public class BeanFactory {
         for (final var constructor : constructors) {
             try {
                 Class<?>[] parameterTypes = constructor.getParameterTypes();
-
                 Object[] paramBeans  = new Object[parameterTypes.length];
-
                 for (int i = 0; i < parameterTypes.length; i++) {
                     Class<?> parameterType = parameterTypes[i];
                     // Kiểm tra có phải interface hay không
                     if (parameterType.isInterface()) {
                         // Lấy ra impl của interface
                         Set<Class<?>> implementations = getImplementations(parameterType);
-
                         if (implementations.size() == 1) {
                             Class<?> implClass = implementations.iterator().next();
                             paramBeans[i] = getBeanFromContextOrCreate(implClass);
@@ -117,11 +123,32 @@ public class BeanFactory {
                     }
                 }
                 obj = clazz.getDeclaredConstructor(parameterTypes).newInstance(paramBeans);
+                if(isEnabled(EnableAsync.class) && isEnabled(Async.class, obj)){
+                    ThreadPoolExecutor executorServiceAsync =  (ThreadPoolExecutor) servletContext.getAttribute(getBeanName(ExecutorService.class));
+                    executorServiceAsync = (ThreadPoolExecutor) (ObjectUtils.isEmpty(executorServiceAsync)
+                            ? Executors.newFixedThreadPool(5) : executorServiceAsync);
+                    obj = wrapProxy(obj, new AsyncProxy(executorServiceAsync));
+                    replace = true;
+                }
             } catch (Exception e) {
                 throw new IllegalArgumentException("Failed to initialize bean for class: " + clazz.getName(), e);
             }
         }
         return new BeanRegister<>(getBeanName(clazz), obj, replace);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T, P extends Proxy> T wrapProxy(T obj, P proxy) {
+        Class<?>[] interfaces = obj.getClass().getInterfaces();
+        if (interfaces.length > 0) {
+            final var interfaceType = interfaces[0]; // Lấy interface đầu tiên
+            // Kiểm tra nếu instance thực sự implement interface này
+            if (!interfaceType.isInstance(obj)) {
+                throw new IllegalArgumentException("Instance does not implement the specified interface: " + interfaceType.getName());
+            }
+            return (T) proxy.createProxy(obj, interfaceType);
+        }
+        throw new IllegalArgumentException("Class does not implement any interface!");
     }
 
     protected String getBeanName(final Method method) {
@@ -137,6 +164,31 @@ public class BeanFactory {
             }
         }
         return null;
+    }
+
+    protected boolean isEnabled(Class<? extends Annotation> annotation) {
+        return !new Reflections(
+                new ConfigurationBuilder()
+                        .forPackage("com.course")
+                        .setScanners(
+                                Scanners.TypesAnnotated
+                        )
+        ).getTypesAnnotatedWith(annotation).isEmpty();
+    }
+
+    protected boolean isEnabled(Class<? extends Annotation> annotation, Object obj) {
+        if (obj.getClass().isAnnotationPresent(annotation)) {
+            return true;
+        }
+        // Lấy tất cả các phương thức từ class của đối tượng
+        Method[] methods = obj.getClass().getDeclaredMethods();
+        // Kiểm tra từng phương thức xem có annotation không
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(annotation)) {
+                return true; // Nếu tìm thấy ít nhất 1 phương thức có annotation
+            }
+        }
+        return false; // Không tìm thấy phương thức nào có annotation
     }
 
 
