@@ -2,6 +2,8 @@ package com.course.storage;
 
 import com.course.common.utils.ConverterUtils;
 import com.course.core.bean.annotations.Service;
+import com.course.service.async.VideoService;
+import com.course.service.async.impl.VideoServiceImpl;
 import com.course.storage.model.ChunkFileArg;
 import com.course.storage.model.DownloadFileArg;
 import com.course.storage.model.MergeFileArg;
@@ -22,8 +24,11 @@ public final class MinioServiceImpl implements MinioService {
 
     private final MinioClient minioClient;
 
+    private final VideoService videoService;
+
     public MinioServiceImpl() {
         this.minioClient = getBean(MinioClient.class.getSimpleName());
+        this.videoService = getBean(VideoServiceImpl.class.getSimpleName());
     }
 
     @Override
@@ -114,10 +119,8 @@ public final class MinioServiceImpl implements MinioService {
 
         try (FileOutputStream fos = new FileOutputStream(mergedFile, true);
              BufferedOutputStream bos = new BufferedOutputStream(fos)) {
-
             while (chunkExists) {
                 String objectName = "chunks/" + arg.getFileName() + "/chunk_" + chunkIndex;
-
                 try {
                     // Kiểm tra xem chunk có tồn tại không
                     minioClient.statObject(StatObjectArgs.builder()
@@ -145,7 +148,6 @@ public final class MinioServiceImpl implements MinioService {
                 }
             }
         }
-
         // Upload file hợp nhất lên MinIO
         String finalPath = "videos/" + arg.getFileName();
         try (FileInputStream fis = new FileInputStream(mergedFile)) {
@@ -158,24 +160,7 @@ public final class MinioServiceImpl implements MinioService {
             );
             System.out.println("✅ Tải file hợp nhất lên MinIO thành công: " + finalPath);
         }
-
-        // Xóa các chunk sau khi hợp nhất thành công
-        for (int i = 0; i < chunkIndex; i++) {
-            String chunkObject = "chunks/" + arg.getFileName() + "/chunk_" + i;
-            minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(BUCKET_NAME)
-                    .object(chunkObject)
-                    .build());
-            System.out.println("🗑️ Đã xóa chunk: " + chunkObject);
-        }
-
-        // Xóa file tạm
-        if (mergedFile.delete()) {
-            System.out.println("🗑️ Xóa file tạm sau khi upload thành công: " + mergedFilePath);
-        } else {
-            System.err.println("⚠️ Không thể xóa file tạm: " + mergedFilePath);
-        }
-
+        videoService.removeAfterMerge(chunkIndex, mergedFile, arg, mergedFilePath);
         return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                         .method(Method.GET)
@@ -184,8 +169,5 @@ public final class MinioServiceImpl implements MinioService {
                         .build()
         );
     }
-
-
-
 
 }

@@ -1,9 +1,9 @@
-package com.course.service.impl;
+package com.course.service.async.impl;
 
 import com.course.config.properties.MailProperties;
 import com.course.core.bean.annotations.Service;
 import com.course.core.scheduling.annotations.Async;
-import com.course.service.EmailService;
+import com.course.service.async.EmailService;
 import lombok.RequiredArgsConstructor;
 
 import javax.mail.*;
