@@ -8,12 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/instructor/course/*")
-public class CourseController extends HttpServlet {
+@WebServlet("/instructor/basics/*")
+public class BasicManageCourseController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/views/instructor/views-course.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/instructor/manage-basic-course.jsp").forward(req, resp);
     }
-
 }

@@ -4,8 +4,6 @@ import com.course.common.constants.PageConstant;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.core.repository.data.Sort;
-import com.course.dao.*;
-import com.course.dao.impl.*;
 import com.course.dto.request.BlogCreateRequest;
 import com.course.dto.request.BlogFilterRequest;
 import com.course.dto.request.BlogUpdateRequest;

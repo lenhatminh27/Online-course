@@ -16,6 +16,7 @@ import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.LessonService;
+import com.course.service.async.VideoService;
 import lombok.RequiredArgsConstructor;
 
 import javax.transaction.Transactional;
@@ -29,6 +30,8 @@ public class LessonServiceImpl implements LessonService {
     private final LessonDAO lessonDAO;
 
     private final SectionDAO sectionDAO;
+
+    private final VideoService videoService;
 
     @Override
     public LessonResponse createLesson(CreateLessonRequest createLessonRequest) {
@@ -85,7 +88,12 @@ public class LessonServiceImpl implements LessonService {
             lesson.setDescription(updateLessonRequest.getDescription());
         }
         if(!ObjectUtils.isEmpty(updateLessonRequest.getArticle())){
-            lesson.setArticle(updateLessonRequest.getArticle());
+            if(updateLessonRequest.getArticle().equals("delete")){
+                lesson.setArticle(null);
+            }
+            else{
+                lesson.setArticle(updateLessonRequest.getArticle());
+            }
         }
         if(!ObjectUtils.isEmpty(updateLessonRequest.getVideoUrl())){
             lesson.setVideoUrl(updateLessonRequest.getVideoUrl());
@@ -101,6 +109,23 @@ public class LessonServiceImpl implements LessonService {
         }
         CourseLessonEntity courseLesson = lessonDAO.updateLesson(lesson);
         return convertToLessonResponse(courseLesson);
+    }
+
+    @Override
+    public void deleteVideo(Long lessonId) {
+        CourseLessonEntity lesson = lessonDAO.findById(lessonId);
+        if(ObjectUtils.isEmpty(lesson)){
+            throw new NotFoundException("Id bài học không tồn tại");
+        }
+        String accountCurrent = getAuthenticatedAccount();
+        boolean isAdmin = AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN);
+        boolean isOwner = lesson.getCourseSection().getCourse().getAccountCreated().getEmail().equals(accountCurrent);
+        if (!isAdmin && !isOwner) {
+            throw new ForbiddenException("Không có quyền thay đổi");
+        }
+        videoService.remove(lesson.getVideoUrl());
+        lesson.setVideoUrl(null);
+        lessonDAO.updateLesson(lesson);
     }
 
     private String getAuthenticatedAccount() {

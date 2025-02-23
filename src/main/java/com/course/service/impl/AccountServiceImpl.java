@@ -20,7 +20,7 @@ import com.course.entity.RoleEntity;
 import com.course.entity.enums.ERole;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.AccountService;
-import com.course.service.EmailService;
+import com.course.service.async.EmailService;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
