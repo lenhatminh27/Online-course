@@ -1,6 +1,7 @@
 package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
+import com.course.dto.response.FileResponse;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -37,17 +38,22 @@ public class UploadApi extends BaseServlet {
     @Override
     @IsAuthenticated
     @HasPermission("UPLOAD_FILE")
-    //Upload file
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         Part filePart = req.getPart("file");
+        final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        if (filePart.getSize() > MAX_FILE_SIZE) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+                    gson.toJson("Kích thước tệp vượt quá giới hạn tối đa 10MB"));
+            return;
+        }
         UploadFileArg arg = UploadFileArg.builder()
                 .path("")
                 .part(filePart)
                 .build();
         String filePath = minioService.upload(MinioServiceImpl.BUCKET_NAME, arg);
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(filePath));
+        FileResponse fileResponse = new FileResponse(filePath);
+        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(fileResponse));
     }
-
 }

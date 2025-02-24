@@ -42,6 +42,7 @@ public class SectionApi extends BaseServlet {
     }
 
     @Override
+    @IsAuthenticated
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -65,6 +66,10 @@ public class SectionApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(response));
         }catch (NotFoundException e){
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
+        }
+        catch (ForbiddenException e){
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
         }
     }
 
@@ -139,7 +144,7 @@ public class SectionApi extends BaseServlet {
         }
         catch (ForbiddenException e){
             e.printStackTrace();
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getMessage()));
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
         }
         catch (Exception e) {
             e.printStackTrace();

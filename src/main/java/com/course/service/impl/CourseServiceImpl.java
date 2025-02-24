@@ -21,6 +21,7 @@ import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CourseService;
+import com.course.service.async.FileSerivce;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -35,6 +36,8 @@ public class CourseServiceImpl implements CourseService {
     private final CourseDAO courseDAO;
 
     private final AccountDAO accountDAO;
+
+    private final FileSerivce fileSerivce;
 
     @Override
     public PageResponse<CourseResponse> getAllListCourseByUserCurrent(CourseInstructorFilterRequest filterRequest) {
@@ -69,6 +72,7 @@ public class CourseServiceImpl implements CourseService {
             courseUpdated.setPrice(request.getPrice());
         }
         if(!ObjectUtils.isEmpty(request.getThumbnail())){
+            fileSerivce.deleteFile(courseUpdated.getThumbnail());
             courseUpdated.setThumbnail(request.getThumbnail());
         }
         if(!ObjectUtils.isEmpty(request.getStatus())){
