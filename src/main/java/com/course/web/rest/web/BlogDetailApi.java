@@ -2,12 +2,9 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
-import com.course.dao.*;
-import com.course.dao.impl.*;
 import com.course.dto.response.BlogResponse;
 import com.course.exceptions.NotFoundException;
 import com.course.service.BlogService;
-import com.course.service.impl.BlogCommentServiceImpl;
 import com.course.service.impl.BlogServiceImpl;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;

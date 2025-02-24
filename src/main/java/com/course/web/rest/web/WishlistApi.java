@@ -3,7 +3,6 @@ package com.course.web.rest.web;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dto.request.WishlistCourseRequest;
-import com.course.dto.response.BookmarksBlogResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.WishlistCourseRespone;
 import com.course.exceptions.ForbiddenException;

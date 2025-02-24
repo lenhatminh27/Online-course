@@ -17,6 +17,7 @@ import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContextHolder;
+import com.course.service.LessonService;
 import com.course.service.SectionService;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,8 @@ public class SectionServiceImpl implements SectionService {
     private final EnrollmentDAO enrollmentDAO;
 
     private final AccountDAO accountDAO;
+
+    private final LessonService lessonService;
 
     @Override
     public SectionResponse creatSection(CreateSectionRequest section) {
@@ -111,7 +114,6 @@ public class SectionServiceImpl implements SectionService {
         return convertToSectionResponse(courseUpdate);
     }
 
-
     private String getAuthenticatedAccount() {
         return AuthenticationContextHolder.getContext().getEmail();
     }
@@ -151,5 +153,29 @@ public class SectionServiceImpl implements SectionService {
                 .createdAt(lesson.getCreatedAt())
                 .updatedAt(lesson.getUpdatedAt())
                 .build();
+    }
+
+
+    @Override
+    public void deleteSection(Long id) {
+        CourseSectionEntity section = sectionDAO.findById(id);
+        if (section == null) {
+            throw new NotFoundException("Học phần không tồn tại!");
+        }
+
+        String accountCurrent = getAuthenticatedAccount();
+        boolean isAdmin = AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN);
+        boolean isOwner = section.getCourse().getAccountCreated().getEmail().equals(accountCurrent);
+        if (!isAdmin && !isOwner) {
+            throw new ForbiddenException("Bạn không có quyền xoá section này");
+        }
+
+        List<Long> listLessonIds = lessonDAO.findBySection(section).stream().map(it -> it.getId()).toList();
+        if (!ObjectUtils.isEmpty(listLessonIds)) {
+            for (Long lessonId : listLessonIds) {
+                lessonService.deleteLesson(lessonId);
+            }
+        }
+        sectionDAO.deleteSectionById(id);
     }
 }

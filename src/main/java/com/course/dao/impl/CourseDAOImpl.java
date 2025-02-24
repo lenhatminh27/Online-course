@@ -108,5 +108,24 @@ public class CourseDAOImpl implements CourseDAO {
         }
     }
 
+    @Override
+    public void deleteCourse(Long id) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            String hql = "DELETE FROM CourseEntity c WHERE c.id = :id";
+            int deletedCount = session.createQuery(hql)
+                    .setParameter("id", id)
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Failed to delete course with ID: " + id, e);
+        }
+    }
+
 
 }

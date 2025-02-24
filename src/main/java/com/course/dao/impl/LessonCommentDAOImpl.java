@@ -56,4 +56,22 @@ public class LessonCommentDAOImpl implements LessonCommentDAO {
             return null;
         }
     }
+
+    @Override
+    public void deleteLessonCommentByLessonId(Long lessonId) {
+        Transaction tx = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            String hql = "DELETE FROM LessonCommentEntity lc WHERE lc.courseLesson.id = :id";
+            int deletedCount = session.createQuery(hql)
+                    .setParameter("id", lessonId)
+                    .executeUpdate();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            throw new RuntimeException("Failed to delete lesson comment", e);
+        }
+    }
+
 }

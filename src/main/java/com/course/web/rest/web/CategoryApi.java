@@ -4,7 +4,6 @@ import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.CategoryDAO;
 import com.course.dto.request.CategoryCreateRequest;
-import com.course.dto.response.BlogCommentResponse;
 import com.course.dto.response.CategoryResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.security.annotations.HasPermission;
@@ -18,11 +17,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.regex.Pattern;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.course.core.bean.BeanListener.BeanContext.getBean;
 
