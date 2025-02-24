@@ -80,6 +80,24 @@ public class SectionDAOImpl implements SectionDAO {
         }
     }
 
+    @Override
+    public List<CourseSectionEntity> findByCourseNotIn(List<Long> sectionIds, CourseEntity course) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT cs FROM CourseSectionEntity cs WHERE cs.id NOT IN :sectionIds AND cs.course.id = :courseId  ORDER BY cs.orderIndex";
+            List<CourseSectionEntity> list = session.createQuery(hql, CourseSectionEntity.class)
+                    .setParameter("sectionIds", sectionIds)
+                    .setParameter("courseId", course.getId())
+                    .getResultList();
+            list.forEach(section -> {
+                Hibernate.initialize(section.getCourse());
+                Hibernate.initialize(section.getCourse().getAccountCreated());
+            });
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 
     @Override
     public boolean existTitle(String title, Long courseId) {
@@ -111,6 +129,19 @@ public class SectionDAOImpl implements SectionDAO {
         }
     }
 
-
+    @Override
+    public List<CourseSectionEntity> searchSectionsInCourse(Long courseId, String articleContent) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM CourseSectionEntity s WHERE s.course.id = :course AND s.title LIKE :articleContent";
+            List<CourseSectionEntity> list = session.createQuery(hql, CourseSectionEntity.class)
+                    .setParameter("course", courseId)
+                    .setParameter("articleContent", "%" + articleContent + "%")
+                    .getResultList();
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 
 }

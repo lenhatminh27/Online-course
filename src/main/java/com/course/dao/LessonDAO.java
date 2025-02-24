@@ -19,4 +19,6 @@ public interface LessonDAO {
     List<CourseLessonEntity> findBySection(CourseSectionEntity section);
 
     void deleteLesson(Long lessonId);
+
+    List<CourseLessonEntity> searchLessonsInCourse(List<Long> sectionIds, String articleContent);
 }

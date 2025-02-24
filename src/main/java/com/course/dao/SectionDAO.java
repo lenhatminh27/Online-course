@@ -15,7 +15,11 @@ public interface SectionDAO {
 
     List<CourseSectionEntity> findByCourse(CourseEntity course);
 
+    List<CourseSectionEntity> findByCourseNotIn(List<Long> sectionIds, CourseEntity course);
+
     boolean existTitle(String title, Long courseId);
 
     int countSectionsByCourse(CourseEntity course);
+
+    List<CourseSectionEntity> searchSectionsInCourse(Long courseId, String articleContent);
 }
