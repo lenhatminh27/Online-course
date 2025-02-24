@@ -11,4 +11,6 @@ public interface LessonService {
     LessonResponse updateLesson(UpdateLessonRequest updateLessonRequest);
 
     void deleteVideo(Long lessonId);
+
+    LessonResponse getLessonById(Long lessonId);
 }

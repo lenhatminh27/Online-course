@@ -1,6 +1,7 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.common.utils.StringUtils;
 import com.course.core.bean.annotations.Repository;
 import com.course.dao.LessonDAO;
 import com.course.entity.CourseLessonEntity;
@@ -130,6 +131,18 @@ public class LessonDAOImpl implements LessonDAO {
         }
     }
 
-
-
+    @Override
+    public List<CourseLessonEntity> searchLessonsInCourse(List<Long> sectionIds, String articleContent) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM CourseLessonEntity l WHERE l.courseSection.id IN :sectionIds AND (l.title LIKE :articleContent OR l.article LIKE :articleContent)";
+            List<CourseLessonEntity> lessons = session.createQuery(hql, CourseLessonEntity.class)
+                    .setParameter("sectionIds", sectionIds)
+                    .setParameter("articleContent", "%" + articleContent + "%")
+                    .getResultList();
+            return lessons;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
 }

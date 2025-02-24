@@ -147,4 +147,13 @@ public class LessonServiceImpl implements LessonService {
                 .updatedAt(lesson.getUpdatedAt())
                 .build();
     }
+
+    @Override
+    public LessonResponse getLessonById(Long lessonId) {
+        CourseLessonEntity lesson = lessonDAO.findById(lessonId);
+        if (ObjectUtils.isEmpty(lesson)) {
+            throw new NotFoundException("Bài học không tồn tại!");
+        }
+        return convertToLessonResponse(lesson);
+    }
 }

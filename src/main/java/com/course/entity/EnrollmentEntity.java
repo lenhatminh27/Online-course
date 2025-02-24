@@ -9,7 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Table(name = "ratings")
+@Table(name = "enrollments")
 @Entity
 @Getter
 @Setter

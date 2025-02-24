@@ -69,6 +69,7 @@ public final class StringUtils {
         String input = "Đây là một chuỗi+// thử nghiệm: Làm thế nào để tạo slug?";
         String slug = toSlug(input);
         System.out.println(slug); // day-la-mot-chuoi-thu-nghiem-lam-the-nao-de-tao-slug
+        System.out.println(deAccent("cao khả"));
     }
 }
 

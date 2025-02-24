@@ -6,6 +6,7 @@ import com.course.dto.request.CreateLessonRequest;
 import com.course.dto.request.UpdateLessonRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonResponse;
+import com.course.entity.CourseLessonEntity;
 import com.course.exceptions.BadRequestException;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
@@ -27,7 +28,7 @@ import java.util.List;
 
 import static com.course.core.bean.BeanListener.BeanContext.getBean;
 
-@WebServlet("/api/lesson")
+@WebServlet("/api/lesson/*")
 public class LessonApi extends BaseServlet {
 
     private LessonService lessonService;
@@ -117,6 +118,37 @@ public class LessonApi extends BaseServlet {
         catch (Exception e) {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Có lỗi xảy ra!"));
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            String courseIdStr = pathInfo.substring(1);
+            try {
+                Long courseId = Long.parseLong(courseIdStr);
+                handleGetLessonById(courseId, resp);
+            } catch (NumberFormatException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Invalid number"));
+            }
+            return;
+        }
+    }
+
+    private void handleGetLessonById(Long courseId, HttpServletResponse resp) throws IOException {
+        try {
+            LessonResponse response = lessonService.getLessonById(courseId);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(response));
+        }
+        catch (ForbiddenException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN,  gson.toJson(e.getMessage()));
+        }
+        catch (NotFoundException e){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
         }
     }
 }
