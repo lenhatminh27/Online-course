@@ -13,4 +13,6 @@ public interface LessonService {
     void deleteVideo(Long lessonId);
 
     LessonResponse getLessonById(Long lessonId);
+
+    void deleteLesson(Long lessonId);
 }

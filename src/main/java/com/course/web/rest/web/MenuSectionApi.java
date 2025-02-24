@@ -2,15 +2,12 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
 import com.course.dto.response.MenuSectionResponse;
-import com.course.dto.response.SectionResponse;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.MenuSectionService;
-import com.course.service.SectionService;
 import com.course.service.impl.MenuSectionServiceImpl;
-import com.course.service.impl.SectionServiceImpl;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;

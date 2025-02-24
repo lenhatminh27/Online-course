@@ -5,6 +5,8 @@ import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.CategoryDAO;
 import com.course.dao.CourseDAO;
+import com.course.dao.SectionDAO;
+import com.course.dao.impl.SectionDAOImpl;
 import com.course.dto.request.CourseInstructorFilterRequest;
 import com.course.dto.request.CreateCourseRequest;
 import com.course.dto.request.UpdateCourseRequest;
@@ -15,12 +17,14 @@ import com.course.dto.response.PageResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.CategoriesEntity;
 import com.course.entity.CourseEntity;
+import com.course.entity.CourseSectionEntity;
 import com.course.entity.enums.CourseStatus;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CourseService;
+import com.course.service.SectionService;
 import com.course.service.async.FileSerivce;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +42,10 @@ public class CourseServiceImpl implements CourseService {
     private final AccountDAO accountDAO;
 
     private final FileSerivce fileSerivce;
+
+    private final SectionDAO sectionDAO;
+
+    private final SectionService sectionService;
 
     @Override
     public PageResponse<CourseResponse> getAllListCourseByUserCurrent(CourseInstructorFilterRequest filterRequest) {
@@ -120,6 +128,7 @@ public class CourseServiceImpl implements CourseService {
         return convertToCourseResponse(course);
     }
 
+
     private AccountEntity getAuthenticatedAccount() {
         String email = AuthenticationContextHolder.getContext().getEmail();
         return accountDAO.findByEmail(email);
@@ -152,7 +161,5 @@ public class CourseServiceImpl implements CourseService {
         categoryResponse.setUpdatedAt(categoriesEntity.getUpdatedAt());
         return categoryResponse;
     }
-
-
-
+    
 }

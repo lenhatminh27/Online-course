@@ -61,7 +61,7 @@
             border-radius: 5px;
         }
 
-        .delete-btn{
+        .delete-btn {
             background-color: #dc3545; /* Màu đỏ Bootstrap */
             color: white; /* Chữ trắng */
             border: none;
@@ -237,7 +237,7 @@
 
                 },
 
-                async deleteLessonContent(lessonId){
+                async deleteLessonContent(lessonId) {
                     Swal.fire({
                         title: "Bạn có muốn xóa nội dung này không?",
                         icon: "warning",
@@ -246,7 +246,7 @@
                         cancelButtonText: "Hủy"
                     }).then(async (result) => {
                         if (result.isConfirmed) {
-                             await apiRequestWithToken(environment.apiUrl + "/api/lesson", {
+                            await apiRequestWithToken(environment.apiUrl + "/api/lesson", {
                                 method: 'PUT',
                                 headers: {'Content-Type': 'application/json'},
                                 body: JSON.stringify({
@@ -268,7 +268,7 @@
                                 let editorElement = document.getElementById(editorId);
                                 if (editorElement && !editorElement.dataset.ckeditorInitialized) {
                                     // Khởi tạo CKEditor
-                                    CKEDITOR.replace(editorId, { height: 400 });
+                                    CKEDITOR.replace(editorId, {height: 400});
                                     let editorInstance = CKEDITOR.instances[editorId];
                                     editorInstance.setData(lesson.article); // Đặt nội dung từ API vào CKEditor
                                     editorElement.dataset.ckeditorInitialized = "true"; // Đánh dấu đã khởi tạo
@@ -298,7 +298,6 @@
                         });
                     });
                 },
-
 
 
                 async addSection() {
@@ -637,8 +636,8 @@
                     try {
                         const response = await apiRequestWithToken(`/api/lesson`, {
                             method: "PUT",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ title: this.editedLessonTitle.trim(), lessonId: lessonId})
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({title: this.editedLessonTitle.trim(), lessonId: lessonId})
                         });
                         if (response) {
                             await this.loadSections();
@@ -674,10 +673,10 @@
                 },
 
 
-                async deleteVideo(lessonId){
+                async deleteVideo(lessonId) {
                     console.log(lessonId);
                     Swal.fire({
-                        title: "Bạn có muốn xóa vido này không?",
+                        title: "Bạn có muốn xóa video này không?",
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonText: "Xóa",
@@ -685,6 +684,42 @@
                     }).then(async (result) => {
                         if (result.isConfirmed) {
                             await apiRequestWithToken(environment.apiUrl + "/api/lesson/video/" + lessonId, {
+                                method: "DELETE",
+                            })
+                            await this.loadSections();
+                            Swal.fire("Xóa thành công!", "", "success");
+                        }
+                    });
+                },
+
+                async deleteLesson(lessonId) {
+                    Swal.fire({
+                        title: "Bạn có muốn xóa bài học này không?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Xóa",
+                        cancelButtonText: "Hủy"
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await apiRequestWithToken(environment.apiUrl + "/api/lesson/" + lessonId, {
+                                method: "DELETE",
+                            })
+                            await this.loadSections();
+                            Swal.fire("Xóa thành công!", "", "success");
+                        }
+                    });
+                },
+
+                async deleteSection(sectionId) {
+                    Swal.fire({
+                        title: "Bạn có muốn xóa học phần này không?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Xóa",
+                        cancelButtonText: "Hủy"
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await apiRequestWithToken(environment.apiUrl + "/api/section/" + sectionId, {
                                 method: "DELETE",
                             })
                             await this.loadSections();
@@ -719,26 +754,26 @@
 
         /* Định dạng chung cho các icon của bài học */
         .lesson-icon {
-            font-size: 1.2rem;       /* Kích thước icon */
-            margin-right: 0.5rem;    /* Khoảng cách bên phải */
+            font-size: 1.2rem; /* Kích thước icon */
+            margin-right: 0.5rem; /* Khoảng cách bên phải */
             transition: color 0.3s ease, transform 0.3s ease;
         }
 
         /* Màu riêng cho từng loại icon */
         .lesson-icon.video {
-            color: #9c27b0;          /* Màu tím cho video */
+            color: #9c27b0; /* Màu tím cho video */
         }
 
         .lesson-icon.article {
-            color: #28a745;          /* Màu xanh lá cây cho bài viết */
+            color: #28a745; /* Màu xanh lá cây cho bài viết */
         }
 
         .lesson-icon.both {
-            color: #ffc107;          /* Màu vàng cam cho cả hai */
+            color: #ffc107; /* Màu vàng cam cho cả hai */
         }
 
         .lesson-icon.none {
-            color: #6c757d;          /* Màu xám khi không có nội dung */
+            color: #6c757d; /* Màu xám khi không có nội dung */
         }
 
         /* Hiệu ứng hover cho icon */
@@ -746,9 +781,6 @@
             transform: scale(1.1);
             filter: brightness(120%);
         }
-
-
-
 
 
         .content {
@@ -782,7 +814,7 @@
 
         /* Nút Thêm Bài Viết */
         .add-article-btn {
-            background-color: #007bff;  /* Màu xanh dương */
+            background-color: #007bff; /* Màu xanh dương */
             color: #fff;
             border: none;
             padding: 10px 15px;
@@ -799,7 +831,7 @@
 
         /* Nút Thêm Tài Nguyên */
         .add-resource-btn {
-            background-color: #17a2b8;  /* Màu xanh ngọc */
+            background-color: #17a2b8; /* Màu xanh ngọc */
             color: #fff;
             border: none;
             padding: 10px 15px;
@@ -844,7 +876,8 @@
 
         <h5 class="mt-4">Tạo nội dung của bạn</h5>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" checked onclick="updateUrlSegment('curriculum', 'curriculum')">
+            <input class="form-check-input" type="checkbox" checked
+                   onclick="updateUrlSegment('curriculum', 'curriculum')">
             <label class="form-check-label">Chương trình giảng dạy</label>
         </div>
 
@@ -888,6 +921,15 @@
             ">
                             <i class="fa-solid fa-pen"></i>
                         </button>
+
+                        <button class="btn-icon"
+                                x-show="$store.curriculum.hoveredSection === section.id"
+                                @click="
+                            $store.curriculum.deleteSection(section.id)
+                        ">
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
                     </h5>
 
 
@@ -929,32 +971,44 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <%--                                <span x-text="lesson.title"></span>--%>
 
-                                    <div x-show="$store.curriculum.editingLesson !== lesson.id">
-                                        <template x-if="lesson.videoUrl && !lesson.article">
-                                            <i class="fa-solid fa-video me-2 lesson-icon video"></i>
-                                        </template>
-                                        <template x-if="lesson.article && !lesson.videoUrl">
-                                            <i class="fa-solid fa-newspaper me-2 lesson-icon article"></i>
-                                        </template>
-                                        <template x-if="lesson.videoUrl && lesson.article">
-                                            <i class="fa-solid fa-layer-group me-2 lesson-icon both"></i>
-                                        </template>
-                                        <template x-if="!lesson.videoUrl && !lesson.article">
-                                            <i class="fa-solid fa-file me-2 lesson-icon none"></i>
-                                        </template>
-                                        <span x-text="lesson.title"></span>
-                                        <button class="btn-icon"
-                                                x-show="$store.curriculum.hoveredLesson === lesson.id"
-                                                @click="
+                                <div x-show="$store.curriculum.editingLesson !== lesson.id">
+                                    <template x-if="lesson.videoUrl && !lesson.article">
+                                        <i class="fa-solid fa-video me-2 lesson-icon video"></i>
+                                    </template>
+                                    <template x-if="lesson.article && !lesson.videoUrl">
+                                        <i class="fa-solid fa-newspaper me-2 lesson-icon article"></i>
+                                    </template>
+                                    <template x-if="lesson.videoUrl && lesson.article">
+                                        <i class="fa-solid fa-layer-group me-2 lesson-icon both"></i>
+                                    </template>
+                                    <template x-if="!lesson.videoUrl && !lesson.article">
+                                        <i class="fa-solid fa-file me-2 lesson-icon none"></i>
+                                    </template>
+                                    <span x-text="lesson.title"></span>
+                                    <button class="btn-icon"
+                                            x-show="$store.curriculum.hoveredLesson === lesson.id"
+                                            @click="
                             $store.curriculum.editingLesson = lesson.id;
                             $store.curriculum.editedLessonTitle = lesson.title;
                         ">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                    </div>
+                                        <i class="fa-solid fa-pen"></i>
+
+                                    </button>
+
+                                    <button class="btn-icon"
+                                            x-show="$store.curriculum.hoveredLesson === lesson.id"
+                                            @click="
+                            $store.curriculum.deleteLesson(lesson.id)
+                        ">
+                                        <i class="fa-solid fa-trash"></i>
+
+                                    </button>
+
+                                </div>
 
                                 <!-- Form chỉnh sửa tiêu đề bài học -->
-                                <div x-show="$store.curriculum.editingLesson === lesson.id" class="mt-2" style="width: 100%">
+                                <div x-show="$store.curriculum.editingLesson === lesson.id" class="mt-2"
+                                     style="width: 100%">
                                     <label class="fw-bold mb-1">Tiêu đề bài học</label>
                                     <input type="text" class="form-control border-primary"
                                            x-model="$store.curriculum.editedLessonTitle"
@@ -1016,7 +1070,8 @@
                                 <template x-if="!lesson.article">
                                     <div class="mt-2">
                                         <!-- Nút Thêm Bài Viết -->
-                                        <button class="add-resource-btn mt-2" @click="$store.curriculum.selectContentType(lesson.id, 'article')">
+                                        <button class="add-resource-btn mt-2"
+                                                @click="$store.curriculum.selectContentType(lesson.id, 'article')">
                                             Thêm Bài Viết
                                         </button>
                                     </div>

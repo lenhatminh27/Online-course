@@ -151,4 +151,27 @@ public class SectionApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Có lỗi xảy ra!"));
         }
     }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("DELETE_SECTION")
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            String sectionIdStr = pathInfo.substring(1);
+            try {
+                Long sectionId = Long.parseLong(sectionIdStr);
+                sectionService.deleteSection(sectionId);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("Xóa section thành công"));
+            } catch (NumberFormatException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Invalid number"));
+            } catch (NotFoundException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
+            } catch (ForbiddenException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
+            }
+        }
+    }
 }

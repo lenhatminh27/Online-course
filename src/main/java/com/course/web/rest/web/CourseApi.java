@@ -10,6 +10,7 @@ import com.course.dto.request.UpdateCourseRequest;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
+import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -161,4 +162,5 @@ public class CourseApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Có lỗi xảy ra!"));
         }
     }
+
 }

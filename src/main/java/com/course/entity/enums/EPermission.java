@@ -28,4 +28,6 @@ public enum EPermission {
     WISHLIST_COURSE,
     ENROLLMENT_COURSE,
     RATING_COURSE,
+    DELETE_LESSON,
+    DELETE_SECTION,
 }

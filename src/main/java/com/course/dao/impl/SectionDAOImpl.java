@@ -144,4 +144,23 @@ public class SectionDAOImpl implements SectionDAO {
         }
     }
 
+    @Override
+    public void deleteSectionById(Long id) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            String hql = "DELETE FROM CourseSectionEntity cs WHERE cs.id = :id";
+            int deletedCount = session.createQuery(hql)
+                    .setParameter("id", id)
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Failed to delete section with ID: " + id, e);
+        }
+    }
+
 }

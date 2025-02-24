@@ -6,7 +6,6 @@ import com.course.dto.request.CreateLessonRequest;
 import com.course.dto.request.UpdateLessonRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonResponse;
-import com.course.entity.CourseLessonEntity;
 import com.course.exceptions.BadRequestException;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
@@ -149,6 +148,29 @@ public class LessonApi extends BaseServlet {
         }
         catch (NotFoundException e){
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
+        }
+    }
+
+    @Override
+    @IsAuthenticated
+    @HasPermission("DELETE_LESSON")
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            String lessonIdStr = pathInfo.substring(1);
+            try {
+                Long lessonId = Long.parseLong(lessonIdStr);
+                lessonService.deleteLesson(lessonId);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("Xóa lesson thành công"));
+            } catch (NumberFormatException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Invalid number"));
+            } catch (NotFoundException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
+            } catch (ForbiddenException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
+            }
         }
     }
 }

@@ -2,12 +2,12 @@ package com.course.service.impl;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.core.bean.annotations.Service;
-import com.course.dao.LessonDAO;
-import com.course.dao.SectionDAO;
+import com.course.dao.*;
 import com.course.dto.request.CreateLessonRequest;
 import com.course.dto.request.UpdateLessonRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonResponse;
+import com.course.entity.AccountEntity;
 import com.course.entity.CourseLessonEntity;
 import com.course.entity.CourseSectionEntity;
 import com.course.exceptions.BadRequestException;
@@ -15,6 +15,7 @@ import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContextHolder;
+import com.course.service.LessonCommentService;
 import com.course.service.LessonService;
 import com.course.service.async.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,10 @@ public class LessonServiceImpl implements LessonService {
     private final SectionDAO sectionDAO;
 
     private final VideoService videoService;
+
+    private final LessonCommentDAO lessonCommentDAO;
+
+    private final ProgressDAO progressDAO;
 
     @Override
     public LessonResponse createLesson(CreateLessonRequest createLessonRequest) {
@@ -155,5 +160,24 @@ public class LessonServiceImpl implements LessonService {
             throw new NotFoundException("Bài học không tồn tại!");
         }
         return convertToLessonResponse(lesson);
+    }
+
+    @Override
+    public void deleteLesson(Long lessonId) {
+        CourseLessonEntity lesson = lessonDAO.findById(lessonId);
+        if (lesson == null) {
+            throw new NotFoundException("Bài học không tồn tại!");
+        }
+
+        String accountCurrent = getAuthenticatedAccount();
+        boolean isAdmin = AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN);
+        boolean isOwner = lesson.getCourseSection().getCourse().getAccountCreated().getEmail().equals(accountCurrent);
+        if (!isAdmin && !isOwner) {
+            throw new ForbiddenException("Bạn không có quyền xoá lesson này");
+        }
+        videoService.remove(lesson.getVideoUrl());
+        lessonCommentDAO.deleteLessonCommentByLessonId(lessonId);
+        progressDAO.deleteProgressByLessonId(lessonId);
+        lessonDAO.deleteLesson(lessonId);
     }
 }

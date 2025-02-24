@@ -11,4 +11,5 @@ public interface CourseDAO {
     CourseEntity findById(Long id);
     PageResponse<CourseEntity> findByAccountCreatedId(Long id, CourseInstructorFilterRequest filterRequest);
     CourseEntity updateCourse(CourseEntity course);
+    void deleteCourse(Long id);
 }

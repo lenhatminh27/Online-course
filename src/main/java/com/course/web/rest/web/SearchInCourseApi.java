@@ -5,7 +5,6 @@ import com.course.dto.request.SearchInCourseRequest;
 import com.course.dto.response.SearchInCourseResponse;
 import com.course.security.annotations.handle.BaseServlet;
 import com.course.service.SearchInCourseService;
-import com.course.service.impl.BlogServiceImpl;
 import com.course.service.impl.SearchInCourseServiceImpl;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletConfig;

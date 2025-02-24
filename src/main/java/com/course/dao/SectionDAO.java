@@ -22,4 +22,6 @@ public interface SectionDAO {
     int countSectionsByCourse(CourseEntity course);
 
     List<CourseSectionEntity> searchSectionsInCourse(Long courseId, String articleContent);
+
+    void deleteSectionById(Long id);
 }
