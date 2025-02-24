@@ -56,8 +56,6 @@ VALUES
     ('WISHLIST_COURSE'),
     ('ENROLLMENT_COURSE'),
     ('RATING_COURSE'),
-    ('DELETE_LESSON'),
-    ('DELETE_SECTION');
 
 INSERT INTO categories (name, description, parent_id, created_at, updated_at)
 VALUES

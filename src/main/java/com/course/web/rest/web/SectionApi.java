@@ -154,7 +154,7 @@ public class SectionApi extends BaseServlet {
 
     @Override
     @IsAuthenticated
-    @HasPermission("DELETE_SECTION")
+    @HasPermission("DELETE_COURSE")
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
