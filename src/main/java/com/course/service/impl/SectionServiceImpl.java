@@ -2,14 +2,13 @@ package com.course.service.impl;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.core.bean.annotations.Service;
-import com.course.dao.CourseDAO;
-import com.course.dao.LessonDAO;
-import com.course.dao.SectionDAO;
+import com.course.dao.*;
 import com.course.dto.request.CreateSectionRequest;
 import com.course.dto.request.UpdateSectionRequest;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonResponse;
 import com.course.dto.response.SectionResponse;
+import com.course.entity.AccountEntity;
 import com.course.entity.CourseEntity;
 import com.course.entity.CourseLessonEntity;
 import com.course.entity.CourseSectionEntity;
@@ -33,6 +32,10 @@ public class SectionServiceImpl implements SectionService {
     private final CourseDAO courseDAO;
 
     private final LessonDAO lessonDAO;
+
+    private final EnrollmentDAO enrollmentDAO;
+
+    private final AccountDAO accountDAO;
 
     @Override
     public SectionResponse creatSection(CreateSectionRequest section) {
@@ -61,6 +64,14 @@ public class SectionServiceImpl implements SectionService {
         CourseEntity course = courseDAO.findById(courseId);
         if (ObjectUtils.isEmpty(course)) {
             throw new NotFoundException("Không tìm thấy course id tương ứng");
+        }
+        AccountEntity accountCurrent = getAuthenticatedAccountCurrent();
+        boolean isEnrolled = enrollmentDAO.getEnrollmentByAccountIdAndCourseId(accountCurrent.getId(), courseId);
+        boolean isAdmin = AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN);
+        assert accountCurrent != null;
+        boolean isOwner = course.getAccountCreated().getEmail().equals(accountCurrent.getEmail());
+        if (!isAdmin && !isOwner && !isEnrolled) {
+            throw new ForbiddenException("Không có quyền xem");
         }
         List<CourseSectionEntity> list = sectionDAO.findByCourse(course);
         return list.stream().map(this::convertToSectionResponse).toList();
@@ -103,6 +114,14 @@ public class SectionServiceImpl implements SectionService {
 
     private String getAuthenticatedAccount() {
         return AuthenticationContextHolder.getContext().getEmail();
+    }
+
+    private AccountEntity getAuthenticatedAccountCurrent() {
+        if (AuthenticationContextHolder.getContext() == null) {
+            return null;
+        }
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        return accountDAO.findByEmail(email);
     }
 
     private SectionResponse convertToSectionResponse(CourseSectionEntity section) {

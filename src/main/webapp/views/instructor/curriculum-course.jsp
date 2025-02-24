@@ -818,8 +818,14 @@
 <body>
 <nav class="navbar navbar-dark bg-dark p-3">
     <a class="navbar-brand" href="#">Chương trình giảng dạy</a>
-    <button class="btn btn-outline-light">Trình tải lên hàng loạt</button>
+    <div>
+        <button class="btn btn-outline-light">Trình tải lên hàng loạt</button>
+        <a href="/instructor/course/" class="btn btn-light ms-2">
+            <i class="fas fa-times"></i>
+        </a>
+    </div>
 </nav>
+
 <div class="container d-flex mt-4">
     <div class="sidebar">
         <h5 class="mb-3">Lên kế hoạch cho khóa học của bạn</h5>
@@ -846,6 +852,10 @@
         <div class="form-check">
             <input class="form-check-input" type="checkbox" onclick="updateUrlSegment('curriculum', 'basics')">
             <label class="form-check-label">Trang tổng quan khóa học</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" onclick="updateUrlSegment('curriculum', 'price')">
+            <label class="form-check-label">Định giá</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="checkbox" onclick="redirectToPage('/discount')">

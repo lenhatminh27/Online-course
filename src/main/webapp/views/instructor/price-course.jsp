@@ -93,7 +93,7 @@
         import {apiRequestWithToken} from '../../assets/config/service.js';
         document.addEventListener('alpine:init', () => {
             const pathSegments = window.location.pathname.split('/');
-            const curriculumIndex = pathSegments.indexOf("basics");
+            const curriculumIndex = pathSegments.indexOf("price");
             let courseId = null;
             if (curriculumIndex !== -1 && curriculumIndex + 1 < pathSegments.length) {
                 courseId = pathSegments[curriculumIndex + 1];
@@ -106,11 +106,29 @@
                 course: {
                     title: '', // khởi tạo title với chuỗi rỗng
                     description: '',
-                    thumbnail: ''
+                    thumbnail: '',
+                    price: 0,
                 },
-                file: null,
-                fileName: 'Không có file nào được chọn',
-                errorMessage: '',
+                priceOptions: [
+                    { value: 0, label: 'Miễn phí' },
+                    { value: 399000, label: '399.000 ₫ (tháng 1)' },
+                    { value: 449000, label: '449.000 ₫ (tháng 2)' },
+                    { value: 499000, label: '499.000 ₫ (tháng 3)' },
+                    { value: 549000, label: '549.000 ₫ (tháng 4)' },
+                    { value: 599000, label: '599.000 ₫ (tháng 5)' },
+                    { value: 649000, label: '649.000 ₫ (tháng 6)' },
+                    { value: 699000, label: '699.000 ₫ (tháng 7)' },
+                    { value: 749000, label: '749.000 ₫ (tháng 8)' },
+                    { value: 799000, label: '799.000 ₫ (tháng 9)' },
+                    { value: 849000, label: '849.000 ₫ (tháng 10)' },
+                    { value: 899000, label: '899.000 ₫ (tháng 11)' },
+                    { value: 949000, label: '949.000 ₫ (tháng 12)' },
+                    { value: 999000, label: '999.000 ₫ (tháng 13)' },
+                    { value: 1049000, label: '1.049.000 ₫ (tháng 14)' },
+                    { value: 1099000, label: '1.099.000 ₫ (tháng 15)' }
+                ],
+
+
 
                 async getCourseCurrent(){
                     const  response = await apiRequestWithToken(environment.apiUrl +  '/api/course/detail/' + courseId, {
@@ -125,10 +143,10 @@
                         const response = await apiRequestWithToken(environment.apiUrl + '/api/course' , {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ...this.course, courseId: courseId })
+                            body: JSON.stringify({ price: this.course.price, courseId: courseId })
                         });
                         console.log('Course updated: ', response);
-                        Alpine.store('course').getCourseCurrent();
+                        await this.getCourseCurrent();
                         Swal.fire('Thành công', 'Khóa học đã được cập nhật', 'success');
                     } catch(error) {
                         console.error('Error updating course', error);
@@ -136,54 +154,6 @@
                     }
                 },
 
-                handleFileUpload(event) {
-                    this.errorMessage = ''; // Xóa lỗi cũ
-                    const selectedFile = event.target.files[0];
-                    if (!selectedFile) return;
-                    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                    if (!allowedTypes.includes(selectedFile.type)) {
-                        this.errorMessage = 'Định dạng file không hợp lệ! Chỉ chấp nhận .jpg, .jpeg, .png, .gif';
-                        return;
-                    }
-                    const maxSize = 10 * 1024 * 1024; // 10MB
-                    if (selectedFile.size > maxSize) {
-                        this.errorMessage = 'File quá lớn! Kích thước tối đa là 10MB.';
-                        return;
-                    }
-                    this.file = selectedFile;
-                    this.fileName = selectedFile.name;
-                    const reader = new FileReader();
-                    reader.onload = (e) => this.course.thumbnail = e.target.result;
-                    reader.readAsDataURL(selectedFile);
-                },
-
-                async uploadImage() {
-                    if (!this.file) {
-                        Swal.fire('Lỗi', 'Vui lòng chọn một tệp trước khi tải lên!', 'error');
-                        return;
-                    }
-
-                    if (this.errorMessage) {
-                        Swal.fire('Lỗi', this.errorMessage, 'error');
-                        return;
-                    }
-                    const formData = new FormData();
-                    formData.append('file', this.file);
-                    try {
-                        const response = await apiRequestWithToken(environment.apiUrl + '/api/upload', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        if (response) {
-                            this.course.thumbnail = response.file ; // Cập nhật đường dẫn ảnh vào khóa học
-                            await this.updateCourse(); // Tự động cập nhật khóa học sau khi upload ảnh
-                            Swal.fire('Thành công', 'Hình ảnh đã được tải lên', 'success');
-                        }
-                    } catch (error) {
-                        console.error('Lỗi khi tải ảnh:', error);
-                        Swal.fire('Lỗi', 'Không thể tải lên hình ảnh', 'error');
-                    }
-                },
             });
 
             Alpine.store('course').getCourseCurrent();
@@ -238,17 +208,17 @@
 
         <h5 class="mt-4">Tạo nội dung của bạn</h5>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" onclick="updateUrlSegment('basics', 'curriculum')">
+            <input class="form-check-input" type="checkbox" onclick="updateUrlSegment('price', 'curriculum')">
             <label class="form-check-label">Chương trình giảng dạy</label>
         </div>
 
         <h5 class="mt-4">Xuất bản khóa học của bạn</h5>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" checked onclick="updateUrlSegment('basics', 'basics')">
+            <input class="form-check-input" type="checkbox" onclick="updateUrlSegment('price', 'basics')">
             <label class="form-check-label">Trang tổng quan khóa học</label>
         </div>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" onclick="updateUrlSegment('basics', 'price')">
+            <input class="form-check-input" type="checkbox" checked onclick="updateUrlSegment('price', 'price')">
             <label class="form-check-label">Định giá</label>
         </div>
         <div class="form-check">
@@ -260,62 +230,21 @@
     </div>
     <div class="content ms-4" x-data="Alpine.store('course')">
         <div class="form">
-            <h2>Trang tổng quan khóa học</h2>
-            <p>Trang tổng quan khóa học của bạn rất quan trọng đối với thành công trên Udemy.</p>
-
-            <div class="mb-3">
-                <label class="form-label">Tiêu đề khóa học</label>
-                <input type="text" class="form-control" placeholder="Nhập tiêu đề (tối đa 80 ký tự)"
-                       x-model="course.title" maxlength="80">
-                <small class="text-muted" x-text="80 - course.title.length + ' ký tự còn lại'"></small>
+            <h2>Định giá</h2>
+            <div class="row mb-3 align-items-center">
+                <label class="col-3 form-label">Chọn giá khóa học</label>
+                <div class="col-6">
+                    <select class="form-control" x-model="course.price">
+                        <option value="0" disabled>Chọn</option>
+                        <template x-for="(price, index) in priceOptions" :key="index">
+                            <option :value="price.value" x-text="price.label"></option>
+                        </template>
+                    </select>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Mô tả khóa học</label>
-                <textarea class="form-control" rows="4" x-model="course.description" placeholder="Chèn mô tả khóa học"></textarea>
-                <small class="text-muted" x-text="1000 - (course.description ? course.description.length : 0) + ' ký tự còn lại'"></small>
-            </div>
 
             <button class="btn btn-primary" @click="updateCourse()">Lưu</button>
-        </div>
-
-        <div class="container mt-5">
-            <h4>Thông tin cơ bản</h4>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option selected>Tiếng Việt</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option selected>-- Chọn trình độ --</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option selected>CNTT & Phần mềm</option>
-                    </select>
-                </div>
-            </div>
-
-            <h4 class="mt-4">Hình ảnh khóa học</h4>
-            <div class="upload-container">
-                <img :src="course.thumbnail || 'https://via.placeholder.com/250x150'" alt="Hình ảnh khóa học">
-                <p>
-                    Tải hình ảnh khóa học lên tại đây. Để được chấp nhận, hình ảnh phải đáp ứng
-                    <a href="#">tiêu chuẩn chất lượng hình ảnh khóa học</a>.
-                </p>
-                <p>Hướng dẫn quan trọng: 750x422 pixel; .jpg, .jpeg, .gif, hoặc .png.</p>
-
-                <div class="btn-upload">
-                    <input type="file" class="custom-file-input" id="fileUpload" @change="handleFileUpload">
-                    <label for="fileUpload" class="btn btn-outline-secondary" x-text="fileName">Không có file nào được chọn</label>
-                    <button class="btn btn-primary" @click="uploadImage">Tải file lên</button>
-                </div>
-
-                <p class="text-danger" x-show="errorMessage" x-text="errorMessage"></p>
-            </div>
         </div>
     </div>
 
