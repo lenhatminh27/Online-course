@@ -4,6 +4,7 @@ import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.CategoryDAO;
 import com.course.dto.request.CategoryCreateRequest;
+import com.course.dto.request.UpdateCategoryRequest;
 import com.course.dto.response.CategoryResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.security.annotations.HasPermission;
@@ -68,7 +69,6 @@ public class CategoryApi extends BaseServlet {
         resp.setCharacterEncoding("UTF-8");
         CategoryCreateRequest categoryCreateRequest = gson.fromJson(req.getReader(), CategoryCreateRequest.class);
         List<String> errors = new ArrayList<>();
-        CategoryResponse categoryResponse = categoryService.createCategory(categoryCreateRequest);
         if(ObjectUtils.isEmpty(categoryCreateRequest)){
             errors.add("CategoryCreateRequest không được rỗng");
         }
@@ -78,7 +78,7 @@ public class CategoryApi extends BaseServlet {
         if (categoryCreateRequest.getName().length() > 100 || categoryCreateRequest.getName().length() < 3) {
             errors.add("Tên thể loại phải từ 3-100 kí tự");
         }
-        if (categoryResponse == null) {
+        if (categoryService.isExistCategory(categoryCreateRequest)) {
             errors.add("Thể loại này đã tồn tại");
         }
         if (!Pattern.matches(CATEGORY_NAME_REGEX, categoryCreateRequest.getName())) {
@@ -91,9 +91,45 @@ public class CategoryApi extends BaseServlet {
             return;
         }
         try {
+            CategoryResponse categoryResponse = categoryService.createCategory(categoryCreateRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_CREATED, gson.toJson(categoryResponse));
         } catch (Exception e) {
             e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        try {
+            UpdateCategoryRequest updateCategoryRequest = gson.fromJson(req.getReader(), UpdateCategoryRequest.class);
+            List<String> errors = new ArrayList<>();
+            if(ObjectUtils.isEmpty(updateCategoryRequest)){
+                errors.add("CategoryCreateRequest không được rỗng");
+            }
+            if(ObjectUtils.isEmpty(updateCategoryRequest.getName())){
+                errors.add("CategoryName không được rỗng");
+            }
+            if (updateCategoryRequest.getName().length() > 100 || updateCategoryRequest.getName().length() < 3) {
+                errors.add("Tên thể loại phải từ 3-100 kí tự");
+            }
+            if (categoryService.isExistCategory(updateCategoryRequest)) {
+                errors.add("Thể loại này đã tồn tại");
+            }
+            if (!Pattern.matches(CATEGORY_NAME_REGEX, updateCategoryRequest.getName())) {
+                errors.add("Tên thể loại chỉ được chứa chữ cái, số, khoảng trắng, dấu gạch ngang (-) hoặc gạch dưới (_)");
+            }
+            if (errors.size() > 0) {
+                ErrorResponse errorResponse = new ErrorResponse();
+                errorResponse.setError(errors);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+                return;
+            }
+            CategoryResponse categoryResponse = categoryService.updateCategory(updateCategoryRequest);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(categoryResponse));
+        } catch (Exception e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
     }

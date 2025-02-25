@@ -11,4 +11,6 @@ public interface CategoryDAO {
     boolean existCategory(String categoryName);
     List<CategoriesEntity> findAllChildrenCategories(Long id);
     List<CategoriesEntity> getAllCategories();
+    CategoriesEntity findByName(String name);
+    CategoriesEntity updateCategory(CategoriesEntity category);
 }

@@ -49,6 +49,16 @@ public class CategoryDAOImpl implements CategoryDAO {
     }
 
     @Override
+    public CategoriesEntity findByName(String name) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            return session.get(CategoriesEntity.class, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public CategoriesEntity createCategory(CategoriesEntity category) {
         Transaction transaction = null;
         try(Session session = HibernateUtils.getSessionFactory().openSession()){
@@ -89,6 +99,23 @@ public class CategoryDAOImpl implements CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public CategoriesEntity updateCategory(CategoriesEntity category) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(category);
+            transaction.commit();
+            return category;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save RefreshTokenEntity", e);
         }
     }
 }
