@@ -4,12 +4,14 @@ import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.CategoryDAO;
 import com.course.dto.request.CategoryCreateRequest;
+import com.course.dto.request.UpdateCategoryRequest;
 import com.course.dto.response.CategoryResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.CategoriesEntity;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,5 +62,31 @@ public class CategoryServiceImpl implements CategoryService {
             return convertToResponse(categorySave);
         }
         return null;
+    }
+
+    @Override
+    public boolean isExistCategory(CategoryCreateRequest categoryCreateRequest) {
+        return categoryDAO.existCategory(categoryCreateRequest.getName().trim());
+    }
+
+    @Override
+    public boolean isExistCategory(UpdateCategoryRequest updateCategoryRequest) {
+        return categoryDAO.existCategory(updateCategoryRequest.getName().trim());
+    }
+
+    @Override
+    public CategoryResponse updateCategory(UpdateCategoryRequest updateCategoryRequest) {
+        CategoriesEntity categoryCurrent = categoryDAO.findById(updateCategoryRequest.getCategoryId());
+        if (!ObjectUtils.isEmpty(updateCategoryRequest.getDescription())) {
+            categoryCurrent.setDescription(updateCategoryRequest.getDescription().trim());
+        }
+        if (!ObjectUtils.isEmpty(updateCategoryRequest.getParentCategoryId())) {
+            categoryCurrent.setParentCategories(categoryDAO.findById(updateCategoryRequest.getParentCategoryId()));
+        }
+        if (!ObjectUtils.isEmpty(updateCategoryRequest.getName().trim())) {
+            categoryCurrent.setName(updateCategoryRequest.getName().trim());
+        }
+        categoryDAO.updateCategory(categoryCurrent);
+        return convertToResponse(categoryCurrent);
     }
 }
