@@ -193,7 +193,7 @@
                     }
                 },
 
-                async loadLesson(lessonId = 1) {
+                async loadLesson(lessonId) {
                     try {
                         const lesson = await apiRequestWithToken(environment.apiUrl + '/api/lesson/' + lessonId);
                         this.currentLesson = lesson;

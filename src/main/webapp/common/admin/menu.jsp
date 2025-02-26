@@ -17,15 +17,19 @@
             </div>
         </div>
         <div class="navbar-nav w-100">
-            <a href="index.html" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Bảng điều khiển</a>
+            <a href="index.html" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Bảng điều
+                khiển</a>
             <a href="/admin/authorization" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Phân quyền</a>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
                         class="far fa-file-alt me-2"></i>Blogs</a>
                 <div class="dropdown-menu bg-transparent border-0">
-                    <a href="/admin/blogs?action=create" class="dropdown-item"><i class="fa fa-plus me-2"></i>Tạo Blog</a>
-                    <a href="/admin/blogs?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>Xem Blogs</a>
-                    <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Cập nhật Blog</a>
+                    <a href="/admin/blogs?action=create" class="dropdown-item"><i class="fa fa-plus me-2"></i>Tạo
+                        Blog</a>
+                    <a href="/admin/blogs?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>Xem
+                        Blogs</a>
+                    <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Cập nhật
+                        Blog</a>
                     <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Xóa Blog</a>
                 </div>
             </div>
@@ -35,11 +39,14 @@
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="/admin/category" class="dropdown-item"><i class="fa fa-plus me-2"></i>Tạo thể loại</a>
                     <a href="/admin/blogs?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>Xem thể loại</a>
-                    <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Cập nhật thể loại</a>
-                    <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Xóa thể loại</a>
+                    <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Cập nhật
+                        thể loại</a>
+                    <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Xóa thể
+                        loại</a>
                 </div>
             </div>
-            <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Biểu đồ</a>
+            <a href="/admin/review-course" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Khóa học
+                chờ</a>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
                         class="far fa-file-alt me-2"></i>Trang</a>
