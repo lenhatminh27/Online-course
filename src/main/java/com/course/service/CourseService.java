@@ -24,4 +24,8 @@ public interface CourseService {
 
     void sendReviewCourseDetailEmail(ReviewCourseDetailRequest reviewCourseDetailRequest);
 
+    PageResponse<CourseResponse> getAllCoursePublic(CourseFilterRequest filterRequest);
+
+    List<CourseResponse> getTop3Course();
+
 }

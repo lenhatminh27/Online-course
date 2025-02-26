@@ -220,4 +220,25 @@ public class CourseServiceImpl implements CourseService {
         return categoryResponse;
     }
 
+    @Override
+    public PageResponse<CourseResponse> getAllCoursePublic(CourseFilterRequest filterRequest) {
+        PageResponse<CourseEntity> pageResponse = courseDAO.getAllCourses(filterRequest);
+        List<CourseResponse> courses = pageResponse.getData().stream()
+                .map(this::convertToCourseResponse)
+                .toList();
+
+        return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), courses);
+    }
+
+    @Override
+    public List<CourseResponse> getTop3Course() {
+        List<CourseEntity> allCourse = courseDAO.getTop3Courses();
+        if(allCourse == null) {
+            throw new ForbiddenException("hiện chưa có khóa học nào đang sẵn sàng. vui lòng quay lại sau");
+        }
+        return allCourse.stream().map(this::convertToCourseResponse).toList();
+    }
+
+
+
 }

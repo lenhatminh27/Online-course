@@ -1,5 +1,6 @@
 package com.course.dao;
 
+import com.course.dto.request.CourseFilterRequest;
 import com.course.dto.request.CourseInstructorFilterRequest;
 import com.course.dto.request.ReviewCourseFilterRequest;
 import com.course.dto.response.PageResponse;
@@ -24,5 +25,11 @@ public interface CourseDAO {
     List<CourseEntity> findByStatus(CourseStatus status);
 
     PageResponse<CourseEntity> getInReviewCourses(ReviewCourseFilterRequest filterRequest);
+
+    List<CourseEntity> getTop3Courses();
+
+    PageResponse<CourseEntity> getAllCourses(CourseFilterRequest filterRequest);
+
+
 
 }
