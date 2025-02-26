@@ -7,9 +7,7 @@ import com.course.dao.CategoryDAO;
 import com.course.dao.CourseDAO;
 import com.course.dao.SectionDAO;
 import com.course.dao.impl.SectionDAOImpl;
-import com.course.dto.request.CourseInstructorFilterRequest;
-import com.course.dto.request.CreateCourseRequest;
-import com.course.dto.request.UpdateCourseRequest;
+import com.course.dto.request.*;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.CategoryResponse;
 import com.course.dto.response.CourseResponse;
@@ -19,12 +17,15 @@ import com.course.entity.CategoriesEntity;
 import com.course.entity.CourseEntity;
 import com.course.entity.CourseSectionEntity;
 import com.course.entity.enums.CourseStatus;
+import com.course.exceptions.AuthenticationException;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
+import com.course.security.context.AuthenticationContext;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CourseService;
 import com.course.service.SectionService;
+import com.course.service.async.EmailService;
 import com.course.service.async.FileSerivce;
 import lombok.RequiredArgsConstructor;
 
@@ -46,6 +47,8 @@ public class CourseServiceImpl implements CourseService {
     private final SectionDAO sectionDAO;
 
     private final SectionService sectionService;
+
+    private final EmailService emailService;
 
     @Override
     public PageResponse<CourseResponse> getAllListCourseByUserCurrent(CourseInstructorFilterRequest filterRequest) {
@@ -70,25 +73,25 @@ public class CourseServiceImpl implements CourseService {
         if (!isAdmin && !isOwner) {
             throw new ForbiddenException("Không có quyền thay đổi");
         }
-        if(!ObjectUtils.isEmpty(request.getTitle())){
+        if (!ObjectUtils.isEmpty(request.getTitle())) {
             courseUpdated.setTitle(request.getTitle());
         }
-        if(!ObjectUtils.isEmpty(request.getDescription())){
+        if (!ObjectUtils.isEmpty(request.getDescription())) {
             courseUpdated.setDescription(request.getDescription());
         }
-        if(!ObjectUtils.isEmpty(request.getPrice())){
+        if (!ObjectUtils.isEmpty(request.getPrice())) {
             courseUpdated.setPrice(request.getPrice());
         }
-        if(!ObjectUtils.isEmpty(request.getThumbnail())){
+        if (!ObjectUtils.isEmpty(request.getThumbnail())) {
             fileSerivce.deleteFile(courseUpdated.getThumbnail());
             courseUpdated.setThumbnail(request.getThumbnail());
         }
-        if(!ObjectUtils.isEmpty(request.getStatus())){
+        if (!ObjectUtils.isEmpty(request.getStatus())) {
             courseUpdated.setStatus(request.getStatus());
         }
-        if(!ObjectUtils.isEmpty(request.getCategoriesId())){
+        if (!ObjectUtils.isEmpty(request.getCategoriesId())) {
             CategoriesEntity categories = categoryDAO.findById(request.getCategoriesId());
-            if(!ObjectUtils.isEmpty(categories)){
+            if (!ObjectUtils.isEmpty(categories)) {
                 courseUpdated.setCategories(List.of(categories));
             }
         }
@@ -104,7 +107,7 @@ public class CourseServiceImpl implements CourseService {
     public CourseResponse createCourse(CreateCourseRequest createCourseRequest) {
         AccountEntity account = getAuthenticatedAccount();
         CategoriesEntity categories = categoryDAO.findById(createCourseRequest.getCategoriesId());
-        if(ObjectUtils.isEmpty(categories)) {
+        if (ObjectUtils.isEmpty(categories)) {
             throw new NotFoundException("Không tìm thấy category");
         }
         CourseEntity course = CourseEntity.builder()
@@ -122,11 +125,66 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseResponse findById(Long id) {
         CourseEntity course = courseDAO.findById(id);
-        if(ObjectUtils.isEmpty(course)) {
+        if (ObjectUtils.isEmpty(course)) {
             throw new NotFoundException("Không tìm thấy khóa học");
         }
         return convertToCourseResponse(course);
     }
+
+    @Override
+    public void acceptCourse(Long courseId) {
+        CourseEntity course = courseDAO.findById(courseId);
+        if (ObjectUtils.isEmpty(course)) {
+            throw new NotFoundException("Không tìm thấy khóa học với ID: " + courseId);
+        }
+        courseDAO.updateCourseStatus(courseId, CourseStatus.PUBLIC);
+    }
+
+
+    @Override
+    public void rejectCourse(Long courseId) {
+        CourseEntity course = courseDAO.findById(courseId);
+        if (ObjectUtils.isEmpty(course)) {
+            throw new NotFoundException("Không tìm thấy khóa học với ID: " + courseId);
+        }
+        courseDAO.updateCourseStatus(courseId, CourseStatus.DRAFT);
+    }
+
+
+    @Override
+    public PageResponse<CourseResponse> getInReviewCourse(ReviewCourseFilterRequest filterRequest) {
+        AuthenticationContext context = AuthenticationContextHolder.getContext();
+        if (ObjectUtils.isEmpty(context)) {
+            throw new AuthenticationException("Người dùng chưa đăng nhập");
+        }
+        PageResponse<CourseEntity> pageResponse = courseDAO.getInReviewCourses(filterRequest);
+        List<CourseResponse> courses = pageResponse.getData().stream()
+                .map(this::convertToCourseResponse)
+                .toList();
+
+        return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), courses);
+    }
+
+
+    @Override
+    public void sendReviewCourseDetailEmail(ReviewCourseDetailRequest reviewCourseDetailRequest) {
+        AuthenticationContext context = AuthenticationContextHolder.getContext();
+        if (ObjectUtils.isEmpty(context)) {
+            throw new AuthenticationException("Người dùng chưa đăng nhập");
+        }
+        if (!accountDAO.existsByEmail(reviewCourseDetailRequest.getEmail())) {
+            throw new RuntimeException("Email không tồn tại trong hệ thống");
+        }
+
+        String subject = "Yêu cầu chỉnh sửa khóa học";
+        String message = "<html>" +
+                "<body>"
+                + "<h3>" + reviewCourseDetailRequest.getMessage() + "</h3>"
+                + "<p style=\"color: red; font-weight: bold;\">Lưu ý: Nếu bạn có thắc mắc vui lòng liên hệ trực tiếp qua: </p>"
+                + "</body></html>";
+        emailService.sendEmail(reviewCourseDetailRequest.getEmail(), subject, message);
+    }
+
 
 
     private AccountEntity getAuthenticatedAccount() {
@@ -161,5 +219,5 @@ public class CourseServiceImpl implements CourseService {
         categoryResponse.setUpdatedAt(categoriesEntity.getUpdatedAt());
         return categoryResponse;
     }
-    
+
 }

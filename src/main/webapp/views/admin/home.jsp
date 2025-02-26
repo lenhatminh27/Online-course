@@ -23,7 +23,7 @@
 
     <!-- Libraries Stylesheet -->
     <link href="../../assets/admin/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="../../assets/admin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    <link href="../../assets/admin/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet"/>
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="../../assets/admin/css/bootstrap.min.css" rel="stylesheet">
@@ -35,7 +35,8 @@
 <body>
 <div class="container-xxl position-relative bg-white d-flex p-0">
     <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div id="spinner"
+         class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
             <span class="sr-only">Loading...</span>
         </div>
@@ -44,13 +45,13 @@
 
 
     <!-- Sidebar Start -->
-    <%@include file="../../common/admin/menu.jsp"%>
+    <%@include file="../../common/admin/menu.jsp" %>
     <!-- Sidebar End -->
 
 
     <!-- Content Start -->
     <div class="content">
-        <%@include file="../../common/admin/header.jsp"%>
+        <%@include file="../../common/admin/header.jsp" %>
 
 
         <!-- Sale & Revenue Start -->
@@ -145,50 +146,8 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
                         </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
-                        <tr>
-                            <td><input class="form-check-input" type="checkbox"></td>
-                            <td>01 Jan 2045</td>
-                            <td>INV-0123</td>
-                            <td>Jhon Doe</td>
-                            <td>$123</td>
-                            <td>Paid</td>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
-                        </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -207,7 +166,8 @@
                             <a href="">Show All</a>
                         </div>
                         <div class="d-flex align-items-center border-bottom py-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt=""
+                                 style="width: 40px; height: 40px;">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-0">Jhon Doe</h6>
@@ -217,7 +177,8 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center border-bottom py-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt=""
+                                 style="width: 40px; height: 40px;">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-0">Jhon Doe</h6>
@@ -227,7 +188,8 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center border-bottom py-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt=""
+                                 style="width: 40px; height: 40px;">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-0">Jhon Doe</h6>
@@ -237,7 +199,8 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center pt-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt=""
+                                 style="width: 40px; height: 40px;">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-0">Jhon Doe</h6>
@@ -320,7 +283,7 @@
 
 
         <!-- Footer Start -->
-        <%@include file="../../common/admin/footer.jsp"%>
+        <%@include file="../../common/admin/footer.jsp" %>
         <!-- Footer End -->
     </div>
     <!-- Content End -->

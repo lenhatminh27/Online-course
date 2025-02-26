@@ -68,6 +68,7 @@ public class HibernateQueryHelper {
         fieldAliasMap.put("likes", "bs.");  // BlogStatisticEntity likes
         fieldAliasMap.put("createdAt", "c.");  // CourseEntity createdAt
         fieldAliasMap.put("title", "c.");  // CourseEntity title
+        fieldAliasMap.put("price", "c.");  // CourseEntity title
         return fieldAliasMap.getOrDefault(field, "b.");
     }
 

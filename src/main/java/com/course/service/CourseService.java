@@ -1,8 +1,6 @@
 package com.course.service;
 
-import com.course.dto.request.CourseInstructorFilterRequest;
-import com.course.dto.request.CreateCourseRequest;
-import com.course.dto.request.UpdateCourseRequest;
+import com.course.dto.request.*;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.PageResponse;
 
@@ -17,5 +15,13 @@ public interface CourseService {
     CourseResponse createCourse(CreateCourseRequest createCourseRequest);
 
     CourseResponse findById(Long id);
+
+    void acceptCourse(Long courseId);
+
+    void rejectCourse(Long courseId);
+
+    PageResponse<CourseResponse> getInReviewCourse(ReviewCourseFilterRequest filterRequest);
+
+    void sendReviewCourseDetailEmail(ReviewCourseDetailRequest reviewCourseDetailRequest);
 
 }

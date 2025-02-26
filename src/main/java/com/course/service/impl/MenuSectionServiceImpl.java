@@ -35,7 +35,7 @@ public class MenuSectionServiceImpl implements MenuSectionService {
         AuthenticationContext context = AuthenticationContextHolder.getContext();
         AccountEntity account = accountDAO.findByEmail(context.getEmail());
         boolean enrollment = enrollmentDAO.getEnrollmentByAccountIdAndCourseId(account.getId(), courseId);
-        if (context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR) || context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR)) {
+        if (context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR) || context.getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN)) {
             enrollment = true;
         }
         if (ObjectUtils.isEmpty(course)) {
