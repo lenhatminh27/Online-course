@@ -6,6 +6,7 @@ import com.course.common.utils.StringUtils;
 import com.course.core.bean.annotations.Repository;
 import com.course.core.repository.specification.HibernateQueryHelper;
 import com.course.dao.CourseDAO;
+import com.course.dto.request.CourseFilterRequest;
 import com.course.dto.request.CourseInstructorFilterRequest;
 import com.course.dto.request.ReviewCourseFilterRequest;
 import com.course.dto.response.PageResponse;
@@ -16,6 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -234,6 +236,77 @@ public class CourseDAOImpl implements CourseDAO {
 
         return query.uniqueResult();
     }
+
+    @Override
+    @Transactional
+    public List<CourseEntity> getTop3Courses() {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+
+            List<CourseEntity> courses = session.createQuery(
+                            "FROM CourseEntity c WHERE c.status = 'PUBLIC' ORDER BY c.id ASC", // Sắp xếp theo ID từ bé đến lớn
+                            CourseEntity.class)
+                    .setMaxResults(3) // Giới hạn chỉ lấy 3 khóa học
+                    .getResultList();
+
+            courses.forEach(course -> {
+                Hibernate.initialize(course.getAccountCreated());
+                Hibernate.initialize(course.getCategories());
+            });
+
+            return courses;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public PageResponse<CourseEntity> getAllCourses(CourseFilterRequest filterRequest) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            // Câu truy vấn cơ bản: chỉ lấy các khóa học có trạng thái PUBLIC
+            String baseHql = "FROM CourseEntity c WHERE c.status = 'PUBLIC'";
+            Map<String, Object> parameters = new HashMap<>();
+
+            // Lọc theo từ khóa tìm kiếm (tìm trong title, description, email của người tạo)
+            if (!ObjectUtils.isEmpty(filterRequest.getSearch())) {
+                String searchString = deAccent(filterRequest.getSearch());
+                baseHql += " AND (deAccent(c.title) LIKE :search OR deAccent(c.description) LIKE :search OR deAccent(c.accountCreated.email) LIKE :search)";
+                parameters.put("search", "%" + searchString + "%");
+            }
+
+            // Tạo truy vấn Hibernate với sắp xếp & phân trang
+            Query<CourseEntity> query = HibernateQueryHelper.buildQuery(
+                    session,
+                    baseHql,
+                    parameters,
+                    filterRequest.getSort(),
+                    filterRequest.getPageRequest(filterRequest.getSort()),
+                    CourseEntity.class
+            );
+
+            // Lấy danh sách khóa học theo điều kiện
+            List<CourseEntity> courses = query.getResultList();
+            courses.forEach(course -> {
+                Hibernate.initialize(course.getAccountCreated());
+                Hibernate.initialize(course.getCategories());
+            });
+
+            // Truy vấn đếm tổng số bản ghi để tính tổng số trang
+            Query<Long> countQuery = HibernateQueryHelper.buildCountQuery(session, baseHql, parameters, null);
+            long totalElements = countQuery.uniqueResult();
+            int totalPages = (int) Math.ceil((double) totalElements / filterRequest.getSize());
+
+            // Trả về kết quả dưới dạng PageResponse
+            return new PageResponse<>(filterRequest.getPage(), totalPages, courses);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch public courses by page", e);
+        }
+    }
+
+
+
 
 
 }
