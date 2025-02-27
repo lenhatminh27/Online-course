@@ -8,6 +8,7 @@ import com.course.dto.request.UpdateCategoryRequest;
 import com.course.dto.response.CategoryResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.CategoriesEntity;
+import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -88,5 +89,16 @@ public class CategoryServiceImpl implements CategoryService {
         }
         categoryDAO.updateCategory(categoryCurrent);
         return convertToResponse(categoryCurrent);
+    }
+
+    @Override
+    public void deleteCategory(Long categoryId) {
+        CategoriesEntity category = categoryDAO.findById(categoryId);
+        if (category != null) {
+            categoryDAO.deleteCategory(category);
+        }
+        else {
+            throw new NotFoundException("Category không tồn tại");
+        }
     }
 }

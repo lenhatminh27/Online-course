@@ -13,4 +13,5 @@ public interface CategoryDAO {
     List<CategoriesEntity> getAllCategories();
     CategoriesEntity findByName(String name);
     CategoriesEntity updateCategory(CategoriesEntity category);
+    void deleteCategory(CategoriesEntity category);
 }
