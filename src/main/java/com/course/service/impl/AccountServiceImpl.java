@@ -7,16 +7,14 @@ import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.PasswordResetTokenDAO;
 import com.course.dao.RoleDAO;
+import com.course.dao.WalletDAO;
 import com.course.dto.request.ChangePasswordRequest;
 import com.course.dto.request.ForgotPasswordRequest;
 import com.course.dto.request.RegisterRequest;
 import com.course.dto.request.ResetPasswordRequest;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.ErrorResponse;
-import com.course.entity.AccountEntity;
-import com.course.entity.AccountProfileEntity;
-import com.course.entity.PasswordResetTokenEntity;
-import com.course.entity.RoleEntity;
+import com.course.entity.*;
 import com.course.entity.enums.ERole;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.AccountService;
@@ -26,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +43,8 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordResetTokenDAO passwordResetTokenDAO;
 
     private final EmailService emailService;
+
+    private final WalletDAO walletDAO;
 
 
 
@@ -76,16 +77,22 @@ public class AccountServiceImpl implements AccountService {
         newAccount.setCreatedAt(LocalDateTime.now());
         newAccount.setUpdatedAt(LocalDateTime.now());
         newAccount.setRoles(List.of(role));
-        accountDAO.save(newAccount);
+        AccountEntity save = accountDAO.save(newAccount);
 
         AccountProfileEntity accountProfileEntity = new AccountProfileEntity();
-        accountProfileEntity.setAccount(newAccount);  // Liên kết AccountProfileEntity với AccountEntity
+        accountProfileEntity.setAccount(save);  // Liên kết AccountProfileEntity với AccountEntity
         accountProfileEntity.setFirstName(registerRequest.getFirstName());
         accountProfileEntity.setLastName(registerRequest.getLastName());
         accountProfileEntity.setCreatedAt(LocalDateTime.now());
-
         // Lưu AccountProfileEntity vào cơ sở dữ liệu
         accountDAO.saveAccountProfile(accountProfileEntity);
+
+        WalletEntity walletEntity = WalletEntity.builder()
+                .account(save)
+                .balance(BigDecimal.ZERO)
+                .updatedAt(LocalDateTime.now())
+                .build();
+        walletDAO.createWallet(walletEntity);
     }
 
     @Override

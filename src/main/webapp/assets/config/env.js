@@ -12,6 +12,8 @@ const currentEnv = "development";
 // Export the environment configuration
 export const environment = ENV[currentEnv];
 
+export const ws = "ws://localhost:8080";
+
 // Storage keys for local storage or session storage
 export const STORAGE_KEY = {
     accessToken: 'online_course_access_token',
