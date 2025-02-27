@@ -13,8 +13,8 @@ public interface WalletService {
 
     WalletResponse getWallet();
 
-    void authenticateTransactional(WebhooksRequest webhooksRequest);
+//    void authenticateTransactional(WebhooksRequest webhooksRequest);
 
-    CheckTransaction checkTransaction(Transaction transaction);
+    CheckTransaction checkTransaction(Transaction transaction, Long tranId);
 
 }

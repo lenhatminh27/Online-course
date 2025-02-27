@@ -76,32 +76,32 @@ public class WalletServiceImpl implements WalletService {
                 .build();
     }
 
-    @Override
-    public void authenticateTransactional(WebhooksRequest webhooksRequest) {
-        String desc = webhooksRequest.getDescription().split("\\s+")[1];
-        TransactionEntity transaction = transactionDAO.findByTransactionDescription(desc);
-        if (transaction == null) {
-            throw new ForbiddenException("Không tìm thấy nội dung giao dịch tương ứng");
-        }
-        AccountEntity account = transaction.getAccount();
-        WalletEntity wallet = walletDAO.getWallet(account.getId());
-        if (wallet == null) {
-            throw new RuntimeException("Lỗi hệ thống");
-        }
-        wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
-        walletDAO.updateWallet(wallet);
-        transaction.setStatus(ETransaction.SUCCESS);
-        transactionDAO.update(transaction);
-        PaymentResultWs.sendToUser(transaction.getId(), WsResponse.builder()
-                .status(HttpServletResponse.SC_OK)
-                .message("Xác nhận giao dịch thành công")
-                .build());
-    }
+//    @Override
+//    public void authenticateTransactional(WebhooksRequest webhooksRequest) {
+//        String desc = webhooksRequest.getDescription().split("\\s+")[1];
+//        TransactionEntity transaction = transactionDAO.findByTransactionDescription(desc);
+//        if (transaction == null) {
+//            throw new ForbiddenException("Không tìm thấy nội dung giao dịch tương ứng");
+//        }
+//        AccountEntity account = transaction.getAccount();
+//        WalletEntity wallet = walletDAO.getWallet(account.getId());
+//        if (wallet == null) {
+//            throw new RuntimeException("Lỗi hệ thống");
+//        }
+//        wallet.setBalance(wallet.getBalance().add(transaction.getAmount()));
+//        walletDAO.updateWallet(wallet);
+//        transaction.setStatus(ETransaction.SUCCESS);
+//        transactionDAO.update(transaction);
+//        PaymentResultWs.sendToUser(transaction.getId(), WsResponse.builder()
+//                .status(HttpServletResponse.SC_OK)
+//                .message("Xác nhận giao dịch thành công")
+//                .build());
+//    }
 
     @Override
-    public CheckTransaction checkTransaction(Transaction transaction) {
+    public CheckTransaction checkTransaction(Transaction transaction, Long tranId) {
         String desc = transaction.getTransactionContent().split("\\s+")[1];
-        TransactionEntity transactionEntity = transactionDAO.findByTransactionDescription(desc);
+        TransactionEntity transactionEntity = transactionDAO.findByTransactionDescriptionAndId(desc, tranId);
         if (transactionEntity == null) {
             return CheckTransaction.builder().success(false).build();
         }

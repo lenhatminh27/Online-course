@@ -6,13 +6,9 @@ import com.course.config.properties.SepayProperties;
 import com.course.dto.intergration.CheckTransaction;
 import com.course.dto.intergration.Transaction;
 import com.course.dto.intergration.TransactionSepayResponse;
-import com.course.dto.request.WebhooksRequest;
-import com.course.exceptions.ForbiddenException;
 import com.course.service.WalletService;
 import com.course.service.impl.WalletServiceImpl;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -45,12 +41,24 @@ public class WebhookWalletApi extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        Long tranId = null;
+        if (pathInfo != null && pathInfo.length() > 1) {
+            String tranIdSTr = pathInfo.substring(1);
+            try{
+                tranId = Long.parseLong(tranIdSTr);
+            }
+            catch (Exception e){
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,
+                        gson.toJson("Không tìm thấy"));
+            }
+        }
         try {
             String jsonResponse = HttpPaymentUtils.get(sepayProperties.getUrl() + "/list?limit=10", sepayProperties.getApiToken());
             TransactionSepayResponse responseObj = gson.fromJson(jsonResponse, TransactionSepayResponse.class);
             if (responseObj != null && responseObj.getTransactions() != null) {
                 List<Transaction> transactions = responseObj.getTransactions();
-                CheckTransaction checkTransaction = walletService.checkTransaction(transactions.get(0));
+                CheckTransaction checkTransaction = walletService.checkTransaction(transactions.get(0), tranId);
                 ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK,
                         gson.toJson(checkTransaction));
             } else {
@@ -63,19 +71,19 @@ public class WebhookWalletApi extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-        try{
-            WebhooksRequest webhooksRequest = gson.fromJson(req.getReader(), WebhooksRequest.class);
-            walletService.authenticateTransactional(webhooksRequest);
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("Success"));
-        }catch (ForbiddenException e){
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getMessage()));
-        }
-        catch (Exception e){
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Lỗi server"));
-        }
-    }
+//    @Override
+//    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        resp.setContentType("application/json");
+//        resp.setCharacterEncoding("UTF-8");
+//        try{
+//            WebhooksRequest webhooksRequest = gson.fromJson(req.getReader(), WebhooksRequest.class);
+//            walletService.authenticateTransactional(webhooksRequest);
+//            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("Success"));
+//        }catch (ForbiddenException e){
+//            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getMessage()));
+//        }
+//        catch (Exception e){
+//            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Lỗi server"));
+//        }
+//    }
 }
