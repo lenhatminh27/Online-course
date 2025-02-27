@@ -28,7 +28,7 @@ INSERT INTO account_roles (account_id, role_id)
 VALUES (3, 3);
 
 
-INSERT INTO wallets (id, balance, updatedAt)
+INSERT INTO wallets (id, balance, updated_at)
 VALUES  (1, 0, NOW()),
         (2, 0, NOW()),
         (3, 0, NOW());
@@ -93,6 +93,83 @@ VALUES
     (1, 'admin', 'nguyen', NOW(), NOW()),
     (2, 'instructor', 'nguyen', NOW(), NOW()),
     (3, 'learner', 'nguyen', NOW(), NOW());
+
+
+-- Chèn dữ liệu giả vào bảng courses (Khóa học)
+INSERT INTO courses (title, description, thumbnail, price, status, created_by, created_at, updated_at, account_id)
+VALUES
+    ('Lập trình Java từ cơ bản đến nâng cao', 'Khóa học giúp bạn làm chủ Java từ A-Z.', 'java-thumbnail.jpg', 499000, 'PUBLISHED', 'admin', NOW(), NOW(), 1),
+    ('Spring Boot cho người mới bắt đầu', 'Tìm hiểu về Spring Boot thông qua các dự án thực tế.', 'spring-thumbnail.jpg', 799000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('Angular toàn tập', 'Học Angular từ cơ bản đến nâng cao, ứng dụng thực tế.', 'angular-thumbnail.jpg', 599000, 'DRAFT', 'admin', NOW(), NOW(), 2),
+    ('SQL cho người mới bắt đầu', 'Học SQL với MySQL và PostgreSQL.', 'sql-thumbnail.jpg', 399000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('Lập trình Python cơ bản', 'Lập trình Python từ đầu, dành cho người mới.', 'python-thumbnail.jpg', 450000, 'PUBLISHED', 'admin', NOW(), NOW(), 2);
+
+-- Chèn dữ liệu giả vào bảng course_sections (Chương trong khóa học)
+INSERT INTO course_sections (course_id, title, target, order_index, created_at, updated_at)
+VALUES
+    (1, 'Giới thiệu về Java', 'Tổng quan về ngôn ngữ lập trình Java.', 1, NOW(), NOW()),
+    (1, 'Lập trình hướng đối tượng', 'Hiểu về OOP trong Java.', 2, NOW(), NOW()),
+    (2, 'Cấu trúc Spring Boot', 'Cách hoạt động của Spring Boot.', 1, NOW(), NOW()),
+    (2, 'Tích hợp với Hibernate', 'Sử dụng Hibernate trong Spring Boot.', 2, NOW(), NOW()),
+    (3, 'Cài đặt Angular', 'Cách cài đặt và thiết lập Angular.', 1, NOW(), NOW()),
+    (3, 'Component và Module', 'Làm việc với Component và Module trong Angular.', 2, NOW(), NOW()),
+    (4, 'Cơ bản về SQL', 'Học cách truy vấn dữ liệu bằng SQL.', 1, NOW(), NOW()),
+    (4, 'Tạo và quản lý bảng', 'Cách tạo bảng và thiết lập quan hệ.', 2, NOW(), NOW()),
+    (5, 'Cú pháp Python', 'Làm quen với cú pháp Python cơ bản.', 1, NOW(), NOW()),
+    (5, 'Lập trình hàm trong Python', 'Học về hàm và cách sử dụng.', 2, NOW(), NOW());
+
+-- Chèn dữ liệu giả vào bảng course_lessons (Bài học, videoUrl = NULL)
+INSERT INTO course_lessons (course_section_id, title, description, video_url, article, duration, isTrial, order_index, created_at, updated_at)
+VALUES
+    (1, 'Giới thiệu Java', 'Java là gì? Vì sao nên học Java?', NULL, 'Java là một ngôn ngữ lập trình phổ biến.', 600, FALSE, 1, NOW(), NOW()),
+    (1, 'Cài đặt môi trường Java', 'Hướng dẫn cài đặt JDK và IDE.', NULL, 'Cách cài đặt JDK, IntelliJ IDEA.', 900, FALSE, 2, NOW(), NOW()),
+    (2, 'Các nguyên tắc OOP', 'Hiểu về đóng gói, kế thừa, đa hình.', NULL, 'OOP là nền tảng của lập trình hiện đại.', 1200, FALSE, 1, NOW(), NOW()),
+    (3, 'Spring Boot là gì?', 'Giới thiệu về Spring Boot và ứng dụng.', NULL, 'Spring Boot giúp phát triển ứng dụng nhanh hơn.', 800, FALSE, 1, NOW(), NOW()),
+    (3, 'Tạo ứng dụng Spring Boot đầu tiên', 'Bắt đầu với Spring Boot.', NULL, 'Hướng dẫn từng bước để tạo ứng dụng.', 1000, FALSE, 2, NOW(), NOW()),
+    (4, 'Hibernate là gì?', 'Khái niệm ORM và cách sử dụng Hibernate.', NULL, 'Hibernate giúp làm việc với database dễ dàng hơn.', 1100, FALSE, 1, NOW(), NOW()),
+    (5, 'Cài đặt Angular', 'Cách cài đặt Angular CLI.', NULL, 'Cài đặt Angular nhanh chóng và dễ dàng.', 700, FALSE, 1, NOW(), NOW()),
+    (5, 'Component là gì?', 'Cách tạo Component trong Angular.', NULL, 'Angular Component giúp tái sử dụng UI.', 750, FALSE, 2, NOW(), NOW()),
+    (6, 'SQL cơ bản', 'Học về SELECT, INSERT, UPDATE, DELETE.', NULL, 'SQL là ngôn ngữ truy vấn cơ sở dữ liệu.', 650, FALSE, 1, NOW(), NOW()),
+    (6, 'Tạo bảng trong SQL', 'Cách tạo bảng và khai báo khóa chính.', NULL, 'Tạo bảng trong MySQL/PostgreSQL.', 850, FALSE, 2, NOW(), NOW());
+
+-- Chèn thêm dữ liệu vào bảng courses (Khóa học)
+INSERT INTO courses (title, description, thumbnail, price, status, created_by, created_at, updated_at, account_id)
+VALUES
+    ('Lập trình C++ từ cơ bản đến nâng cao', 'Khóa học giúp bạn làm chủ ngôn ngữ C++.', 'cpp-thumbnail.jpg', 499000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('ReactJS toàn tập', 'Học ReactJS từ A-Z với các dự án thực tế.', 'react-thumbnail.jpg', 599000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('Lập trình Web với HTML, CSS, JavaScript', 'Học cách xây dựng trang web từ đầu.', 'web-thumbnail.jpg', 399000, 'DRAFT', 'admin', NOW(), NOW(), 2),
+    ('NodeJS & Express', 'Xây dựng ứng dụng backend với NodeJS.', 'node-thumbnail.jpg', 699000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('Machine Learning cơ bản', 'Học về Machine Learning với Python.', 'ml-thumbnail.jpg', 899000, 'PUBLISHED', 'admin', NOW(), NOW(), 2);
+
+-- Chèn thêm dữ liệu vào bảng course_sections (Chương trong khóa học)
+INSERT INTO course_sections (course_id, title, target, order_index, created_at, updated_at)
+VALUES
+    (6, 'Giới thiệu về C++', 'Tổng quan về C++ và ứng dụng.', 1, NOW(), NOW()),
+    (6, 'Lập trình hướng đối tượng trong C++', 'Tìm hiểu về OOP trong C++.', 2, NOW(), NOW()),
+    (7, 'ReactJS là gì?', 'Tổng quan về ReactJS.', 1, NOW(), NOW()),
+    (7, 'State và Props', 'Cách sử dụng State và Props trong React.', 2, NOW(), NOW()),
+    (8, 'Cấu trúc HTML', 'Học cách xây dựng HTML.', 1, NOW(), NOW()),
+    (8, 'CSS và cách thiết kế giao diện', 'Làm đẹp trang web với CSS.', 2, NOW(), NOW()),
+    (9, 'Giới thiệu về NodeJS', 'Tổng quan về NodeJS.', 1, NOW(), NOW()),
+    (9, 'Express Framework', 'Cách sử dụng Express để xây dựng API.', 2, NOW(), NOW()),
+    (10, 'Machine Learning là gì?', 'Tổng quan về ML.', 1, NOW(), NOW()),
+    (10, 'Học có giám sát và không giám sát', 'Hai loại chính của ML.', 2, NOW(), NOW());
+
+-- Chèn thêm dữ liệu vào bảng course_lessons (Bài học, videoUrl = NULL)
+INSERT INTO course_lessons (course_section_id, title, description, video_url, article, duration, isTrial, order_index, created_at, updated_at)
+VALUES
+    (11, 'Cài đặt môi trường C++', 'Hướng dẫn cài đặt CodeBlocks, VS Code.', NULL, 'Cách thiết lập môi trường C++.', 800, FALSE, 1, NOW(), NOW()),
+    (11, 'Cú pháp cơ bản', 'Làm quen với cú pháp C++.', NULL, 'Viết chương trình đầu tiên trong C++.', 700, FALSE, 2, NOW(), NOW()),
+    (12, 'Lớp và đối tượng', 'Tạo và sử dụng lớp trong C++.', NULL, 'Học cách xây dựng lớp và đối tượng.', 1000, FALSE, 1, NOW(), NOW()),
+    (13, 'Component là gì?', 'Tìm hiểu về Component trong React.', NULL, 'Cách tạo và sử dụng Component.', 750, FALSE, 1, NOW(), NOW()),
+    (14, 'Props trong React', 'Học cách truyền dữ liệu giữa các Component.', NULL, 'Props giúp quản lý dữ liệu động.', 850, FALSE, 2, NOW(), NOW()),
+    (15, 'Tạo bảng HTML', 'Cách tạo bảng trong HTML.', NULL, 'Bảng giúp tổ chức dữ liệu trên web.', 700, FALSE, 1, NOW(), NOW()),
+    (16, 'Flexbox trong CSS', 'Sử dụng Flexbox để bố trí layout.', NULL, 'Flexbox giúp tạo giao diện linh hoạt.', 900, FALSE, 1, NOW(), NOW()),
+    (17, 'Cài đặt NodeJS', 'Hướng dẫn cài đặt NodeJS và npm.', NULL, 'NodeJS là một runtime cho JavaScript.', 850, FALSE, 1, NOW(), NOW()),
+    (18, 'Xây dựng API với Express', 'Học cách tạo API RESTful.', NULL, 'Express giúp xây dựng backend nhanh chóng.', 1000, FALSE, 2, NOW(), NOW()),
+    (19, 'Học máy là gì?', 'Tổng quan về Machine Learning.', NULL, 'Machine Learning giúp máy tính tự học.', 950, FALSE, 1, NOW(), NOW()),
+    (20, 'Thuật toán hồi quy tuyến tính', 'Học cách xây dựng mô hình hồi quy.', NULL, 'Hồi quy tuyến tính là nền tảng của ML.', 1100, FALSE, 2, NOW(), NOW());
+
 
 
 DELIMITER $$
