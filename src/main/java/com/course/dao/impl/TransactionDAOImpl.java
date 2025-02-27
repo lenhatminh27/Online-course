@@ -29,13 +29,17 @@ public class TransactionDAOImpl implements TransactionDAO {
     }
 
     @Override
-    public TransactionEntity findByTransactionDescription(String desc) {
+    public TransactionEntity findByTransactionDescriptionAndId(String desc, Long tranId) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            TransactionEntity transaction = session.createQuery("FROM TransactionEntity t WHERE t.transactionDescription = :desc", TransactionEntity.class)
+            TransactionEntity transaction = session.createQuery(
+                            "FROM TransactionEntity t WHERE t.transactionDescription = :desc AND t.id = :tranId",
+                            TransactionEntity.class)
                     .setParameter("desc", desc)
+                    .setParameter("tranId", tranId)
                     .uniqueResult();
-            if (transaction != null){
-                Hibernate.initialize(transaction.getAccount());
+
+            if (transaction != null) {
+                Hibernate.initialize(transaction.getAccount()); // Load account nếu cần
             }
             return transaction;
         } catch (Exception e) {
@@ -43,6 +47,7 @@ public class TransactionDAOImpl implements TransactionDAO {
             return null;
         }
     }
+
 
     @Override
     public TransactionEntity update(TransactionEntity transactionEntity) {

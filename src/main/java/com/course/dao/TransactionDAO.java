@@ -5,7 +5,7 @@ import com.course.entity.TransactionEntity;
 public interface TransactionDAO {
     TransactionEntity saveTransaction(TransactionEntity transaction);
 
-    TransactionEntity findByTransactionDescription(String desc);
+    TransactionEntity findByTransactionDescriptionAndId(String desc, Long tranId);
 
     TransactionEntity update(TransactionEntity transaction);
 }

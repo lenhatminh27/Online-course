@@ -55,6 +55,7 @@
                 qrTimer: null, // Biến lưu timeout
                 pointCurrent: 0,
                 paymentCheckInterval: null,
+                tranId: null,
 
                 // Cập nhật số sò khi thay đổi số tiền
                 updateSohAmount() {
@@ -85,7 +86,7 @@
                         if (response){
                             this.showQR = true;
                             this.QR = response.qr;
-
+                            this.tranId = response.tranId;
                             // Xóa timer cũ nếu có
                             if (this.qrTimer) {
                                 clearTimeout(this.qrTimer);
@@ -109,7 +110,7 @@
                 // Hàm kiểm tra trạng thái thanh toán
                 async checkPaymentStatus() {
                     try {
-                        const response = await apiRequestWithToken(environment.apiUrl + "/hooks/sepay-payment");
+                        const response = await apiRequestWithToken(environment.apiUrl + "/hooks/sepay-payment/" + this.tranId);
                         if (response && response.success) {
                             console.log("✅ Thanh toán thành công! Cập nhật lại số dư.");
                             await this.loadPoint();
@@ -120,6 +121,7 @@
                                 confirmButtonText: "OK"
                             });
                             this.showQR = false;
+                            this.tranId = null;
                         }
                     } catch (error) {
                         console.log("Lỗi khi kiểm tra thanh toán:", error);
@@ -139,6 +141,7 @@
                         clearInterval(this.paymentCheckInterval);
                         this.paymentCheckInterval = null;
                         console.log("⏳ Dừng kiểm tra thanh toán sau 3 phút.");
+                        this.tranId = null;
                     }, 3 * 60 * 1000); // 3 phút = 180,000 ms
                 },
 
