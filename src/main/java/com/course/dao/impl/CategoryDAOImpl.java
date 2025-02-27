@@ -41,7 +41,10 @@ public class CategoryDAOImpl implements CategoryDAO {
     @Override
     public CategoriesEntity findById(Long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            return session.get(CategoriesEntity.class, id);
+            String hql = "SELECT c FROM CategoriesEntity c LEFT JOIN FETCH c.childrenCategories WHERE c.id = :id";
+            return session.createQuery(hql, CategoriesEntity.class)
+                    .setParameter("id", id)
+                    .uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -116,6 +119,30 @@ public class CategoryDAOImpl implements CategoryDAO {
             }
             e.printStackTrace();
             throw new RuntimeException("Failed to save RefreshTokenEntity", e);
+        }
+    }
+
+    @Override
+    public void deleteCategory(CategoriesEntity category) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+
+            // Xoá tất cả các category con trước
+            List<CategoriesEntity> children = category.getChildrenCategories();
+            for (CategoriesEntity child : children) {
+                session.delete(child);
+            }
+
+            // Sau đó mới xoá category cha
+            session.delete(category);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi xóa category", e);
         }
     }
 }

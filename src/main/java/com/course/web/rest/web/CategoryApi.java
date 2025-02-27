@@ -3,10 +3,12 @@ package com.course.web.rest.web;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.dao.CategoryDAO;
+import com.course.dto.request.BookmarksBlogRequest;
 import com.course.dto.request.CategoryCreateRequest;
 import com.course.dto.request.UpdateCategoryRequest;
 import com.course.dto.response.CategoryResponse;
 import com.course.dto.response.ErrorResponse;
+import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
 import com.course.security.annotations.handle.BaseServlet;
@@ -131,6 +133,32 @@ public class CategoryApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(categoryResponse));
         } catch (Exception e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        UpdateCategoryRequest categoryRequest = gson.fromJson(req.getReader(), UpdateCategoryRequest.class);
+        if (ObjectUtils.isEmpty(categoryRequest)) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setError(List.of("Category không được null"));
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+            return;
+        }
+
+        try {
+            Long categoryId = categoryRequest.getCategoryId();
+            categoryService.deleteCategory(categoryId);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, "");
+        } catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("CategoryId không hợp lệ"));
+        } catch (NotFoundException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson("Category không tồn tại"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
         }
     }
 }

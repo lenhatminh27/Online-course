@@ -12,4 +12,5 @@ public interface CategoryService {
     boolean isExistCategory(CategoryCreateRequest categoryCreateRequest);
     boolean isExistCategory(UpdateCategoryRequest updateCategoryRequest);
     CategoryResponse updateCategory(UpdateCategoryRequest updateCategoryRequest);
+    void deleteCategory(Long categoryId);
 }
