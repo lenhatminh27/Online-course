@@ -98,11 +98,11 @@ VALUES
 -- Chèn dữ liệu giả vào bảng courses (Khóa học)
 INSERT INTO courses (title, description, thumbnail, price, status, created_by, created_at, updated_at, account_id)
 VALUES
-    ('Lập trình Java từ cơ bản đến nâng cao', 'Khóa học giúp bạn làm chủ Java từ A-Z.', 'java-thumbnail.jpg', 499000, 'PUBLISHED', 'admin', NOW(), NOW(), 1),
-    ('Spring Boot cho người mới bắt đầu', 'Tìm hiểu về Spring Boot thông qua các dự án thực tế.', 'spring-thumbnail.jpg', 799000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('Lập trình Java từ cơ bản đến nâng cao', 'Khóa học giúp bạn làm chủ Java từ A-Z.', 'java-thumbnail.jpg', 499000, 'PUBLIC', 'admin', NOW(), NOW(), 1),
+    ('Spring Boot cho người mới bắt đầu', 'Tìm hiểu về Spring Boot thông qua các dự án thực tế.', 'spring-thumbnail.jpg', 799000, 'PUBLIC', 'admin', NOW(), NOW(), 2),
     ('Angular toàn tập', 'Học Angular từ cơ bản đến nâng cao, ứng dụng thực tế.', 'angular-thumbnail.jpg', 599000, 'DRAFT', 'admin', NOW(), NOW(), 2),
-    ('SQL cho người mới bắt đầu', 'Học SQL với MySQL và PostgreSQL.', 'sql-thumbnail.jpg', 399000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
-    ('Lập trình Python cơ bản', 'Lập trình Python từ đầu, dành cho người mới.', 'python-thumbnail.jpg', 450000, 'PUBLISHED', 'admin', NOW(), NOW(), 2);
+    ('SQL cho người mới bắt đầu', 'Học SQL với MySQL và PostgreSQL.', 'sql-thumbnail.jpg', 399000, 'PUBLIC', 'admin', NOW(), NOW(), 2),
+    ('Lập trình Python cơ bản', 'Lập trình Python từ đầu, dành cho người mới.', 'python-thumbnail.jpg', 450000, 'PUBLIC', 'admin', NOW(), NOW(), 2);
 
 -- Chèn dữ liệu giả vào bảng course_sections (Chương trong khóa học)
 INSERT INTO course_sections (course_id, title, target, order_index, created_at, updated_at)
@@ -135,11 +135,11 @@ VALUES
 -- Chèn thêm dữ liệu vào bảng courses (Khóa học)
 INSERT INTO courses (title, description, thumbnail, price, status, created_by, created_at, updated_at, account_id)
 VALUES
-    ('Lập trình C++ từ cơ bản đến nâng cao', 'Khóa học giúp bạn làm chủ ngôn ngữ C++.', 'cpp-thumbnail.jpg', 499000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
-    ('ReactJS toàn tập', 'Học ReactJS từ A-Z với các dự án thực tế.', 'react-thumbnail.jpg', 599000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
+    ('Lập trình C++ từ cơ bản đến nâng cao', 'Khóa học giúp bạn làm chủ ngôn ngữ C++.', 'cpp-thumbnail.jpg', 499000, 'DRAFT', 'admin', NOW(), NOW(), 2),
+    ('ReactJS toàn tập', 'Học ReactJS từ A-Z với các dự án thực tế.', 'react-thumbnail.jpg', 599000, 'DRAFT', 'admin', NOW(), NOW(), 2),
     ('Lập trình Web với HTML, CSS, JavaScript', 'Học cách xây dựng trang web từ đầu.', 'web-thumbnail.jpg', 399000, 'DRAFT', 'admin', NOW(), NOW(), 2),
-    ('NodeJS & Express', 'Xây dựng ứng dụng backend với NodeJS.', 'node-thumbnail.jpg', 699000, 'PUBLISHED', 'admin', NOW(), NOW(), 2),
-    ('Machine Learning cơ bản', 'Học về Machine Learning với Python.', 'ml-thumbnail.jpg', 899000, 'PUBLISHED', 'admin', NOW(), NOW(), 2);
+    ('NodeJS & Express', 'Xây dựng ứng dụng backend với NodeJS.', 'node-thumbnail.jpg', 699000, 'PUBLIC', 'admin', NOW(), NOW(), 2),
+    ('Machine Learning cơ bản', 'Học về Machine Learning với Python.', 'ml-thumbnail.jpg', 899000, 'DRAFT', 'admin', NOW(), NOW(), 2);
 
 -- Chèn thêm dữ liệu vào bảng course_sections (Chương trong khóa học)
 INSERT INTO course_sections (course_id, title, target, order_index, created_at, updated_at)
