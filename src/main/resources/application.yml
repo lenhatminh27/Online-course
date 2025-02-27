@@ -21,3 +21,9 @@ integration:
     access-key: admin
     secret-key: admin@2024
     url: http://localhost:9000
+
+sepay:
+  url: https://my.sepay.vn/userapi/transactions
+  api-token: V7SXRROPIUDCGPSIOLWD1AI0BOEF74RNYHRD9UL8BF2MQZSTW63LEHQBO1G4YKVX
+  account: 0869953175
+  bank: MBBank

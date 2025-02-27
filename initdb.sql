@@ -27,6 +27,12 @@ VALUES (2, 2);
 INSERT INTO account_roles (account_id, role_id)
 VALUES (3, 3);
 
+
+INSERT INTO wallets (id, balance, updatedAt)
+VALUES  (1, 0, NOW()),
+        (2, 0, NOW()),
+        (3, 0, NOW());
+
 INSERT INTO permissions (name)
 VALUES
     ('UPLOAD_FILE'),
@@ -55,7 +61,7 @@ VALUES
     ('DELETE_DISCOUNT'),
     ('WISHLIST_COURSE'),
     ('ENROLLMENT_COURSE'),
-    ('RATING_COURSE'),
+    ('RATING_COURSE');
 
 INSERT INTO categories (name, description, parent_id, created_at, updated_at)
 VALUES

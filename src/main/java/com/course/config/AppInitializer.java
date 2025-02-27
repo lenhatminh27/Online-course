@@ -5,6 +5,7 @@ import com.course.config.filter.AccessTokenFilter;
 import com.course.config.filter.RefreshTokenFilter;
 import com.course.config.properties.MinioProperties;
 import com.course.config.properties.SecurityProperties;
+import com.course.config.properties.SepayProperties;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
@@ -22,6 +23,8 @@ public class AppInitializer implements ServletContextListener {
         SecurityProperties securityProperties = SecurityProperties.getInstance();
 
         MinioProperties minioProperties = MinioProperties.getInstance();
+
+        SepayProperties sepayProperties = SepayProperties.getInstance();
 
         // Log properties for debugging (remove in production)
         System.out.println("Loaded Security Properties:");

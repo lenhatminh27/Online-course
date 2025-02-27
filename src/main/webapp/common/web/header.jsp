@@ -35,14 +35,14 @@
                                         <ul id="navigation">
                                             <li class="active"><a href="/home">Trang chủ</a></li>
                                             <li><a href="courses.html">Khóa học</a></li>
-                                            <li><a href="about.html">Giới thiệu</a></li>
                                             <li><a href="/blogs">Bài viết</a></li>
-                                            <li><a href="contact.html">Liên hệ</a></li>
                                             <li id="redInstructor"><a href="/instructor">Giảng viên</a></li>
+                                            <li><a href="/wallet">Nạp tiền</a></li>
                                             <!-- Nút tham gia -->
                                             <li class="button-header margin-left" id="joinBtn">
                                                 <a href="/joinInstructor" class="btn">Tham gia giảng viên</a>
                                             </li>
+
 
                                             <!-- Nút đăng nhập -->
                                             <li class="button-header" id="loginBtn">

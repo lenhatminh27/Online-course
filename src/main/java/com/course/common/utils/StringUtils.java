@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.text.Normalizer;
 import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,6 +52,10 @@ public final class StringUtils {
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         str = pattern.matcher(nfdNormalizedString).replaceAll("");
         return str.toLowerCase();
+    }
+
+    public static String generateCustomId() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     public static String generate(int length) {
