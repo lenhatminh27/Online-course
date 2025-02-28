@@ -14,4 +14,5 @@ public interface CategoryDAO {
     CategoriesEntity findByName(String name);
     CategoriesEntity updateCategory(CategoriesEntity category);
     void deleteCategory(CategoriesEntity category);
+    boolean isDuplicateCategoryName(Long categoryId, String categoryName);
 }

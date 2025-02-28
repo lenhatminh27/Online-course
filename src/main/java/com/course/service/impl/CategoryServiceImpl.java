@@ -5,8 +5,10 @@ import com.course.dao.AccountDAO;
 import com.course.dao.CategoryDAO;
 import com.course.dto.request.CategoryCreateRequest;
 import com.course.dto.request.UpdateCategoryRequest;
+import com.course.dto.response.BookmarksBlogResponse;
 import com.course.dto.response.CategoryResponse;
 import com.course.entity.AccountEntity;
+import com.course.entity.BlogEntity;
 import com.course.entity.CategoriesEntity;
 import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,8 +74,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean isExistCategory(UpdateCategoryRequest updateCategoryRequest) {
-        return categoryDAO.existCategory(updateCategoryRequest.getName().trim());
+    public boolean isDuplicateCategory(UpdateCategoryRequest updateCategoryRequest) {
+        return categoryDAO.isDuplicateCategoryName(updateCategoryRequest.getCategoryId(), updateCategoryRequest.getName().trim());
     }
 
     @Override
@@ -100,5 +103,19 @@ public class CategoryServiceImpl implements CategoryService {
         else {
             throw new NotFoundException("Category không tồn tại");
         }
+    }
+
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+        List<CategoriesEntity> categories = categoryDAO.getAllCategories();
+        return categories.stream().map(category -> {
+            CategoryResponse response = new CategoryResponse();
+            response.setId(category.getId());
+            response.setName(category.getName());
+            response.setDescription(category.getDescription());
+            response.setCreatedAt(category.getCreatedAt());
+            response.setUpdatedAt(category.getUpdatedAt());
+            return response;
+        }).collect(Collectors.toList());
     }
 }

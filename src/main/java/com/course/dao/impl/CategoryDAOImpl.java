@@ -91,6 +91,20 @@ public class CategoryDAOImpl implements CategoryDAO {
         }
     }
 
+    @Override
+    public boolean isDuplicateCategoryName(Long categoryId, String categoryName) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(c) FROM CategoriesEntity c WHERE c.name = :categoryName AND c.id != :categoryId";
+            Long count = (Long) session.createQuery(hql)
+                    .setParameter("categoryName", categoryName)
+                    .setParameter("categoryId", categoryId)
+                    .uniqueResult();
+            return count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     @Override
     public List<CategoriesEntity> findAllChildrenCategories(Long parentId) {

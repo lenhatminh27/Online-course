@@ -41,6 +41,7 @@ public class CategoryApi extends BaseServlet {
         categoryService = getBean(CategoryServiceImpl.class.getSimpleName());
     }
 
+    @IsAuthenticated
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -49,6 +50,18 @@ public class CategoryApi extends BaseServlet {
         if (pathInfo != null && pathInfo.equals("/no-parent")) {
             handleGetAllNoParent(resp);
             return;
+        } else {
+            try {
+                List<CategoryResponse> categoryResponses = categoryService.getAllCategories();
+                if (categoryResponses.isEmpty()) {
+                    ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("Không có category nào tồn tại"));
+                    return;
+                }
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(categoryResponses));
+            } catch (Exception e) {
+                e.printStackTrace();
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
+            }
         }
     }
 
@@ -100,7 +113,8 @@ public class CategoryApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
     }
-
+    @IsAuthenticated
+    @HasPermission("UPDATE_CATEGORY")
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -109,7 +123,7 @@ public class CategoryApi extends BaseServlet {
             UpdateCategoryRequest updateCategoryRequest = gson.fromJson(req.getReader(), UpdateCategoryRequest.class);
             List<String> errors = new ArrayList<>();
             if(ObjectUtils.isEmpty(updateCategoryRequest)){
-                errors.add("CategoryCreateRequest không được rỗng");
+                errors.add("UpdateCategoryRequest không được rỗng");
             }
             if(ObjectUtils.isEmpty(updateCategoryRequest.getName())){
                 errors.add("CategoryName không được rỗng");
@@ -117,7 +131,7 @@ public class CategoryApi extends BaseServlet {
             if (updateCategoryRequest.getName().length() > 100 || updateCategoryRequest.getName().length() < 3) {
                 errors.add("Tên thể loại phải từ 3-100 kí tự");
             }
-            if (categoryService.isExistCategory(updateCategoryRequest)) {
+            if (categoryService.isDuplicateCategory(updateCategoryRequest)) {
                 errors.add("Thể loại này đã tồn tại");
             }
             if (!Pattern.matches(CATEGORY_NAME_REGEX, updateCategoryRequest.getName())) {
@@ -136,6 +150,8 @@ public class CategoryApi extends BaseServlet {
         }
     }
 
+    @IsAuthenticated
+    @HasPermission("DELETE_CATEGORY")
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -161,4 +177,6 @@ public class CategoryApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
         }
     }
+
+
 }
