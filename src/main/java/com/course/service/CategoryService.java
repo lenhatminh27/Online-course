@@ -10,7 +10,9 @@ public interface CategoryService {
     List<CategoryResponse> getAllCategoriesParent();
     CategoryResponse createCategory(CategoryCreateRequest categoryCreateRequest);
     boolean isExistCategory(CategoryCreateRequest categoryCreateRequest);
-    boolean isExistCategory(UpdateCategoryRequest updateCategoryRequest);
     CategoryResponse updateCategory(UpdateCategoryRequest updateCategoryRequest);
     void deleteCategory(Long categoryId);
+    List<CategoryResponse> getAllCategories();
+    boolean isDuplicateCategory(UpdateCategoryRequest updateCategoryRequest);
 }
+    
