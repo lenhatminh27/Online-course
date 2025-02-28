@@ -29,15 +29,13 @@ public class TransactionDAOImpl implements TransactionDAO {
     }
 
     @Override
-    public TransactionEntity findByTransactionDescriptionAndId(String desc, Long tranId) {
+    public TransactionEntity findById( Long tranId) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             TransactionEntity transaction = session.createQuery(
-                            "FROM TransactionEntity t WHERE t.transactionDescription = :desc AND t.id = :tranId",
+                            "FROM TransactionEntity t WHERE t.id = :tranId",
                             TransactionEntity.class)
-                    .setParameter("desc", desc)
                     .setParameter("tranId", tranId)
                     .uniqueResult();
-
             if (transaction != null) {
                 Hibernate.initialize(transaction.getAccount()); // Load account nếu cần
             }

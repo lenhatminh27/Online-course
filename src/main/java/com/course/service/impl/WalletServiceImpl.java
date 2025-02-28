@@ -100,9 +100,12 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public CheckTransaction checkTransaction(Transaction transaction, Long tranId) {
-        String desc = transaction.getTransactionContent().split("\\s+")[1];
-        TransactionEntity transactionEntity = transactionDAO.findByTransactionDescriptionAndId(desc, tranId);
+        String desc = transaction.getTransactionContent();
+        TransactionEntity transactionEntity = transactionDAO.findById(tranId);
         if (transactionEntity == null) {
+            return CheckTransaction.builder().success(false).build();
+        }
+        if(!desc.contains(transactionEntity.getTransactionDescription())) {
             return CheckTransaction.builder().success(false).build();
         }
         AccountEntity account = transactionEntity.getAccount();
