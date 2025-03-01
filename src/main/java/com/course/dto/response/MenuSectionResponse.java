@@ -24,4 +24,6 @@ public class MenuSectionResponse implements Serializable {
     private int orderIndex = 1;
 
     private List<MenuLessonResponse> menuLessons = new ArrayList<>();
+
+    private Long currentLessonId;
 }

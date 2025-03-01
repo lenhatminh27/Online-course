@@ -14,4 +14,6 @@ public interface LessonCommentDAO {
     LessonCommentEntity findLessonCommentById(Long id);
 
     void deleteLessonCommentByLessonId(Long lessonId);
+
+    List<LessonCommentEntity> findNoParentLessonCommentsByLessonId(Long lessonId);
 }

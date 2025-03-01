@@ -65,5 +65,6 @@ public class MenuSectionApi extends BaseServlet {
         catch (NotFoundException e){
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND,  gson.toJson(e.getMessage()));
         }
+        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Điểm cuối không hợp lệ"));
     }
 }

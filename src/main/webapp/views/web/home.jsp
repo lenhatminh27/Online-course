@@ -24,11 +24,12 @@
   <link rel="stylesheet" href="../../assets/css/slick.css">
   <link rel="stylesheet" href="../../assets/css/nice-select.css">
   <link rel="stylesheet" href="../../assets/css/style.css">
-
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
 <body>
 <!-- ? Preloader Start -->
+
 <div id="preloader-active">
   <div class="preloader d-flex align-items-center justify-content-center">
     <div class="preloader-inner position-relative">
