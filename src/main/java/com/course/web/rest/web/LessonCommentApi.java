@@ -26,10 +26,8 @@ import java.util.List;
 
 import static com.course.core.bean.BeanListener.BeanContext.getBean;
 
-@WebServlet("/api/lesson-comment")
+@WebServlet("/api/lesson-comment/*")
 public class LessonCommentApi extends BaseServlet {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     private LessonCommentService lessonCommentService;
 
@@ -55,9 +53,6 @@ public class LessonCommentApi extends BaseServlet {
         if(ObjectUtils.isEmpty(request.getContent())) {
             errors.add("Nội dung bình luận không được để trống!");
         }
-        if (request.getContent().length() > 500) {
-            errors.add("Nội dung không được quá 500 ký tự");
-        }
         if(!ObjectUtils.isEmpty(errors)) {
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setError(errors);
@@ -76,5 +71,26 @@ public class LessonCommentApi extends BaseServlet {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Server Error"));
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo();
+        if(pathInfo != null && pathInfo.startsWith("/")) {
+            try {
+                Long lessonId = Long.parseLong(pathInfo.substring(1));
+                List<LessonCommentResponse> response = lessonCommentService.getLessonCommentByLessonId(lessonId);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(response));
+            }
+            catch (NumberFormatException e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Định dạng ID không đúng!"));
+            }
+            catch (Exception e) {
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
+            }
+        }
+        ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Điểm cuối không hợp lệ"));
     }
 }

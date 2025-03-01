@@ -35,7 +35,7 @@ public class SearchInCourseServiceImpl implements SearchInCourseService {
         for (CourseSectionEntity section : listSection) {
             menuSectionResponses.add(convertToMenuSectionResponses(section));
         }
-        List<CourseSectionEntity> sections = new ArrayList<>();
+        List<CourseSectionEntity> sections;
         if (!ObjectUtils.isEmpty(listSection)) {
             List<Long> listSectionId = listSection.stream().map(CourseSectionEntity::getId).collect(Collectors.toList());
             sections = sectionDAO.findByCourseNotIn(listSectionId, course);

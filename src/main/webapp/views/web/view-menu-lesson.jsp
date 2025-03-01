@@ -31,6 +31,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             width: 100vw;
@@ -43,11 +45,22 @@
             cursor: pointer;
         }
 
-        .scroller {
-            height: 73vh;
+        .cursor-pointer:hover {
+            color: #0d6efd;
+        }
+
+        .menu-scroller {
+            height: 80vh;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
         }
+
+        .content-scroller {
+            height: 88vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+
 
         .article {
             max-width: 100%;
@@ -62,7 +75,7 @@
         }
 
         .bg-gray {
-            background-color: #eeeeee; /* Màu xám, bạn có thể thay đổi theo ý muốn */
+            background-color: #fafafa; /* Màu xám, bạn có thể thay đổi theo ý muốn */
         }
 
         .search {
@@ -80,74 +93,67 @@
         .input-group {
             border-radius: 5px;
         }
+
+        .comment-button {
+            right: 20px;
+            bottom: 10px;
+            background-color: #74C0FC;
+            opacity: 80%;
+            color: white;
+            width: 150px;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 0;
+        }
+
+        .comment-modal {
+            top: 0;
+            right: 0;
+            height: 100%;
+            position: fixed;
+            width: 100vw;
+        }
+
+        .comment-modal .modal-content {
+            top: 0;
+            right: -242px;
+            height: 100%;
+            width: 50vw;
+        }
+
+        .avatar {
+            background-color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .account h5 {
+            margin-bottom: auto;
+            margin-top: auto;
+            color: #0d6efd;
+        }
+
+        .comment-input {
+            min-height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .comment-group {
+            width: 70%;
+        }
+
+        .btn {
+            padding: 5px 20px !important;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
     </style>
-    <script type="module">
-        import {environment, STORAGE_KEY, avatarDefault} from '../../assets/config/env.js';
-        import {apiRequestWithToken} from '../../assets/config/service.js';
-
-        const pathSegments = window.location.pathname.split('/');
-        const menuSectionIndex = pathSegments.indexOf("menu-section");
-        let courseId = null;
-        if (menuSectionIndex !== -1 && menuSectionIndex + 1 < pathSegments.length) {
-            courseId = pathSegments[menuSectionIndex + 1];
-            console.log("Course ID:", courseId);
-
-        } else {
-            console.error("Không tìm thấy courseId trong URL");
-        }
-
-        async function loadSection() {
-            if (!courseId) {
-                console.error("Không có courseId, không thể gọi API!");
-                return [];
-            }
-
-            const apiUrl = environment.apiUrl + '/api/menu-section/' + courseId;
-            console.log("Gọi API:", apiUrl);
-
-            try {
-                const response = await apiRequestWithToken(apiUrl);
-                console.log("Dữ liệu nhận được:", response);
-                return response;
-            } catch (error) {
-                console.error("Lỗi khi gọi API:", error);
-                return [];
-            }
-        }
-
-        async function loadLesson() {
-            try {
-                const lesson = await apiRequestWithToken(environment.apiUrl + '/api/lesson/1')
-                console.log("Lesson: " + lesson)
-            } catch (error) {
-                console.error("Lỗi khi gọi API:", error);
-                return [];
-            }
-        }
-
-        async function loadSearch() {
-            try {
-                await fetch(environment.apiUrl + "/api/search-in-course", {
-                    method: "POST",
-                    body: JSON.stringify({content: this.searchValue, courseId: courseId}),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => console.log("Searh: " + data));
-            } catch (error) {
-                console.error("Lỗi khi gọi API: ", error);
-            }
-        }
-
-        // Attach function to window so Alpine.js can access it
-        window.loadSection = loadSection;
-        window.loadLesson = loadLesson;
-        window.loadSearch = loadSearch;
-
-
-    </script>
     <script type="module">
         import {environment, STORAGE_KEY, avatarDefault} from '../../assets/config/env.js';
         import {apiRequestWithToken} from '../../assets/config/service.js';
@@ -162,6 +168,7 @@
                 console.log("Course ID:", courseId);
             } else {
                 console.error("Không tìm thấy courseId trong URL");
+                window.location.assign('/404');
             }
 
             Alpine.store('menuSection', {
@@ -173,9 +180,32 @@
                 progress: 80,
                 searchValue: null,
                 searchItem: null,
-
+                listComments: [],
+                comment: {parentId: null, content: ""},
+                currentInput: null,
+                noParentComment: "",
+                setCurrentInput(id) {
+                    this.currentInput = id
+                },
+                setComment(parentId) {
+                    this.comment.parentId = parentId
+                },
                 setInput(e) {
                     this.searchValue = e;
+                },
+                async loadCourse() {
+                    if (!courseId) {
+                        console.error("Không có courseId, không thể gọi API!");
+                        return;
+                    }
+                    try {
+                        const response = await apiRequestWithToken(environment.apiUrl + '/api/course/detail/' + courseId);
+                        this.course = response;
+                        console.log("This course: " + this.course);
+                    } catch (error) {
+                        console.error("Lỗi khi gọi API:", error);
+                        window.location.assign('/404');
+                    }
                 },
 
                 async loadSections() {
@@ -186,10 +216,10 @@
                     try {
                         const response = await apiRequestWithToken(environment.apiUrl + '/api/menu-section/' + courseId);
                         this.sections = response;
-                        this.course = this.sections.at(0).course;
                         console.log(response);
                     } catch (error) {
                         console.error("Lỗi khi gọi API:", error);
+                        window.location.assign('/404');
                     }
                 },
 
@@ -207,7 +237,7 @@
                     // Nếu searchValue rỗng thì không gọi API và reset searchItem
                     if (!this.searchValue.trim()) {
                         console.warn("Không gọi API vì searchValue rỗng!");
-                        this.searchItem = { sections: [], lessons: [], articles: [] };
+                        this.searchItem = {sections: [], lessons: [], articles: []};
                         return;
                     }
 
@@ -217,12 +247,12 @@
                     }
                     // Tạo AbortController mới cho request hiện tại
                     this.searchAbortController = new AbortController();
-                    const { signal } = this.searchAbortController;
+                    const {signal} = this.searchAbortController;
 
                     try {
                         const response = await fetch(environment.apiUrl + "/api/search-in-course", {
                             method: "POST",
-                            body: JSON.stringify({ content: this.searchValue, courseId: courseId }),
+                            body: JSON.stringify({content: this.searchValue, courseId: courseId}),
                             headers: {
                                 "Content-Type": "application/json"
                             },
@@ -244,9 +274,87 @@
                             console.error("❌ Lỗi khi gọi API:", error);
                         }
                         // Reset searchItem để tránh lỗi khi API gặp sự cố
-                        this.searchItem = { sections: [], lessons: [], articles: [] };
+                        this.searchItem = {sections: [], lessons: [], articles: []};
+                    }
+                },
+
+                async loadComment() {
+                    try {
+                        const response = await fetch(environment.apiUrl + '/api/lesson-comment/' + this.currentLesson.id);
+                        this.listComments = await response.json()
+                        this.listComments = this.listComments.reverse()
+                        console.log("🔥 Alpine.js đã cập nhật danh sách bình luận:", this.listComments);
+
+                    } catch (error) {
+                        console.error("❌ Lỗi khi lấy bình luận:", error);
                     }
                 }
+                ,
+
+                async sendComment() {
+                    if (this.comment.content.length > 500) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gửi bình luận thất bại!",
+                            text: "Nội dung bình luận không được quá 500 ký tự!"
+                        });
+                        return;
+                    }
+                    try {
+                        const response = await apiRequestWithToken(environment.apiUrl + '/api/lesson-comment',
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    lessonId: this.currentLesson.id,
+                                    parentId: this.comment.parentId,
+                                    content: this.comment.content
+                                }),
+                            }
+                        )
+                        if (response) {
+                            document.getElementById("comment").value = "";
+                            this.comment = {parentId: null, content: ""}
+                            this.currentInput = ""
+                            await this.loadComment()
+                        }
+                    } catch (error) {
+                        console.log("Error: " + error)
+                    }
+                },
+                async sendNoParentComment() {
+                    if (this.noParentComment.length > 500) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gửi bình luận thất bại!",
+                            text: "Nội dung bình luận không được quá 500 ký tự!"
+                        });
+                        return;
+                    }
+                    try {
+                        const response = await apiRequestWithToken(environment.apiUrl + '/api/lesson-comment',
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    lessonId: this.currentLesson.id,
+                                    content: this.noParentComment
+                                }),
+                            }
+                        )
+                        if (response) {
+                            document.getElementById("comment").value = "";
+                            this.comment = {parentId: null, content: ""}
+                            await this.loadComment()
+                        }
+                    } catch (error) {
+                        console.log("Error: " + error)
+                    }
+                },
 
 
             });
@@ -261,17 +369,20 @@
                 }, 1000);
             });
 
-
+            Alpine.store('menuSection').loadCourse();
             Alpine.store('menuSection').loadSections();
-            Alpine.store('menuSection').loadLesson();
             Alpine.store('menuSection').loadSearch();
+            Alpine.store('menuSection').loadComment();
             console.log("Data in store:", Alpine.store('menuSection').searchItem);
 
         });
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 </head>
-<body>
+<body x-data>
+
 <!--? Preloader Start -->
 <div id="preloader-active">
     <div class="preloader d-flex align-items-center justify-content-center">
@@ -284,11 +395,12 @@
     </div>
 </div>
 
-<div class="d-flex flex-column pl-2" x-data>
+<div class="d-flex flex-column pl-2">
+
     <div class="row w-105 ">
         <nav class="navbar nav-color navbar-expand-lg bg-body-tertiary d-flex justify-content-lg-between pt-3 pl-5">
             <div>
-                <p class="navbar-brand fs-1 text-light" href="#" x-text="$store.menuSection.course.title"></p>
+                <p class="navbar-brand fs-1 text-light" href="#" x-text="$store.menuSection.course.data.title"></p>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
                         aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -296,7 +408,7 @@
             </div>
             <div>
                 <button class="search" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><span><i
-                        class="fa-solid fa-magnifying-glass"></i></span><span>Tìm gì à? Để tôi giúp
+                        class="fa-solid fa-magnifying-glass "></i></span><span>Tìm gì à? Để tôi giúp
                     bạn một tay</span><span><i class="fa-solid fa-face-laugh-wink fa-rotate-by"
                                                style="color: #FFD43B; --fa-rotate-angle: 20deg;"></i></span>
                 </button>
@@ -310,7 +422,8 @@
             </div>
 
         </nav>
-        <div class="myModal modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false" tabindex="-1"
+        <div class="myModal modal fade" id="staticBackdrop" data-bs-backdrop="true" data-bs-keyboard="false"
+             tabindex="-1"
              aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -328,7 +441,7 @@
                                       :key="index">
                                 <div class="border p-3">
                                     <p class="border-bottom font-weight-bold" x-text="section.title"></p>
-                                    <template  x-for="(lesson, index) in section.menuLessons" :key="index">
+                                    <template x-for="(lesson, index) in section.menuLessons" :key="index">
                                         <p type="button" data-bs-dismiss="modal" @click="$store.menuSection.loadLesson(lesson.id);
                                                                                          $store.menuSection.searchValue = null;
                                                                                          $store.menuSection.searchItem = null;
@@ -362,11 +475,11 @@
 
     </div>
     <div class="mt-4 row">
-        <div class="col-4">
+        <div class="col-3">
             <div class='border-bottom'>
                 <h1 class="pl-1 pt-2 mb-0">Nội dung khoá học</h1>
             </div>
-            <div class="scroller">
+            <div class="menu-scroller">
                 <!-- Lặp qua từng Section -->
                 <template x-for="(section, index) in $store.menuSection.sections" :key="section.id">
                     <div class="border-bottom" x-data="{ open: false }">
@@ -406,8 +519,8 @@
 
             </div>
         </div>
-        <div class="col-8 ">
-            <div class="scroller">
+        <div class="col-9 ">
+            <div class="content-scroller">
                 <h1 class="lesson-tittle" x-text="$store.menuSection.currentLesson.title"></h1>
                 <template x-if="$store.menuSection.currentLesson.videoUrl">
                     <div>
@@ -426,6 +539,110 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Bình Luận -->
+<div class="modal fadeInRight animated comment-modal" id="exampleModal" tabindex="-1"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="comment-group">
+                    <textarea class="input-group comment-input" id="comment"
+                              x-model="$store.menuSection.noParentComment"></textarea>
+                    <button class="btn btn-outline-primary" @click="$store.menuSection.sendNoParentComment()">Gửi
+                    </button>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <template x-if="$store.menuSection.listComments && $store.menuSection.listComments.length > 0">
+                    <template x-for="(comment, index) in $store.menuSection.listComments" :key="index">
+                        <div>
+                            <div class="bg-gray rounded-2 p-4 pt-2 ml-1 mt-4">
+                                <div class="d-flex justify-content-lg-between mb-2">
+                                    <div class="d-flex account">
+                                        <template x-if="comment.account.avatar">
+                                            <img src="comment.account.avatar" class="rounded-50"/>
+                                        </template>
+
+                                        <template x-if="!comment.account.avatar">
+                                            <div class="avatar mr-2"><i class="fa-solid fa-user-tie"></i></div>
+                                        </template>
+                                        <h5 x-text="comment.account.email"></h5>
+                                    </div>
+                                    <p class="cursor-pointer" @click="$store.menuSection.setComment(comment.id)
+                                                                      $store.menuSection.setCurrentInput(comment.id)">
+                                        Phản hồi</p>
+                                </div>
+                                <p class="ml-3 text-wrap text-break" x-text="comment.content"></p>
+                                <p style="color: #0d6efd"
+                                   x-text="new Date(comment.createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })"></p>
+
+                                <template x-if="$store.menuSection.currentInput === comment.id">
+                                    <div class="comment-group comment-input">
+                                        <textarea class="input-group"
+                                                  x-model="$store.menuSection.comment.content"></textarea>
+                                        <button class="btn btn-outline-primary"
+                                                @click="$store.menuSection.sendComment()">
+                                            Gửi
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                            <template x-if="comment.childrenComments && comment.childrenComments.length > 0">
+                                <template x-for="(child, index) in comment.childrenComments" :key="index">
+                                    <div class="bg-gray rounded-2 p-4 pt-2 ml-5 mt-4 border-left border-2 border-primary">
+                                        <div class="d-flex justify-content-lg-between mb-2">
+                                            <div class="d-flex account">
+                                                <template x-if="child.account.avatar">
+                                                    <img src="child.account.avatar" class="rounded-50"/>
+                                                </template>
+
+                                                <template x-if="!child.account.avatar">
+                                                    <div class="avatar mr-2"><i class="fa-solid fa-user-tie"></i></div>
+                                                </template>
+                                                <h5 x-text="child.account.email"></h5>
+                                            </div>
+                                            <p class="ml-3 cursor-pointer " @click="$store.menuSection.setComment(comment.id)
+                                                                                   $store.menuSection.setCurrentInput(child.id)
+                                            ">Phản hồi</p>
+                                        </div>
+                                        <p class="ml-3 text-wrap text-break" x-text="child.content"></p>
+
+                                        <p style="color: #0d6efd"
+                                           x-text="new Date(child.createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })"></p>
+
+
+                                        <template x-if="$store.menuSection.currentInput === child.id">
+                                            <div class="comment-group comment-input ">
+                                                <textarea class="input-group"
+                                                          x-model="$store.menuSection.comment.content"></textarea>
+                                                <button class="btn btn-outline-primary"
+                                                        @click="$store.menuSection.sendComment()">
+                                                    Gửi
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                </template>
+
+                            </template>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button mở modal -->
+<template x-if="$store.menuSection.currentLesson !== null">
+    <button class="comment-button position-fixed" @click="$store.menuSection.loadComment(); renderReactComments();"
+            data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <i class="fa-regular fa-comments" style="color: white; margin-right: 5px"></i> Bình luận
+    </button>
+</template>
 
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

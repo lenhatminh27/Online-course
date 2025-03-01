@@ -32,14 +32,17 @@ public class MenuSectionServiceImpl implements MenuSectionService {
     @Override
     public List<MenuSectionResponse> getMenuSectionByCourseId(Long courseId) {
         CourseEntity course = courseDAO.findById(courseId);
+        if (course == null) {
+            throw new ForbiddenException("Không tìm thấy course!");
+        }
         AuthenticationContext context = AuthenticationContextHolder.getContext();
         AccountEntity account = accountDAO.findByEmail(context.getEmail());
         boolean enrollment = enrollmentDAO.getEnrollmentByAccountIdAndCourseId(account.getId(), courseId);
-        if (context.getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR) || context.getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN)) {
+        if (course.getCreatedBy().equals(account.getEmail())) {
             enrollment = true;
         }
-        if (ObjectUtils.isEmpty(course)) {
-            throw new NotFoundException("Không tìm thấy course id tương ứng");
+        if (context.getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN)) {
+            enrollment = true;
         }
         if (!enrollment) {
             throw new ForbiddenException("Bạn chưa đăng ký khoá học này");

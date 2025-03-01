@@ -5,6 +5,7 @@ import com.course.core.bean.annotations.Repository;
 import com.course.dao.LessonCommentDAO;
 import com.course.entity.BlogCommentEntity;
 import com.course.entity.LessonCommentEntity;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -35,9 +36,14 @@ public class LessonCommentDAOImpl implements LessonCommentDAO {
     public List<LessonCommentEntity> findAllChildrenLessonComments(Long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             String hql = "FROM LessonCommentEntity b WHERE b.parentLessonComment.id = :id";
-            return session.createQuery(hql, LessonCommentEntity.class)
+            List<LessonCommentEntity> lessonComments = session.createQuery(hql, LessonCommentEntity.class)
                     .setParameter("id", id)
                     .getResultList();
+            lessonComments.forEach(lessonCommentEntity -> {
+                Hibernate.initialize(lessonCommentEntity.getCourseLesson());
+                Hibernate.initialize(lessonCommentEntity.getAccount());
+            });
+            return lessonComments;
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
@@ -71,6 +77,24 @@ public class LessonCommentDAOImpl implements LessonCommentDAO {
             if (tx != null) tx.rollback();
             e.printStackTrace();
             throw new RuntimeException("Failed to delete lesson comment", e);
+        }
+    }
+
+    @Override
+    public List<LessonCommentEntity> findNoParentLessonCommentsByLessonId(Long lessonId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "FROM LessonCommentEntity b WHERE b.courseLesson.id = :lessonId AND b.parentLessonComment.id IS NULL";
+            List<LessonCommentEntity> comments = session.createQuery(hql, LessonCommentEntity.class)
+                    .setParameter("lessonId", lessonId)
+                    .getResultList();
+            comments.forEach(commentEntity -> {
+                Hibernate.initialize(commentEntity.getCourseLesson());
+                Hibernate.initialize(commentEntity.getAccount());
+            });
+            return comments;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 
