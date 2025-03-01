@@ -54,9 +54,12 @@ public class LessonCommentDAOImpl implements LessonCommentDAO {
     public LessonCommentEntity findLessonCommentById(Long id) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
             String hql = "FROM LessonCommentEntity b WHERE b.id = :id";
-            return session.createQuery(hql, LessonCommentEntity.class)
+            LessonCommentEntity comment = session.createQuery(hql, LessonCommentEntity.class)
                     .setParameter("id", id)
                     .uniqueResult();
+            Hibernate.initialize(comment.getCourseLesson());
+            Hibernate.initialize(comment.getAccount());
+            return comment;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -95,6 +98,56 @@ public class LessonCommentDAOImpl implements LessonCommentDAO {
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public LessonCommentEntity updateLessonComment(LessonCommentEntity lessonComment) {
+        Transaction transaction = null;
+        try(Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(lessonComment);
+            session.getTransaction().commit();
+            return lessonComment;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void deleteLessonComment(LessonCommentEntity lessonComment) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.delete(lessonComment);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteLessonCommentIn(List<Long> lessonCommentIds) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            String hql = "DELETE FROM LessonCommentEntity lc WHERE lc.id IN :ids";
+            session.createQuery(hql)
+                    .setParameter("ids", lessonCommentIds)
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
         }
     }
 

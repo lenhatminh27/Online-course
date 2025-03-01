@@ -153,6 +153,18 @@
         .input-group {
             margin-bottom: 10px;
         }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            left: auto;
+            right: 1%;
+            top: 30px;
+        }
     </style>
     <script type="module">
         import {environment, STORAGE_KEY, avatarDefault} from '../../assets/config/env.js';
@@ -174,6 +186,8 @@
             Alpine.store('menuSection', {
                 sections: [],
                 course: null,
+                currentUser: localStorage.getItem(STORAGE_KEY.userCurrent),
+                isCreator: false,
                 selectedSection: [],
                 currentLesson: null,
                 doneLessons: [],
@@ -184,6 +198,11 @@
                 comment: {parentId: null, content: ""},
                 currentInput: null,
                 noParentComment: "",
+                inputUpdateComment: {commentId: null, content: ""},
+                setUpdateComment(id, content) {
+                    this.inputUpdateComment.commentId = id
+                    this.inputUpdateComment.content = content
+                },
                 setCurrentInput(id) {
                     this.currentInput = id
                 },
@@ -200,7 +219,10 @@
                     }
                     try {
                         const response = await apiRequestWithToken(environment.apiUrl + '/api/course/detail/' + courseId);
-                        this.course = response;
+                        this.course = await response;
+                        this.isCreator = JSON.parse(this.currentUser).email === this.course.accountResponse.email
+                        console.log(response)
+                        console.log(this.isCreator)
                         console.log("This course: " + this.course);
                     } catch (error) {
                         console.error("Lỗi khi gọi API:", error);
@@ -349,13 +371,87 @@
                         if (response) {
                             document.getElementById("comment").value = "";
                             this.comment = {parentId: null, content: ""}
+                            this.noParentComment = ""
                             await this.loadComment()
                         }
                     } catch (error) {
                         console.log("Error: " + error)
                     }
                 },
+                async updateComment() {
+                    if (this.inputUpdateComment.content.length > 500) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gửi bình luận thất bại!",
+                            text: "Nội dung bình luận không được để trống!"
+                        });
+                        return;
+                    }
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Bạn có chắc chắn?",
+                        text: "Hành động này không thể hoàn tác!",
+                        showCancelButton: "true",
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Đồng ý",
+                        cancelButtonText: "Hủy"
+                    }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    const response = await apiRequestWithToken(environment.apiUrl + '/api/lesson-comment',
+                                        {
+                                            method: "PUT",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                commentId: this.inputUpdateComment.commentId,
+                                                content: this.inputUpdateComment.content
+                                            }),
+                                        }
+                                    )
+                                    if (response) {
+                                        this.inputUpdateComment.commentId = null
+                                        this.inputUpdateComment.content = ""
+                                        await this.loadComment()
+                                    }
+                                } catch (error) {
 
+                                }
+                            }
+                        }
+                    )
+                },
+                async deleteComment(id) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Bạn có chắc chắn?",
+                        text: "Hành động này không thể hoàn tác!",
+                        showCancelButton: "true",
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Đồng ý",
+                        cancelButtonText: "Hủy"
+                    }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    await apiRequestWithToken(environment.apiUrl + '/api/lesson-comment/' + id,
+                                        {
+                                            method: "DELETE",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                        }
+                                    )
+                                    await this.loadComment()
+                                } catch (error) {
+
+                                }
+                            }
+                        }
+                    )
+                }
 
             });
 
@@ -570,11 +666,41 @@
                                         </template>
                                         <h5 x-text="comment.account.email"></h5>
                                     </div>
-                                    <p class="cursor-pointer" @click="$store.menuSection.setComment(comment.id)
+                                    <div class="d-flex">
+                                        <p class="cursor-pointer" @click="$store.menuSection.setComment(comment.id)
                                                                       $store.menuSection.setCurrentInput(comment.id)">
-                                        Phản hồi</p>
+                                            Phản hồi</p>
+                                        <template
+                                                x-if="JSON.parse($store.menuSection.currentUser).email === comment.account?.email || $store.menuSection.isCreator === true">
+                                            <div class="dropdown dropstart">
+                                                <i class="fa-solid fa-ellipsis-vertical ml-5 mt-2 cursor-pointer"
+                                                   type="button" data-bs-toggle="dropdown"></i>
+                                                <ul class="dropdown-menu">
+                                                    <template x-if="JSON.parse($store.menuSection.currentUser).email === comment.account?.email">
+                                                    <li @click="$store.menuSection.setUpdateComment(comment.id, comment.content)">
+                                                        <a
+                                                                class="dropdown-item">Sửa bình luận</a></li>
+                                                    </template>
+                                                    <li @click="$store.menuSection.deleteComment(comment.id)"><a class="dropdown-item" style="color: red">Xoá bình luận</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
-                                <p class="ml-3 text-wrap text-break" x-text="comment.content"></p>
+                                <template x-if="$store.menuSection.inputUpdateComment.commentId !== comment.id">
+                                    <p class="ml-3 text-wrap text-break" x-text="comment.content"></p>
+                                </template>
+                                <template x-if="$store.menuSection.inputUpdateComment.commentId === comment.id">
+                                    <div>
+                                        <textarea class="input-group comment-input"
+                                                  x-text="$store.menuSection.inputUpdateComment.content"
+                                                  x-model="$store.menuSection.inputUpdateComment.content"></textarea>
+                                        <button class="btn btn-outline-primary"
+                                                @click="$store.menuSection.updateComment()">Sửa
+                                        </button>
+                                    </div>
+                                </template>
                                 <p style="color: #0d6efd"
                                    x-text="new Date(comment.createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })"></p>
 
@@ -603,11 +729,41 @@
                                                 </template>
                                                 <h5 x-text="child.account.email"></h5>
                                             </div>
-                                            <p class="ml-3 cursor-pointer " @click="$store.menuSection.setComment(comment.id)
+                                            <div class="d-flex">
+                                                <p class="ml-3 cursor-pointer " @click="$store.menuSection.setComment(comment.id)
                                                                                    $store.menuSection.setCurrentInput(child.id)
                                             ">Phản hồi</p>
+                                                <template
+                                                        x-if="JSON.parse($store.menuSection.currentUser).email === child.account?.email || $store.menuSection.isCreator === true">
+                                                    <div class="dropdown dropstart ">
+                                                        <i class="fa-solid fa-ellipsis-vertical ml-5 mt-2 cursor-pointer"
+                                                           type="button" data-bs-toggle="dropdown"></i>
+                                                        <ul class="dropdown-menu">
+                                                            <template x-if="JSON.parse($store.menuSection.currentUser).email === child.account?.email">
+                                                                <li @click="$store.menuSection.setUpdateComment(child.id, child.content)">
+                                                                    <a
+                                                                            class="dropdown-item">Sửa bình luận</a></li>
+                                                            </template>
+                                                            <li @click="$store.menuSection.deleteComment(child.id)"><a class="dropdown-item" style="color: red">Xoá bình luận</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </div>
-                                        <p class="ml-3 text-wrap text-break" x-text="child.content"></p>
+                                        <template x-if="$store.menuSection.inputUpdateComment.commentId !== child.id">
+                                            <p class="ml-3 text-wrap text-break" x-text="child.content"></p>
+                                        </template>
+                                        <template x-if="$store.menuSection.inputUpdateComment.commentId === child.id">
+                                            <div>
+                                        <textarea class="input-group comment-input"
+                                                  x-text="$store.menuSection.inputUpdateComment.content"
+                                                  x-model="$store.menuSection.inputUpdateComment.content"></textarea>
+                                                <button class="btn btn-outline-primary"
+                                                        @click="$store.menuSection.updateComment()">Sửa
+                                                </button>
+                                            </div>
+                                        </template>
 
                                         <p style="color: #0d6efd"
                                            x-text="new Date(child.createdAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })"></p>
