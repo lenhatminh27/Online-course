@@ -187,7 +187,6 @@ public class CourseServiceImpl implements CourseService {
     }
 
 
-
     private AccountEntity getAuthenticatedAccount() {
         String email = AuthenticationContextHolder.getContext().getEmail();
         return accountDAO.findByEmail(email);
@@ -234,7 +233,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseListRespone> getTop3Course() {
         List<CourseEntity> allCourse = courseDAO.getTop3Courses();
-        if(allCourse == null) {
+        if (allCourse == null) {
             throw new ForbiddenException("hiện chưa có khóa học nào đang sẵn sàng. vui lòng quay lại sau");
         }
         return allCourse.stream().map(this::convertToCourseListRespone).toList();
@@ -250,17 +249,17 @@ public class CourseServiceImpl implements CourseService {
                 .toList();
         Double rating = ratingDAO.calRatingByCourseId(courseEntity.getId());
         CourseListRespone respone;
-        try{
+        try {
             String email = AuthenticationContextHolder.getContext().getEmail();
             AccountEntity accountEntity = accountDAO.findByEmail(email);
             WishlistEntity wishlist = wishlistDAO.findWishlistByCourseIdAndAccountId(courseEntity.getId(), accountEntity.getId());
             boolean isTrue;
-            if(wishlist == null) {
+            if (wishlist == null) {
                 isTrue = false;
-            }else{
+            } else {
                 isTrue = true;
             }
-            respone =  CourseListRespone.builder()
+            respone = CourseListRespone.builder()
                     .id(courseEntity.getId())
                     .title(courseEntity.getTitle())
                     .description(courseEntity.getDescription())
@@ -276,7 +275,7 @@ public class CourseServiceImpl implements CourseService {
                     .categories(categories)
                     .build();
         } catch (Exception e) {
-            respone =  CourseListRespone.builder()
+            respone = CourseListRespone.builder()
                     .id(courseEntity.getId())
                     .title(courseEntity.getTitle())
                     .description(courseEntity.getDescription())
@@ -338,5 +337,27 @@ public class CourseServiceImpl implements CourseService {
                 .accountResponse(accountResponse)
                 .rating(rating)
                 .build();
+    }
+
+    @Override
+    public void updateStatus(Long courseId, CourseStatus status) {
+        // Retrieve the course by its ID
+        CourseEntity course = courseDAO.findById(courseId);
+
+        if (ObjectUtils.isEmpty(course)) {
+            throw new NotFoundException("Không tìm thấy khóa học với ID: " + courseId);
+        }
+
+        // Check the permissions for status change
+        String accountCurrentEmail = getAuthenticatedAccountEmail();
+        boolean isAdmin = AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_ADMIN);
+        boolean isOwner = course.getAccountCreated().getEmail().equals(accountCurrentEmail);
+
+        if (!isAdmin && !isOwner) {
+            throw new ForbiddenException("Không có quyền thay đổi trạng thái khóa học.");
+        }
+
+        course.setStatus(status);
+        courseDAO.updateCourse(course);
     }
 }

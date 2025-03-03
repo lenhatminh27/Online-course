@@ -143,6 +143,8 @@ public class CourseDAOImpl implements CourseDAO {
                 course.setStatus(status);
                 session.update(course);
                 transaction.commit();
+                Hibernate.initialize(course.getAccountCreated());
+                Hibernate.initialize(course.getCategories());
             } else {
                 throw new RuntimeException("Course not found with id: " + id);
             }
