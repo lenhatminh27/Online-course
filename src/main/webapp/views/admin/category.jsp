@@ -137,6 +137,13 @@
                                     icon: "success",
                                     confirmButtonText: "OK"
                                 });
+                            } else {
+                                await this.loadCategories();
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Không thể xoá thể loại vì đang được sử dụng trong khoá học",
+                                    text: errorMess,
+                                });
                             }
                         }
                     } catch (error) {
@@ -245,8 +252,6 @@
                         });
                     }
                 }
-
-
             });
             Alpine.store('categories').loadCategories();
             Alpine.store('categories').loadCategoriesNoParent();
