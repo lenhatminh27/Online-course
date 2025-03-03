@@ -30,7 +30,7 @@ public class LessonCommentEntity{
     @JoinColumn(name = "account_id")
     private AccountEntity account;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "created_at")
