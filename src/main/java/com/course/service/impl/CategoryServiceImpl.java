@@ -133,13 +133,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long categoryId) {
         CategoriesEntity category = categoryDAO.findById(categoryId);
-        if (category != null) {
-            categoryDAO.deleteCategory(category);
-        }
-        else {
+        if (category == null) {
             throw new NotFoundException("Thể loại không tồn tại");
         }
-    }
+        boolean isCategoryInUse = categoryDAO.isCategoryInUse(categoryId);
+        if (isCategoryInUse) {
+            throw new IllegalStateException("Không thể xoá thể loại vì đang được sử dụng trong khoá học");
+        }
+        categoryDAO.deleteCategory(category);
+     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
