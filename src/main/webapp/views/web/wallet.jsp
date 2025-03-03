@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/responsive.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script type="module">
         import {STORAGE_KEY} from "../../assets/config/env.js";
         const userCurrent = localStorage.getItem(STORAGE_KEY.userCurrent);
@@ -210,6 +211,10 @@
             background-color: #ff5722;
             color: white;
         }
+
+        .fa-bitcoin{
+            color: blueviolet;
+        }
     </style>
 </head>
 <body>
@@ -245,7 +250,7 @@
         <div class="container">
             <div class="row">
                 <div class="current-point">
-                    <h4>Điểm hiện tại: <span x-text="$store.wallet.pointCurrent"></span></h4>
+                    <h4>Điểm hiện tại: <span x-text="$store.wallet.pointCurrent"></span> <i class='fa-brands fa-bitcoin'></i></h4>
                 </div>
             </div>
             <div class="row">
@@ -261,7 +266,7 @@
                                         <span class="fHutKFROlyyE1qVJNGaEq" x-text="amount.toLocaleString() + ' ₫'"></span>
                                     </div>
                                     <div class="_1v4QMCKGPgfdVXYRO07us">
-                                        <div>Point × <span x-text="rate"></span></div>
+                                        <div><i class='fa-brands fa-bitcoin'></i> × <span x-text="rate"></span></div>
                                     </div>
                                 </div>
                             </a>
@@ -277,7 +282,7 @@
                             <template x-if="!$store.wallet.showQR">
                                 <div>
                                     <h5 class="card-title">Chi tiết giao dịch</h5>
-                                    <p class="card-text">Sản phẩm được chọn: Sò × <span x-text="$store.wallet.selectedSohAmount"></span></p>
+                                    <p class="card-text">Sản phẩm được chọn: <i class='fa-brands fa-bitcoin'></i> × <span x-text="$store.wallet.selectedSohAmount"></span></p>
                                     <p class="card-text">Giá: <span x-text="$store.wallet.selectedAmount.toLocaleString()"></span> ₫</p>
                                     <p class="card-text">Phương thức thanh toán: Quét mã QR</p>
                                     <button class="btn btn-danger" @click="$store.wallet.processQr()">Xử lý thanh toán</button>

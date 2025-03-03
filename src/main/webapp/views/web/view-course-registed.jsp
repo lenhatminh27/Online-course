@@ -53,6 +53,11 @@
       padding: 20px;
     }
 
+
+    .properties__footer{
+      display: flex;
+      flex-direction: column;
+    }
     .properties__img.overlay1 {
       position: relative;
       overflow: hidden;
@@ -99,6 +104,10 @@
       font-size: 16px;
       font-weight: bold;
       color: #333;
+    }
+
+    .fa-bitcoin{
+      color: blueviolet;
     }
 
     .border-btn {
@@ -269,7 +278,7 @@
           htmls += "          <p> Học viên đánh giá</p>";
           htmls += "        </div>";
           htmls += "        <div class='price'>";
-          htmls += "          <span>"+ course.price +"VNĐ</span>";
+          htmls += "          <span>"+ course.price +" <i class='fa-brands fa-bitcoin'></i></span>";
           htmls += "        </div>";
           htmls += "      </div>";
           htmls += "      <a class='border-btn' href='/menu-section/" + course.id + "'>Vào học </a>";
