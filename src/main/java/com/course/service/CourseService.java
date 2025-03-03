@@ -6,6 +6,7 @@ import com.course.dto.response.CourseRegistedRespone;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.PageResponse;
 import com.course.entity.CourseEntity;
+import com.course.entity.enums.CourseStatus;
 
 import java.util.List;
 
@@ -38,4 +39,6 @@ public interface CourseService {
     List<CourseRegistedRespone> getRegisteredCourse();
 
     CourseRegistedRespone convertToCourseRegistedResponse(CourseEntity courseEntity);
+
+    void updateStatus(Long courseId, CourseStatus courseStatus);
 }
