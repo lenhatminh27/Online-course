@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Data
-public class PageRequest implements  Serializable {
+public class PageRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -15,7 +15,7 @@ public class PageRequest implements  Serializable {
     private final int pageNumber;
     private final int pageSize;
 
-    protected PageRequest(int pageNumber, int pageSize,Sort sort) {
+    protected PageRequest(int pageNumber, int pageSize, Sort sort) {
         this.sort = sort;
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;

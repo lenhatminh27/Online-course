@@ -2,6 +2,7 @@ package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
 import com.course.dao.WishlistDAO;
+import com.course.dto.response.TestWishlistRespone;
 import com.course.entity.AccountEntity;
 import com.course.entity.CourseEntity;
 import com.course.entity.WishlistEntity;
@@ -9,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WishlistDaoImpl implements WishlistDAO {
@@ -61,19 +63,23 @@ public class WishlistDaoImpl implements WishlistDAO {
     }
 
     @Override
-    public WishlistEntity findWishlistById(Long id) {
+    @Transactional
+    public WishlistEntity findWishlistByCourseIdAndAccountId(Long courseId, Long accountId) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            // Viết câu truy vấn HQL tìm kiếm khóa học theo id
-            String hql = "FROM WishlistEntity w WHERE w.id = :id";
-            // Truy vấn khóa học theo id và lấy kết quả duy nhất
+            // Câu lệnh HQL tìm kiếm một mục trong wishlist theo courseId và accountId
+            String hql = "FROM WishlistEntity w WHERE w.course.id = :courseId AND w.account.id = :accountId";
+
+            // Thực thi câu truy vấn và lấy kết quả duy nhất
             WishlistEntity wishlist = session.createQuery(hql, WishlistEntity.class)
-                    .setParameter("id", id)
+                    .setParameter("courseId", courseId)
+                    .setParameter("accountId", accountId)
                     .uniqueResult();
-            // Kiểm tra nếu không tìm thấy khóa học
+
+            // Trả về kết quả tìm được
             return wishlist;
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi nếu có
-            throw new RuntimeException("Lỗi khi tìm khóa học theo ID", e);
+            throw new RuntimeException("Lỗi khi tìm danh sách yêu thích theo ID khóa học và ID tài khoản", e);
         }
     }
 
@@ -97,3 +103,7 @@ public class WishlistDaoImpl implements WishlistDAO {
 
 
 }
+
+
+
+

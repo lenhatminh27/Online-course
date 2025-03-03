@@ -51,14 +51,6 @@ public class WishlistApi extends BaseServlet {
         try {
             // Gọi service để lấy danh sách khóa học đã thêm vào danh sách yêu thích
             List<WishlistCourseRespone> wishlistCourseRespones = wishlistService.getWishlist();
-
-            // Kiểm tra nếu danh sách rỗng
-            if (ObjectUtils.isEmpty(wishlistCourseRespones)) {
-                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("Không có khóa học nào ở trong danh sách yêu thích của bạn"));
-                return;
-            }
-
-            // Ghi phản hồi JSON về client
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(wishlistCourseRespones));
         } catch (ForbiddenException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(e.getMessage()));
@@ -74,27 +66,24 @@ public class WishlistApi extends BaseServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        WishlistCourseRequest wishlistCourseRequest = gson.fromJson(req.getReader(), WishlistCourseRequest.class);
-        List<String> errors = new ArrayList<>();
-
-        if (ObjectUtils.isEmpty(wishlistCourseRequest)) {
-            errors.add("Request không được null");
-        }
-
-        if (ObjectUtils.isEmpty(wishlistCourseRequest.getCourseId())) {
-            errors.add("BlogId không được null");
-        }
-
-        if (!errors.isEmpty()) {
-            ErrorResponse errorResponse = new ErrorResponse();
-            errorResponse.setError(errors);
-            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+        String pathInfo = req.getPathInfo();
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của khóa học không được để trống"));
             return;
         }
 
+        Long courseId;
+
 
         try {
-            wishlistService.createWishlist(wishlistCourseRequest);
+            courseId = Long.parseLong(pathInfo.substring(1));
+        } catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của khóa học không hợp lệ"));
+            return;
+        }
+
+        try {
+            wishlistService.createWishlist(courseId);
             // Trả về phản hồi thành công với wishlist vừa tạo
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(""));
         } catch (NotFoundException ex) {
@@ -118,17 +107,17 @@ public class WishlistApi extends BaseServlet {
             return;
         }
 
-        Long wishlistId;
-
+        Long courseId;
+        // xóa theo id của khóa học
         try {
-            wishlistId = Long.parseLong(pathInfo.substring(1));
+            courseId = Long.parseLong(pathInfo.substring(1));
         } catch (NumberFormatException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id của wishlist không hợp lệ"));
             return;
         }
 
         try {
-            wishlistService.deleteWishlist(wishlistId);
+            wishlistService.deleteWishlist(courseId);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson("Xóa wishlist thành công"));
         } catch (ForbiddenException ex) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_FORBIDDEN, gson.toJson(ex.getMessage()));

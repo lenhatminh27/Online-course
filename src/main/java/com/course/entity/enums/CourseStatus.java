@@ -3,6 +3,6 @@ package com.course.entity.enums;
 public enum CourseStatus {
     DRAFT,
     PUBLIC,
-    DELETED,
+    REVOKED,
     IN_REVIEW
 }

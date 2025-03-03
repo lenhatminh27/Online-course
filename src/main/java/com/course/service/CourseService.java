@@ -1,8 +1,10 @@
 package com.course.service;
 
 import com.course.dto.request.*;
+import com.course.dto.response.CourseListRespone;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.PageResponse;
+import com.course.entity.CourseEntity;
 
 import java.util.List;
 
@@ -24,8 +26,12 @@ public interface CourseService {
 
     void sendReviewCourseDetailEmail(ReviewCourseDetailRequest reviewCourseDetailRequest);
 
-    PageResponse<CourseResponse> getAllCoursePublic(CourseFilterRequest filterRequest);
+    PageResponse<CourseListRespone> getAllCoursePublic(CourseFilterRequest filterRequest);
 
-    List<CourseResponse> getTop3Course();
+    List<CourseListRespone> getTop3Course();
+
+    CourseListRespone convertToCourseListRespone(CourseEntity courseEntity);
+
+
 
 }
