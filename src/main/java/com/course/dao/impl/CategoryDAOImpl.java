@@ -1,18 +1,64 @@
 package com.course.dao.impl;
 
 import com.course.common.utils.HibernateUtils;
+import com.course.common.utils.ObjectUtils;
 import com.course.core.bean.annotations.Repository;
+import com.course.core.repository.specification.HibernateQueryHelper;
 import com.course.dao.CategoryDAO;
+import com.course.dto.request.CategoryFilterRequest;
+import com.course.dto.response.PageResponse;
 import com.course.entity.CategoriesEntity;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import static com.course.common.utils.StringUtils.deAccent;
 
 @Repository
 public class CategoryDAOImpl implements CategoryDAO {
+
+    @Override
+    public PageResponse<CategoriesEntity> getCategoriesByPage(CategoryFilterRequest categoryFilter) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String baseHql = "FROM CategoriesEntity c LEFT JOIN FETCH c.parentCategories p WHERE 1=1";
+            Map<String, Object> parameters = new HashMap<>();
+
+            // Tìm kiếm theo tên category (không phân biệt dấu)
+            if (!ObjectUtils.isEmpty(categoryFilter.getSearch())) {
+                String searchString = deAccent(categoryFilter.getSearch());
+                baseHql += " AND (deAccent(c.name) LIKE :search OR deAccent(c.description) LIKE :search)";
+                parameters.put("search", "%" + searchString + "%");
+            }
+
+            // Xây dựng truy vấn chính để lấy danh sách categories
+            Query<CategoriesEntity> query = HibernateQueryHelper.buildQuery(
+                    session,
+                    baseHql,
+                    parameters,
+                    categoryFilter.getSort(),
+                    categoryFilter.getPageRequest(categoryFilter.getSort()),
+                    CategoriesEntity.class
+            );
+
+            List<CategoriesEntity> categories = query.getResultList();
+
+            // Khởi tạo các quan hệ nếu cần
+            categories.forEach(category -> Hibernate.initialize(category.getParentCategories()));
+
+            // Truy vấn đếm tổng số phần tử
+            Query<Long> countQuery = HibernateQueryHelper.buildCountQuery(session, baseHql, parameters, "c");
+            long totalElements = countQuery.uniqueResult();
+            int totalPages = (int) Math.ceil((double) totalElements / categoryFilter.getSize());
+
+            return new PageResponse<>(categoryFilter.getPage(), totalPages, categories);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch categories by page", e);
+        }
+    }
+
 
     @Override
     public List<CategoriesEntity> getAllCategories() {
