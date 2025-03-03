@@ -348,7 +348,7 @@
             <template x-for="course in $store.courses.courses" :key="course.id">
                 <div class="properties__card" :data-id="course.id">
                     <div class="properties__img">
-                        <a :href="'/courses/' + course.id">
+                        <a :href="'/course/' + course.id">
                             <img :src="course.thumbnail" alt="">
                         </a>
                     </div>
@@ -382,7 +382,7 @@
                                 <span x-text="course.price + ' VNĐ'"></span>
                             </div>
                         </div>
-                        <a :href="'/courses/' + course.id" class="border-btn">Tìm hiểu thêm</a>
+                        <a :href="'/course/' + course.id" class="border-btn">Tìm hiểu thêm</a>
                     </div>
                     <i :class="course.isLiked ? 'fa fa-heart bookmark-icon text-danger' : 'fa fa-heart bookmark-icon'"></i>
                 </div>

@@ -2,8 +2,6 @@ package com.course.service.impl;
 
 import com.course.core.bean.annotations.Service;
 import com.course.dao.*;
-import com.course.dto.request.WishlistCourseRequest;
-import com.course.dto.response.TestWishlistRespone;
 import com.course.dto.response.WishlistCourseRespone;
 import com.course.entity.AccountEntity;
 import com.course.entity.CourseEntity;
@@ -27,7 +25,7 @@ public class WishlistServiceImpl implements WishlistService {
     private final AccountDAO accountDAO;
     private final WishlistDAO wishlistDAO;
     private final CourseDAO courseDAO;
-    private final RatingDao ratingDao;
+    private final RatingDAO ratingDao;
 
 
     @Override

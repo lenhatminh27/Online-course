@@ -191,7 +191,7 @@ public class CourseDAOImpl implements CourseDAO {
 
             if (!ObjectUtils.isEmpty(filterRequest.getSearch())) {
                 String searchString = StringUtils.deAccent(filterRequest.getSearch().toLowerCase());
-                hql += " AND deAccent(LOWER(b.title)) LIKE :search";
+                hql += " AND deAccent(LOWER(c.title)) LIKE :search";
                 parameters.put("search", "%" + searchString + "%");
             }
 
