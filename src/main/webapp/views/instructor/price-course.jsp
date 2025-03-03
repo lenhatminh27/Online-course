@@ -111,21 +111,36 @@
                 },
                 priceOptions: [
                     { value: 0, label: 'Miễn phí' },
-                    { value: 399000, label: '399.000 ₫ (tháng 1)' },
-                    { value: 449000, label: '449.000 ₫ (tháng 2)' },
-                    { value: 499000, label: '499.000 ₫ (tháng 3)' },
-                    { value: 549000, label: '549.000 ₫ (tháng 4)' },
-                    { value: 599000, label: '599.000 ₫ (tháng 5)' },
-                    { value: 649000, label: '649.000 ₫ (tháng 6)' },
-                    { value: 699000, label: '699.000 ₫ (tháng 7)' },
-                    { value: 749000, label: '749.000 ₫ (tháng 8)' },
-                    { value: 799000, label: '799.000 ₫ (tháng 9)' },
-                    { value: 849000, label: '849.000 ₫ (tháng 10)' },
-                    { value: 899000, label: '899.000 ₫ (tháng 11)' },
-                    { value: 949000, label: '949.000 ₫ (tháng 12)' },
-                    { value: 999000, label: '999.000 ₫ (tháng 13)' },
-                    { value: 1049000, label: '1.049.000 ₫ (tháng 14)' },
-                    { value: 1099000, label: '1.099.000 ₫ (tháng 15)' }
+                    { value: 399000, label: '399.000 point' +
+                            ' (tháng 1)' },
+                    { value: 449000, label: '449.000 point' +
+                            ' (tháng 2)' },
+                    { value: 499000, label: '499.000 point' +
+                            ' (tháng 3)' },
+                    { value: 549000, label: '549.000 point' +
+                            ' (tháng 4)' },
+                    { value: 599000, label: '599.000 point' +
+                            ' (tháng 5)' },
+                    { value: 649000, label: '649.000 point' +
+                            ' (tháng 6)' },
+                    { value: 699000, label: '699.000 point' +
+                            ' (tháng 7)' },
+                    { value: 749000, label: '749.000 point' +
+                            ' (tháng 8)' },
+                    { value: 799000, label: '799.000 point' +
+                            ' (tháng 9)' },
+                    { value: 849000, label: '849.000 point' +
+                            ' (tháng 10)' },
+                    { value: 899000, label: '899.000 point' +
+                            ' (tháng 11)' },
+                    { value: 949000, label: '949.000 point' +
+                            ' (tháng 12)' },
+                    { value: 999000, label: '999.000 point' +
+                            ' (tháng 13)' },
+                    { value: 1049000, label: '1.049.000 point' +
+                            ' (tháng 14)' },
+                    { value: 1099000, label: '1.099.000 point' +
+                            ' (tháng 15)' }
                 ],
 
 
@@ -225,8 +240,6 @@
             <input class="form-check-input" type="checkbox" onclick="redirectToPage('/discount')">
             <label class="form-check-label">Khuyến mại</label>
         </div>
-
-        <button class="btn btn-primary w-100 mt-3" onclick="redirectToPage('review.html')">Gửi đi để xem xét</button>
     </div>
     <div class="content ms-4" x-data="Alpine.store('course')">
         <div class="form">

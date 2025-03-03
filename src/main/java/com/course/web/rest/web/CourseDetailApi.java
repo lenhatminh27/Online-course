@@ -1,6 +1,7 @@
 package com.course.web.rest.web;
 
 import com.course.common.utils.ResponseUtils;
+import com.course.dto.base.CourseCanEdit;
 import com.course.dto.response.CourseResponse;
 import com.course.exceptions.NotFoundException;
 import com.course.service.CourseService;
@@ -49,6 +50,33 @@ public class CourseDetailApi extends HttpServlet {
         }
         catch (NumberFormatException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id khóa học là bắt buộc."));
+        }
+    }
+
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        String pathInfo = req.getPathInfo(); // "/1"
+        if (pathInfo == null || pathInfo.length() <= 1) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id khóa học là bắt buộc."));
+            return;
+        }
+        try {
+            Long courseId = Long.parseLong(pathInfo.substring(1));
+            boolean canEdit = courseService.checkCourseCanEdit(courseId);
+            CourseCanEdit edit = CourseCanEdit.builder().canEdit(canEdit).build();
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(edit));
+        }
+        catch (NotFoundException e){
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson(e.getMessage()));
+        }
+        catch (NumberFormatException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("Id khóa học là bắt buộc."));
+        }
+        catch (Exception e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson(e.getMessage()));
         }
     }
 }

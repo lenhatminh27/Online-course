@@ -5,13 +5,20 @@ import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.LessonCommentDAO;
 import com.course.dao.LessonDAO;
+import com.course.dao.SectionDAO;
+import com.course.dao.impl.LessonCommentDAOImpl;
 import com.course.dto.request.CreateLessonCommentRequest;
+import com.course.dto.request.UpdateLessonCommentRequest;
 import com.course.dto.response.AccountResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.LessonCommentResponse;
 import com.course.entity.AccountEntity;
+import com.course.entity.CourseLessonEntity;
+import com.course.entity.CourseSectionEntity;
 import com.course.entity.LessonCommentEntity;
 import com.course.exceptions.BadRequestException;
+import com.course.exceptions.ForbiddenException;
+import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.LessonCommentService;
@@ -31,6 +38,8 @@ public class LessonCommentServiceImpl implements LessonCommentService {
 
     private final LessonDAO lessonDAO;
 
+    private final SectionDAO sectionDAO;
+
     @Override
     public LessonCommentResponse createLessonComment(CreateLessonCommentRequest request) {
         if (!AuthenticationContextHolder.getContext().getAuthorities().contains(AuthoritiesConstants.ROLE_INSTRUCTOR) && request.getContent().length() > 500) {
@@ -41,7 +50,7 @@ public class LessonCommentServiceImpl implements LessonCommentService {
         String email = AuthenticationContextHolder.getContext().getEmail();
         AccountEntity accountEntity = accountDAO.findByEmail(email);
         LessonCommentEntity parentComment = null;
-        if(request.getParentId() != null) {
+        if (request.getParentId() != null) {
             parentComment = lessonCommentDAO.findLessonCommentById(request.getParentId());
         }
         LessonCommentEntity lessonCommentEntity = new LessonCommentEntity();
@@ -64,6 +73,40 @@ public class LessonCommentServiceImpl implements LessonCommentService {
             }
         }
         return lessonCommentResponses;
+    }
+
+    @Override
+    public LessonCommentResponse updateLessonComment(UpdateLessonCommentRequest request) {
+        LessonCommentEntity lessonCommentEntity = lessonCommentDAO.findLessonCommentById(request.getCommentId());
+        if (lessonCommentEntity == null) {
+            throw new NotFoundException("Bình luận không tồn tại!");
+        }
+        if (!AuthenticationContextHolder.getContext().getEmail().equals(lessonCommentEntity.getAccount().getEmail())) {
+            throw new ForbiddenException("Bạn không có quyền cập nhật comment này!");
+        }
+        lessonCommentEntity.setContent(request.getContent());
+        lessonCommentEntity.setUpdatedAt(LocalDateTime.now());
+        LessonCommentEntity comment = lessonCommentDAO.updateLessonComment(lessonCommentEntity);
+        return convertToLessonCommentResponse(comment);
+    }
+
+    @Override
+    public void deleteLessonComment(Long lessonCommentId) {
+        LessonCommentEntity comment = lessonCommentDAO.findLessonCommentById(lessonCommentId);
+        AccountEntity accountEntity = accountDAO.findByEmail(AuthenticationContextHolder.getContext().getEmail());
+        CourseLessonEntity lesson = lessonDAO.findById(comment.getCourseLesson().getId());
+        CourseSectionEntity section = sectionDAO.findById(lesson.getCourseSection().getId());
+        if (comment == null) {
+            throw new NotFoundException("Bình luận không tồn tại!");
+        }
+        if (!accountEntity.getEmail().equals(comment.getAccount().getEmail()) && !accountEntity.getRoles().contains(AuthoritiesConstants.ROLE_ADMIN) && !accountEntity.getEmail().equals(section.getCourse().getCreatedBy())) {
+            throw new ForbiddenException("Bạn không có quyền cập nhật comment này!");
+        }
+        List<Long> listChildrenIds = lessonCommentDAO.findAllChildrenLessonComments(lessonCommentId).stream().map(child -> child.getId()).toList();
+        if (!ObjectUtils.isEmpty(listChildrenIds)) {
+            lessonCommentDAO.deleteLessonCommentIn(listChildrenIds);
+        }
+        lessonCommentDAO.deleteLessonComment(comment);
     }
 
 

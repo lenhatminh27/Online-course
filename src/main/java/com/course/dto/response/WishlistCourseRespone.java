@@ -23,4 +23,7 @@ public class WishlistCourseRespone {
     private String description;
     private String createdAt;
     private BigDecimal price;
+    private Double rating ;
+    private String imageUrl;
+
 }

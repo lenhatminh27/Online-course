@@ -191,7 +191,7 @@ public class CourseDAOImpl implements CourseDAO {
 
             if (!ObjectUtils.isEmpty(filterRequest.getSearch())) {
                 String searchString = StringUtils.deAccent(filterRequest.getSearch().toLowerCase());
-                hql += " AND deAccent(LOWER(b.title)) LIKE :search";
+                hql += " AND deAccent(LOWER(c.title)) LIKE :search";
                 parameters.put("search", "%" + searchString + "%");
             }
 
@@ -298,15 +298,13 @@ public class CourseDAOImpl implements CourseDAO {
             long totalElements = countQuery.uniqueResult();
             int totalPages = (int) Math.ceil((double) totalElements / filterRequest.getSize());
 
+
             // Trả về kết quả dưới dạng PageResponse
             return new PageResponse<>(filterRequest.getPage(), totalPages, courses);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch public courses by page", e);
         }
     }
-
-
-
 
 
 }

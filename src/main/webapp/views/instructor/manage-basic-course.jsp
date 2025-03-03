@@ -106,11 +106,15 @@
                 course: {
                     title: '', // khởi tạo title với chuỗi rỗng
                     description: '',
-                    thumbnail: ''
+                    thumbnail: '',
+                    status: '',
+                    categories: [],
+                    categoriesId: null,
                 },
                 file: null,
                 fileName: 'Không có file nào được chọn',
                 errorMessage: '',
+                categories: [],
 
                 async getCourseCurrent(){
                     const  response = await apiRequestWithToken(environment.apiUrl +  '/api/course/detail/' + courseId, {
@@ -118,6 +122,14 @@
                     })
                     console.log(response);
                     this.course = response;
+                    this.course.categoriesId = this.course.categories[0].id;
+                },
+
+                async getCategories(){
+                    const response = await apiRequestWithToken(environment.apiUrl + '/api/category/no-parent', {
+                        method: 'GET',
+                    })
+                    this.categories = response;
                 },
 
                 async updateCourse(){
@@ -125,7 +137,7 @@
                         const response = await apiRequestWithToken(environment.apiUrl + '/api/course' , {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ...this.course, courseId: courseId })
+                            body: JSON.stringify({ ...this.course, courseId: courseId, categoriesId: this.course.categoriesId })
                         });
                         console.log('Course updated: ', response);
                         Alpine.store('course').getCourseCurrent();
@@ -187,6 +199,7 @@
             });
 
             Alpine.store('course').getCourseCurrent();
+            Alpine.store('course').getCategories();
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -208,6 +221,24 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
+        .course-status {
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .status-badge {
+            background: #ff9800;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -221,7 +252,7 @@
     </div>
 </nav>
 <div class="container d-flex mt-4">
-    <div class="sidebar">
+    <div class="sidebar" x-data>
         <h5 class="mb-3">Lên kế hoạch cho khóa học của bạn</h5>
         <div class="form-check">
             <input class="form-check-input" type="checkbox" onclick="redirectToPage('target.html')">
@@ -256,7 +287,14 @@
             <label class="form-check-label">Khuyến mại</label>
         </div>
 
-        <button class="btn btn-primary w-100 mt-3" onclick="redirectToPage('review.html')">Gửi đi để xem xét</button>
+        <div class="course-status mt-4">
+            Trạng thái khóa học: <span class="status-badge" x-text="$store.course.course.status"></span>
+        </div>
+
+        <!-- Ẩn nút "Gửi đi để xem xét" nếu trạng thái là PUBLIC -->
+        <button class="btn btn-primary w-100 mt-3"
+                x-show="$store.course.course.status && $store.course.course.status !== 'PUBLIC'"
+                onclick="redirectToPage('review.html')">Gửi đi để xem xét</button>
     </div>
     <div class="content ms-4" x-data="Alpine.store('course')">
         <div class="form">
@@ -276,28 +314,21 @@
                 <small class="text-muted" x-text="1000 - (course.description ? course.description.length : 0) + ' ký tự còn lại'"></small>
             </div>
 
-            <button class="btn btn-primary" @click="updateCourse()">Lưu</button>
+            <div class="form-group mt-3">
+                <label for="categorySelect">Chọn thể loại</label>
+                <select id="categorySelect" class="form-control" x-model="course.categoriesId">
+                    <template x-for="category in categories" :key="category.id">
+                        <option :value="category.id" x-text="category.name"></option>
+                    </template>
+                </select>
+            </div>
+
+
+            <button class="btn btn-primary mt-5" @click="updateCourse()">Lưu</button>
         </div>
 
         <div class="container mt-5">
             <h4>Thông tin cơ bản</h4>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option selected>Tiếng Việt</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option selected>-- Chọn trình độ --</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <select class="form-select">
-                        <option selected>CNTT & Phần mềm</option>
-                    </select>
-                </div>
-            </div>
 
             <h4 class="mt-4">Hình ảnh khóa học</h4>
             <div class="upload-container">

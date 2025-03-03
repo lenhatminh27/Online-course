@@ -2,20 +2,13 @@ package com.course.service.impl;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.core.bean.annotations.Service;
-import com.course.dao.AccountDAO;
-import com.course.dao.CategoryDAO;
-import com.course.dao.CourseDAO;
-import com.course.dao.SectionDAO;
-import com.course.dao.impl.SectionDAOImpl;
+import com.course.dao.*;
 import com.course.dto.request.*;
-import com.course.dto.response.AccountResponse;
-import com.course.dto.response.CategoryResponse;
-import com.course.dto.response.CourseResponse;
-import com.course.dto.response.PageResponse;
+import com.course.dto.response.*;
 import com.course.entity.AccountEntity;
 import com.course.entity.CategoriesEntity;
 import com.course.entity.CourseEntity;
-import com.course.entity.CourseSectionEntity;
+import com.course.entity.WishlistEntity;
 import com.course.entity.enums.CourseStatus;
 import com.course.exceptions.AuthenticationException;
 import com.course.exceptions.ForbiddenException;
@@ -29,8 +22,10 @@ import com.course.service.async.EmailService;
 import com.course.service.async.FileSerivce;
 import lombok.RequiredArgsConstructor;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +44,12 @@ public class CourseServiceImpl implements CourseService {
     private final SectionService sectionService;
 
     private final EmailService emailService;
+
+    private final RatingDAO ratingDAO;
+
+    private final WishlistDAO wishlistDAO;
+
+    private final EnrollmentDAO enrollmentDAO;
 
     @Override
     public PageResponse<CourseResponse> getAllListCourseByUserCurrent(CourseInstructorFilterRequest filterRequest) {
@@ -221,24 +222,121 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public PageResponse<CourseResponse> getAllCoursePublic(CourseFilterRequest filterRequest) {
+    public PageResponse<CourseListRespone> getAllCoursePublic(CourseFilterRequest filterRequest) {
         PageResponse<CourseEntity> pageResponse = courseDAO.getAllCourses(filterRequest);
-        List<CourseResponse> courses = pageResponse.getData().stream()
-                .map(this::convertToCourseResponse)
+        List<CourseListRespone> courses = pageResponse.getData().stream()
+                .map(this::convertToCourseListRespone)
                 .toList();
 
         return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), courses);
     }
 
     @Override
-    public List<CourseResponse> getTop3Course() {
+    public List<CourseListRespone> getTop3Course() {
         List<CourseEntity> allCourse = courseDAO.getTop3Courses();
         if(allCourse == null) {
             throw new ForbiddenException("hiện chưa có khóa học nào đang sẵn sàng. vui lòng quay lại sau");
         }
-        return allCourse.stream().map(this::convertToCourseResponse).toList();
+        return allCourse.stream().map(this::convertToCourseListRespone).toList();
+    }
+
+    @Override
+    public CourseListRespone convertToCourseListRespone(CourseEntity courseEntity) {
+        AccountEntity author = courseEntity.getAccountCreated();
+        AccountResponse accountResponse = new AccountResponse(author.getEmail(), author.getAvatar());
+        // Lấy danh sách danh mục của khóa học
+        List<CategoryResponse> categories = courseEntity.getCategories().stream()
+                .map(this::convertToCategoryResponse)
+                .toList();
+        Double rating = ratingDAO.calRatingByCourseId(courseEntity.getId());
+        CourseListRespone respone;
+        try{
+            String email = AuthenticationContextHolder.getContext().getEmail();
+            AccountEntity accountEntity = accountDAO.findByEmail(email);
+            WishlistEntity wishlist = wishlistDAO.findWishlistByCourseIdAndAccountId(courseEntity.getId(), accountEntity.getId());
+            boolean isTrue;
+            if(wishlist == null) {
+                isTrue = false;
+            }else{
+                isTrue = true;
+            }
+            respone =  CourseListRespone.builder()
+                    .id(courseEntity.getId())
+                    .title(courseEntity.getTitle())
+                    .description(courseEntity.getDescription())
+                    .thumbnail(courseEntity.getThumbnail())
+                    .price(courseEntity.getPrice())
+                    .status(courseEntity.getStatus())
+                    .rating(rating)  // Gán rating tính được từ phương thức calRatingByCourseId
+                    .isWishlist(isTrue)
+                    .createdBy(courseEntity.getCreatedBy())
+                    .createdAt(courseEntity.getCreatedAt())
+                    .updatedAt(courseEntity.getUpdatedAt())
+                    .accountResponse(accountResponse)
+                    .categories(categories)
+                    .build();
+        } catch (Exception e) {
+            respone =  CourseListRespone.builder()
+                    .id(courseEntity.getId())
+                    .title(courseEntity.getTitle())
+                    .description(courseEntity.getDescription())
+                    .thumbnail(courseEntity.getThumbnail())
+                    .price(courseEntity.getPrice())
+                    .status(courseEntity.getStatus())
+                    .rating(rating)  // Gán rating tính được từ phương thức calRatingByCourseId
+                    .isWishlist(false)
+                    .createdBy(courseEntity.getCreatedBy())
+                    .createdAt(courseEntity.getCreatedAt())
+                    .updatedAt(courseEntity.getUpdatedAt())
+                    .accountResponse(accountResponse)
+                    .categories(categories)
+                    .build();
+        }
+        return respone;
+    }
+
+    @Override
+    public boolean checkCourseCanEdit(Long courseId) {
+        CourseEntity course = courseDAO.findById(courseId);
+        if (ObjectUtils.isEmpty(course)) {
+            throw new NotFoundException("Không tìm thấy khóa học với ID: " + courseId);
+        }
+        if (course.getStatus() == CourseStatus.PUBLIC || course.getStatus() == CourseStatus.IN_REVIEW) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public List<CourseRegistedRespone> getRegisteredCourse() {
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        AccountEntity account = accountDAO.findByEmail(email);
+        List<CourseEntity> courses = enrollmentDAO.getEnrollmentCourseByAccountId(account.getId());
+        return courses.stream()
+                .map(this::convertToCourseRegistedResponse)
+                .collect(Collectors.toList());
     }
 
 
-
+    @Override
+    public CourseRegistedRespone convertToCourseRegistedResponse(CourseEntity courseEntity) {
+        AccountEntity author = courseEntity.getAccountCreated();
+        AccountResponse accountResponse = new AccountResponse(author.getEmail(), author.getAvatar());
+        Double rating = ratingDAO.calRatingByCourseId(courseEntity.getId());
+        List<CategoryResponse> categories = courseEntity.getCategories().stream().map(this::convertToCategoryResponse).toList();
+        return CourseRegistedRespone.builder()
+                .id(courseEntity.getId())
+                .title(courseEntity.getTitle())
+                .description(courseEntity.getDescription())
+                .createdAt(courseEntity.getCreatedAt())
+                .updatedAt(courseEntity.getUpdatedAt())
+                .status(courseEntity.getStatus())
+                .price(courseEntity.getPrice())
+                .thumbnail(courseEntity.getThumbnail())
+                .categories(categories)
+                .accountResponse(accountResponse)
+                .rating(rating)
+                .build();
+    }
 }

@@ -37,8 +37,8 @@
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
                         class="far fa-file-alt me-2"></i>Thể loại khoá học</a>
                 <div class="dropdown-menu bg-transparent border-0">
-                    <a href="/admin/category" class="dropdown-item"><i class="fa fa-plus me-2"></i>Tạo thể loại</a>
-                    <a href="/admin/blogs?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>Xem thể loại</a>
+                    <a href="/admin/category?action=view" class="dropdown-item"><i class="fa fa-list me-2"></i>Xem thể loại</a>
+                    <a href="/admin/blogs?action=create" class="dropdown-item"><i class="fa fa-plus me-2"></i>Tạo thể loại</a>
                     <a href="/admin/blogs?action=update" class="dropdown-item"><i class="fa fa-edit me-2"></i>Cập nhật
                         thể loại</a>
                     <a href="/admin/blogs?action=delete" class="dropdown-item"><i class="fa fa-trash me-2"></i>Xóa thể

@@ -2,6 +2,7 @@ package com.course.web.rest.web;
 
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
+import com.course.dto.response.CourseListRespone;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.WishlistCourseRespone;
 import com.course.entity.CourseEntity;
@@ -44,7 +45,7 @@ public class CourseHomePageApi extends BaseServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         try {
-            List<CourseResponse> list = courseService.getTop3Course();
+            List<CourseListRespone> list = courseService.getTop3Course();
 
             if (ObjectUtils.isEmpty(list)) {
                 ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("không có khóa học nào đang sẵn sàng"));

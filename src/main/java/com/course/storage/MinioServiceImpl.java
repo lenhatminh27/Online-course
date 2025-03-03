@@ -92,6 +92,14 @@ public final class MinioServiceImpl implements MinioService {
     @Override
     @SneakyThrows
     public void uploadChunk(String bucket, ChunkFileArg arg) {
+        boolean found = minioClient.bucketExists(BucketExistsArgs.builder()
+                .bucket(BUCKET_NAME)
+                .build());
+        if (!found){
+            minioClient.makeBucket(MakeBucketArgs.builder()
+                    .bucket(BUCKET_NAME)
+                    .build());
+        }
         String pathFile = String.join("/", arg.getPath());
         minioClient.putObject(PutObjectArgs.builder()
                 .bucket(bucket)

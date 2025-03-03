@@ -2,7 +2,6 @@ package com.course.service.impl;
 
 import com.course.core.bean.annotations.Service;
 import com.course.dao.*;
-import com.course.dto.request.WishlistCourseRequest;
 import com.course.dto.response.WishlistCourseRespone;
 import com.course.entity.AccountEntity;
 import com.course.entity.CourseEntity;
@@ -26,15 +25,16 @@ public class WishlistServiceImpl implements WishlistService {
     private final AccountDAO accountDAO;
     private final WishlistDAO wishlistDAO;
     private final CourseDAO courseDAO;
-    
+    private final RatingDAO ratingDao;
+
 
     @Override
-    public void createWishlist(WishlistCourseRequest wishlistCourseRequest) {
+    public void createWishlist(Long courseId) {
         String email = AuthenticationContextHolder.getContext().getEmail();
         AccountEntity accountCurrent = accountDAO.findByEmail(email);
 
 
-        CourseEntity course = courseDAO.findById(wishlistCourseRequest.getCourseId());
+        CourseEntity course = courseDAO.findById(courseId);
 
         if (course == null) {
             throw new NotFoundException("khóa học không tồn tại");
@@ -47,9 +47,9 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public void deleteWishlist(Long wishlistId) {
+    public void deleteWishlist(Long courseId) {
         AccountEntity account = accountDAO.findByEmail(AuthenticationContextHolder.getContext().getEmail());
-        WishlistEntity wishlist = wishlistDAO.findWishlistById(wishlistId);
+        WishlistEntity wishlist = wishlistDAO.findWishlistByCourseIdAndAccountId(courseId, account.getId());
 
         if (wishlist == null) {
             throw new ForbiddenException("khóa học này không tồn tại trong danh sách yêu thích");
@@ -64,7 +64,8 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    @Transactional //@Transactional giúp duy trì session Hibernate suốt quá trình truy vấn, tránh lỗi LazyInitializationException
+    @Transactional
+    //@Transactional giúp duy trì session Hibernate suốt quá trình truy vấn, tránh lỗi LazyInitializationException
     public List<WishlistCourseRespone> getWishlist() {
         // Lấy thông tin người dùng hiện tại từ email
         AccountEntity account = accountDAO.findByEmail(AuthenticationContextHolder.getContext().getEmail());
@@ -72,26 +73,32 @@ public class WishlistServiceImpl implements WishlistService {
         // Lấy danh sách các mục trong wishlist của người dùng
         List<WishlistEntity> wishlists = wishlistDAO.getByUserId(account.getId());
 
-        // Kiểm tra nếu không có khóa học nào trong wishlist
-        if (wishlists == null || wishlists.isEmpty()) {
-            throw new ForbiddenException("Bạn chưa thêm khóa học vào danh sách yêu thích");
-        }
-
         // Định dạng ngày giờ thành chuỗi (nếu cần thiết)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         // Chuyển đổi danh sách WishlistEntity sang WishlistCourseRespone
         return wishlists.stream().map(wishlist -> {
             CourseEntity course = wishlist.getCourse();
+
+            // Gọi hàm tính rating trung bình cho khóa học dựa trên courseId
+            Double rating = ratingDao.calRatingByCourseId(course.getId());
+
+            // Trả về đối tượng TestWishlistRespone với dữ liệu của khóa học và điểm rating
             return new WishlistCourseRespone(
-                    course.getId(),                         // courseId
-                    course.getTitle(),                      // title
-                    course.getCreatedBy(),         // createBy (email của người tạo khóa học)
-                    course.getDescription(),                // description
-                    course.getCreatedAt().format(formatter), // createAt
-                    course.getPrice()                       // price
+                    course.getId(),                             // courseId
+                    course.getTitle(),                          // title
+                    course.getCreatedBy(),                      // createBy (email của người tạo khóa học)
+                    course.getDescription(),                    // description
+                    course.getCreatedAt().format(formatter),    // createdAt
+                    course.getPrice(),                          // price
+                    rating,                                      // rating tính từ calRatingByCourseId
+                    course.getThumbnail()
             );
         }).collect(Collectors.toList());
     }
 
+
 }
+
+
+
