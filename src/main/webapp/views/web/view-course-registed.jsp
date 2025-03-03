@@ -250,7 +250,7 @@
           htmls += "<div class='properties pb-20'>";
           htmls += "  <div class='properties__card' data-id='" + course.id + "'>";
           htmls += "    <div class='properties__img overlay1'>";
-          htmls += "      <a class='' href='#'><img src='" + course.thumbnail + "' alt=''></a>";
+          htmls += "      <a class='' href='/menu-section/' + course.id><img src='" + course.thumbnail + "' alt=''></a>";
           htmls += "    </div>";
           htmls += "    <div class='properties__caption'>";
           htmls += "      <p>Khóa học hữu ích</p>";
@@ -272,7 +272,7 @@
           htmls += "          <span>"+ course.price +"VNĐ</span>";
           htmls += "        </div>";
           htmls += "      </div>";
-          htmls += "      <a href='#' class='border-btn'>Vào học </a>";
+          htmls += "      <a class='border-btn' href='/menu-section/" + course.id + "'>Vào học </a>";
           htmls += "</div>";
           htmls += "</div>";
           htmls += "    </div>";
