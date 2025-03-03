@@ -2,6 +2,7 @@ package com.course.service;
 
 import com.course.dto.request.*;
 import com.course.dto.response.CourseListRespone;
+import com.course.dto.response.CourseRegistedRespone;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.PageResponse;
 import com.course.entity.CourseEntity;
@@ -32,6 +33,9 @@ public interface CourseService {
 
     CourseListRespone convertToCourseListRespone(CourseEntity courseEntity);
 
+    List<CourseRegistedRespone> getRegisteredCourse();
+
+    CourseRegistedRespone convertToCourseRegistedResponse(CourseEntity courseEntity);
 
 
 }

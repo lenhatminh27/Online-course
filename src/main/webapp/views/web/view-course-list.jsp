@@ -322,7 +322,7 @@
                                         <li class="breadcrumb-item"><a href="home">Trang chủ</a></li>
                                         <li class="breadcrumb-item"><a href="wishlist">Danh sách khóa học yêu thích</a>
                                         </li>
-                                        <li class="breadcrumb-item"><a href="#">Đang học</a></li>
+                                        <li class="breadcrumb-item"><a href="courses-registed">Đang học</a></li>
                                     </ol>
                                 </nav>
                             </div>

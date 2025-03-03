@@ -21,8 +21,10 @@ import com.course.service.async.EmailService;
 import com.course.service.async.FileSerivce;
 import lombok.RequiredArgsConstructor;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,8 @@ public class CourseServiceImpl implements CourseService {
     private final RatingDao ratingDAO;
 
     private final WishlistDAO wishlistDAO;
+
+    private final EnrollmentDAO enrollmentDAO;
 
     @Override
     public PageResponse<CourseResponse> getAllListCourseByUserCurrent(CourseInstructorFilterRequest filterRequest) {
@@ -292,5 +296,42 @@ public class CourseServiceImpl implements CourseService {
         return respone;
     }
 
+    @Override
+    @Transactional
+    public List<CourseRegistedRespone> getRegisteredCourse() {
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        AccountEntity account = accountDAO.findByEmail(email);
 
+        List<CourseEntity> courses = enrollmentDAO.getEnrollmentCourseByAccountId(account.getId());
+
+//        if (courses.isEmpty()) {
+//            throw new ForbiddenException("Bạn chưa đăng ký khóa học nào.");
+//        }
+
+        return courses.stream()
+                .map(this::convertToCourseRegistedResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public CourseRegistedRespone convertToCourseRegistedResponse(CourseEntity courseEntity) {
+        AccountEntity author = courseEntity.getAccountCreated();
+        AccountResponse accountResponse = new AccountResponse(author.getEmail(), author.getAvatar());
+        Double rating = ratingDAO.calRatingByCourseId(courseEntity.getId());
+        List<CategoryResponse> categories = courseEntity.getCategories().stream().map(this::convertToCategoryResponse).toList();
+        return CourseRegistedRespone.builder()
+                .id(courseEntity.getId())
+                .title(courseEntity.getTitle())
+                .description(courseEntity.getDescription())
+                .createdAt(courseEntity.getCreatedAt())
+                .updatedAt(courseEntity.getUpdatedAt())
+                .status(courseEntity.getStatus())
+                .price(courseEntity.getPrice())
+                .thumbnail(courseEntity.getThumbnail())
+                .categories(categories)
+                .accountResponse(accountResponse)
+                .rating(rating)
+                .build();
+    }
 }

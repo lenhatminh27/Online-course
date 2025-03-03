@@ -7,7 +7,9 @@ import com.course.entity.CourseEntity;
 import com.course.entity.EnrollmentEntity;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,4 +29,30 @@ public class EnrollmentDAOImpl implements EnrollmentDAO {
             return false;
         }
     }
+
+
+    @Override
+    @Transactional
+    public List<CourseEntity> getEnrollmentCourseByAccountId(Long accountId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+
+            // Truy vấn danh sách khóa học đã đăng ký của tài khoản
+            List<CourseEntity> courses = session.createQuery(
+                            "SELECT DISTINCT c FROM EnrollmentEntity e " +
+                                    "JOIN e.course c " +
+                                    "LEFT JOIN FETCH c.accountCreated " +
+                                    "LEFT JOIN FETCH c.categories " +
+                                    "WHERE e.account.id = :accountId", CourseEntity.class)
+                    .setParameter("accountId", accountId)
+                    .getResultList();
+
+            return courses;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+
+
 }
