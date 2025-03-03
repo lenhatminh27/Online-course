@@ -509,8 +509,7 @@
                                     <p class="p-2">
                                         <span x-text="lessonIndex + 1"></span>. <span x-text="lesson.title"></span>
                                     </p>
-                                    <div class="mr-4 mt-3"><i class="fa-solid fa-circle-check"
-                                                              style="color: #63E6BE;"></i></div>
+                                    <div class="mr-4 mt-3"><i class="fa-regular fa-circle-check"></i></div>
                                 </div>
                             </template>
                         </div>
