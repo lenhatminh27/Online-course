@@ -33,9 +33,9 @@ public interface CourseService {
 
     CourseListRespone convertToCourseListRespone(CourseEntity courseEntity);
 
+    boolean checkCourseCanEdit(Long courseId);
+
     List<CourseRegistedRespone> getRegisteredCourse();
 
     CourseRegistedRespone convertToCourseRegistedResponse(CourseEntity courseEntity);
-
-
 }

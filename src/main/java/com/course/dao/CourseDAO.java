@@ -30,6 +30,4 @@ public interface CourseDAO {
 
     PageResponse<CourseEntity> getAllCourses(CourseFilterRequest filterRequest);
 
-
-
 }

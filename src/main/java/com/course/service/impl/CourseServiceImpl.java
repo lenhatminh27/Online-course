@@ -3,10 +3,12 @@ package com.course.service.impl;
 import com.course.common.utils.ObjectUtils;
 import com.course.core.bean.annotations.Service;
 import com.course.dao.*;
-import com.course.dao.impl.SectionDAOImpl;
 import com.course.dto.request.*;
 import com.course.dto.response.*;
-import com.course.entity.*;
+import com.course.entity.AccountEntity;
+import com.course.entity.CategoriesEntity;
+import com.course.entity.CourseEntity;
+import com.course.entity.WishlistEntity;
 import com.course.entity.enums.CourseStatus;
 import com.course.exceptions.AuthenticationException;
 import com.course.exceptions.ForbiddenException;
@@ -14,7 +16,6 @@ import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
 import com.course.security.context.AuthenticationContext;
 import com.course.security.context.AuthenticationContextHolder;
-import com.course.service.AccountService;
 import com.course.service.CourseService;
 import com.course.service.SectionService;
 import com.course.service.async.EmailService;
@@ -241,10 +242,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseListRespone convertToCourseListRespone(CourseEntity courseEntity) {
-
         AccountEntity author = courseEntity.getAccountCreated();
         AccountResponse accountResponse = new AccountResponse(author.getEmail(), author.getAvatar());
-
         // Lấy danh sách danh mục của khóa học
         List<CategoryResponse> categories = courseEntity.getCategories().stream()
                 .map(this::convertToCategoryResponse)
@@ -297,17 +296,23 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public boolean checkCourseCanEdit(Long courseId) {
+        CourseEntity course = courseDAO.findById(courseId);
+        if (ObjectUtils.isEmpty(course)) {
+            throw new NotFoundException("Không tìm thấy khóa học với ID: " + courseId);
+        }
+        if (course.getStatus() == CourseStatus.PUBLIC || course.getStatus() == CourseStatus.IN_REVIEW) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     @Transactional
     public List<CourseRegistedRespone> getRegisteredCourse() {
         String email = AuthenticationContextHolder.getContext().getEmail();
         AccountEntity account = accountDAO.findByEmail(email);
-
         List<CourseEntity> courses = enrollmentDAO.getEnrollmentCourseByAccountId(account.getId());
-
-//        if (courses.isEmpty()) {
-//            throw new ForbiddenException("Bạn chưa đăng ký khóa học nào.");
-//        }
-
         return courses.stream()
                 .map(this::convertToCourseRegistedResponse)
                 .collect(Collectors.toList());

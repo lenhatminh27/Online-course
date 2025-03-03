@@ -16,7 +16,7 @@
                 let newUrl = window.location.origin + urlParts.join('/');
                 window.location.href = newUrl;
             } else {
-                console.error(`Không tìm thấy segment: ${oldSegment}`);
+                console.error(`Không tìm thấy segment:`);
             }
         }
 
@@ -100,6 +100,24 @@
             background-color: #a71d2a;
         }
 
+        .course-status {
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .status-badge {
+            background: #ff9800;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
 
     </style>
     <script type="module">
@@ -179,6 +197,8 @@
                 editedTarget: "",// Lưu mục tiêu học tập khi chỉnh sửa
                 editingLesson: null, // ID của section đang chỉnh sửa
                 editedLessonTitle: "",// Lưu tiêu đề bài học khi chỉnh sửa
+                course: null,
+                canEdit: true,
 
 
                 toggleLessonForm(sectionId) {
@@ -273,26 +293,29 @@
                                     editorInstance.setData(lesson.article); // Đặt nội dung từ API vào CKEditor
                                     editorElement.dataset.ckeditorInitialized = "true"; // Đánh dấu đã khởi tạo
 
-                                    // Thêm nút "Lưu thay đổi"
-                                    let saveButton = document.createElement("button");
-                                    saveButton.textContent = "Lưu thay đổi";
-                                    saveButton.classList.add("save-btn");
-                                    saveButton.style.marginTop = "10px";
-                                    saveButton.onclick = () => this.saveLessonContent(lesson.id, editorInstance);
+                                    if(this.canEdit){
+                                        // Thêm nút "Lưu thay đổi"
+                                        let saveButton = document.createElement("button");
+                                        saveButton.textContent = "Lưu thay đổi";
+                                        saveButton.classList.add("save-btn");
+                                        saveButton.style.marginTop = "10px";
+                                        saveButton.onclick = () => this.saveLessonContent(lesson.id, editorInstance);
 
-                                    // Thêm nút "Xóa bài viết"
-                                    let deleteButton = document.createElement("button");
-                                    deleteButton.textContent = "Xóa bài viết";
-                                    deleteButton.classList.add("delete-btn");
-                                    deleteButton.style.marginLeft = "10px";
-                                    deleteButton.onclick = () => this.deleteLessonContent(lesson.id);
+                                        // Thêm nút "Xóa bài viết"
+                                        let deleteButton = document.createElement("button");
+                                        deleteButton.textContent = "Xóa bài viết";
+                                        deleteButton.classList.add("delete-btn");
+                                        deleteButton.style.marginLeft = "10px";
+                                        deleteButton.onclick = () => this.deleteLessonContent(lesson.id);
 
-                                    // Thêm nút vào DOM
-                                    let buttonContainer = document.createElement("div");
-                                    buttonContainer.style.marginTop = "10px";
-                                    buttonContainer.appendChild(saveButton);
-                                    buttonContainer.appendChild(deleteButton);
-                                    editorElement.parentElement.appendChild(buttonContainer);
+                                        // Thêm nút vào DOM
+                                        let buttonContainer = document.createElement("div");
+                                        buttonContainer.style.marginTop = "10px";
+                                        buttonContainer.appendChild(saveButton);
+                                        buttonContainer.appendChild(deleteButton);
+                                        editorElement.parentElement.appendChild(buttonContainer);
+                                    }
+
                                 }
                             }
                         });
@@ -726,6 +749,32 @@
                             Swal.fire("Xóa thành công!", "", "success");
                         }
                     });
+                },
+
+                async loadCourse() {
+                    if (!courseId) {
+                        console.error("Không có courseId, không thể gọi API!");
+                        return;
+                    }
+                    try {
+                        const response = await apiRequestWithToken(environment.apiUrl + '/api/course/detail/' + courseId);
+                        this.course = await response;
+                        console.log(response)
+                        console.log(this.isCreator)
+                        console.log("This course: " + this.course);
+                    } catch (error) {
+                        console.error("Lỗi khi gọi API:", error);
+                        window.location.assign('/404');
+                    }
+                },
+
+                async checkEdit(){
+                    const response = await apiRequestWithToken(environment.apiUrl + "/api/course/detail/" + courseId, {
+                        method: "POST",
+                    });
+                    if(response){
+                        this.canEdit = response.canEdit;
+                    }
                 }
 
 
@@ -733,6 +782,8 @@
             ;
 
             Alpine.store('curriculum').loadSections();
+            Alpine.store('curriculum').loadCourse();
+            Alpine.store('curriculum').checkEdit();
 
         });
     </script>
@@ -859,7 +910,7 @@
 </nav>
 
 <div class="container d-flex mt-4">
-    <div class="sidebar">
+    <div class="sidebar" x-data>
         <h5 class="mb-3">Lên kế hoạch cho khóa học của bạn</h5>
         <div class="form-check">
             <input class="form-check-input" type="checkbox" onclick="redirectToPage('target.html')">
@@ -895,7 +946,14 @@
             <label class="form-check-label">Khuyến mại</label>
         </div>
 
-        <button class="btn btn-primary w-100 mt-3" onclick="redirectToPage('review.html')">Gửi đi để xem xét</button>
+        <div class="course-status mt-4">
+            Trạng thái khóa học: <span class="status-badge" x-text="$store.curriculum.course.status"></span>
+        </div>
+
+        <!-- Ẩn nút "Gửi đi để xem xét" nếu trạng thái là PUBLIC -->
+        <button class="btn btn-primary w-100 mt-3"
+                x-show="$store.curriculum.course.status && $store.curriculum.course.status !== 'PUBLIC'"
+                onclick="redirectToPage('review.html')">Gửi đi để xem xét</button>
     </div>
     <div class="content ms-4" x-data>
         <h2>Chương trình giảng dạy</h2>
@@ -913,7 +971,7 @@
                     >
                         <span x-text="section.title"></span>
                         <button class="btn-icon"
-                                x-show="$store.curriculum.hoveredSection === section.id"
+                                x-show="$store.curriculum.hoveredSection === section.id && $store.curriculum.canEdit"
                                 @click="
                 $store.curriculum.editingSection = section.id;
                 $store.curriculum.editedTitle = section.title;
@@ -923,7 +981,7 @@
                         </button>
 
                         <button class="btn-icon"
-                                x-show="$store.curriculum.hoveredSection === section.id"
+                                x-show="$store.curriculum.hoveredSection === section.id && $store.curriculum.canEdit"
                                 @click="
                             $store.curriculum.deleteSection(section.id)
                         ">
@@ -986,7 +1044,7 @@
                                     </template>
                                     <span x-text="lesson.title"></span>
                                     <button class="btn-icon"
-                                            x-show="$store.curriculum.hoveredLesson === lesson.id"
+                                            x-show="$store.curriculum.hoveredLesson === lesson.id && $store.curriculum.canEdit"
                                             @click="
                             $store.curriculum.editingLesson = lesson.id;
                             $store.curriculum.editedLessonTitle = lesson.title;
@@ -996,7 +1054,7 @@
                                     </button>
 
                                     <button class="btn-icon"
-                                            x-show="$store.curriculum.hoveredLesson === lesson.id"
+                                            x-show="$store.curriculum.hoveredLesson === lesson.id && $store.curriculum.canEdit"
                                             @click="
                             $store.curriculum.deleteLesson(lesson.id)
                         ">
@@ -1030,6 +1088,7 @@
                                 <!-- Nếu bài học chưa có video & bài viết -> Hiển thị "Chọn nội dung" -->
                                 <template x-if="!lesson.videoUrl && !lesson.article">
                                     <button class="btn btn-sm btn-outline-primary"
+                                            x-show="$store.curriculum.canEdit"
                                             @click="$store.curriculum.selectedLessonId = ($store.curriculum.selectedLessonId === lesson.id ? null : lesson.id)">
                                         Chọn nội dung
                                     </button>
@@ -1059,6 +1118,7 @@
                                         </video>
                                         <!-- Nút Xóa Video -->
                                         <button
+                                                x-show="$store.curriculum.canEdit"
                                                 class="delete-video-btn mt-2"
                                                 @click="$store.curriculum.deleteVideo(lesson.id)"
                                         >
@@ -1145,6 +1205,7 @@
 
                 <!-- Nút Thêm bài học -->
                 <button class="btn btn-sm btn-outline-primary mt-2"
+                        x-show="$store.curriculum.canEdit"
                         style="width: 120px; font-size: 12px; padding: 5px 8px;"
                         @click="$store.curriculum.toggleLessonForm(section.id)">
                     + Thêm bài học
@@ -1175,10 +1236,12 @@
         </template>
 
         <!-- Nút thêm phần mới -->
-        <button class="btn btn-outline-primary mt-3"
+        <button x-show="$store.curriculum.canEdit"
+                class="btn btn-outline-primary mt-3"
                 @click="$store.curriculum.showFormSection = !$store.curriculum.showFormSection">
             + Thêm phần mới
         </button>
+
         <!-- Form thêm phần mới -->
         <div x-show="$store.curriculum.showFormSection" class="mt-3 border p-3 rounded"
              @click.outside="$store.curriculum.showFormSection = false" @click.stop>

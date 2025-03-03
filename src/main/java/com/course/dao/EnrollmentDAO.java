@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface EnrollmentDAO {
     boolean getEnrollmentByAccountIdAndCourseId(Long accountId, Long courseId);
+    Long countByCourseId(Long courseId);
     List<CourseEntity> getEnrollmentCourseByAccountId(Long accountId);
 }

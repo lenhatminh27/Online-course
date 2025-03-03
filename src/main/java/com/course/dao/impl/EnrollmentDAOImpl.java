@@ -7,7 +7,6 @@ import com.course.entity.CourseEntity;
 import com.course.entity.EnrollmentEntity;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
@@ -30,6 +29,17 @@ public class EnrollmentDAOImpl implements EnrollmentDAO {
         }
     }
 
+    @Override
+    public Long countByCourseId(Long courseId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            return session.createQuery("SELECT COUNT(e) FROM EnrollmentEntity e WHERE e.course.id = :courseId", Long.class)
+                    .setParameter("courseId", courseId)
+                    .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
 
     @Override
     @Transactional
@@ -52,7 +62,4 @@ public class EnrollmentDAOImpl implements EnrollmentDAO {
             return Collections.emptyList();
         }
     }
-
-
-
 }
