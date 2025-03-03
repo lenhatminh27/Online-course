@@ -24,15 +24,14 @@ public class CategoryDAOImpl implements CategoryDAO {
     @Override
     public boolean isCategoryInUse(Long categoryId) {
         try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            String hql = "SELECT COUNT(*) FROM course_categories WHERE categories_id = :categoryId";
-            Long count = (Long) session.createNativeQuery(hql)
-                    .setParameter("categoryId", categoryId)
-                    .uniqueResult();
-            return count != null && count > 0;
+            String sql = "SELECT COUNT(*) FROM course_categories WHERE categories_id = " + categoryId;
+            Object result = session.createNativeQuery(sql).uniqueResult();
+            return result != null && ((Number) result).longValue() > 0;
         } catch (Exception e) {
             return false;
         }
     }
+
 
     @Override
     public PageResponse<CategoriesEntity> getCategoriesByPage(CategoryFilterRequest categoryFilter) {

@@ -9,6 +9,7 @@ import com.course.dto.request.*;
 import com.course.dto.response.CategoryResponse;
 import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
+import com.course.exceptions.BadRequestException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -195,7 +196,11 @@ public class CategoryApi extends BaseServlet {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson("CategoryId không hợp lệ"));
         } catch (NotFoundException e) {
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NOT_FOUND, gson.toJson("Category không tồn tại"));
-        } catch (Exception e) {
+        }
+        catch (BadRequestException e) {
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(e.getError()));
+        }
+        catch (Exception e) {
             e.printStackTrace();
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
         }
