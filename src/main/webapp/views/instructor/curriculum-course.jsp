@@ -775,8 +775,18 @@
                     if(response){
                         this.canEdit = response.canEdit;
                     }
-                }
+                },
 
+
+                async sendAdminReview(){
+                    const response = await apiRequestWithToken(environment.apiUrl + "/api/course/detail/" + courseId, {
+                        method: "POST",
+                    });
+                    if(response){
+                       await this.loadCourse();
+                       await this.checkEdit();
+                    }
+                }
 
             })
             ;
