@@ -3,13 +3,17 @@ package com.course.service.impl;
 import com.course.core.bean.annotations.Service;
 import com.course.dao.AccountDAO;
 import com.course.dao.CategoryDAO;
+import com.course.dao.SearchHistoryDAO;
 import com.course.dto.request.CategoryCreateRequest;
+import com.course.dto.request.CategoryFilterRequest;
 import com.course.dto.request.UpdateCategoryRequest;
 import com.course.dto.response.BookmarksBlogResponse;
 import com.course.dto.response.CategoryResponse;
+import com.course.dto.response.PageResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.BlogEntity;
 import com.course.entity.CategoriesEntity;
+import com.course.entity.SearchHistoryEntity;
 import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CategoryService;
@@ -27,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryDAO categoryDAO;
     private final AccountDAO accountDAO;
+    private final SearchHistoryDAO searchHistoryDAO;
 
     @Override
     public List<CategoryResponse> getAllCategoriesParent() {
@@ -44,7 +49,38 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryResponse;
     }
 
+    private AccountEntity getAuthenticatedAccount() {
+        if (AuthenticationContextHolder.getContext() == null) {
+            return null;
+        }
+        String email = AuthenticationContextHolder.getContext().getEmail();
+        return accountDAO.findByEmail(email);
+    }
 
+    @Override
+    public PageResponse<CategoryResponse> getCategories(CategoryFilterRequest filterRequest) {
+        AccountEntity account = getAuthenticatedAccount();
+
+        // Lưu lại lịch sử tìm kiếm nếu có search và người dùng đã xác thực
+        if (!ObjectUtils.isEmpty(account) && !ObjectUtils.isEmpty(filterRequest.getSearch())) {
+            SearchHistoryEntity searchHistory = new SearchHistoryEntity();
+            searchHistory.setAccount(account);
+            searchHistory.setContent(filterRequest.getSearch());
+            searchHistory.setCreatedAt(LocalDateTime.now());
+            searchHistoryDAO.save(searchHistory);
+        }
+
+        // Gọi DAO để lấy danh sách category theo bộ lọc
+        PageResponse<CategoriesEntity> pageResponse = categoryDAO.getCategoriesByPage(filterRequest);
+
+        // Convert từ entity sang response
+        List<CategoryResponse> categories = pageResponse.getData().stream()
+                .map(this::convertToResponse)
+                .toList();
+
+        // Trả về PageResponse với danh sách category đã convert
+        return new PageResponse<>(pageResponse.getPage(), pageResponse.getTotalPages(), categories);
+    }
 
 
     @Override
@@ -101,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
             categoryDAO.deleteCategory(category);
         }
         else {
-            throw new NotFoundException("Category không tồn tại");
+            throw new NotFoundException("Thể loại không tồn tại");
         }
     }
 

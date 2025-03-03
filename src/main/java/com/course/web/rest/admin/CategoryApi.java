@@ -1,13 +1,14 @@
-package com.course.web.rest.web;
+package com.course.web.rest.admin;
 
+import com.course.common.constants.PageConstant;
 import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
+import com.course.core.repository.data.Sort;
 import com.course.dao.CategoryDAO;
-import com.course.dto.request.BookmarksBlogRequest;
-import com.course.dto.request.CategoryCreateRequest;
-import com.course.dto.request.UpdateCategoryRequest;
+import com.course.dto.request.*;
 import com.course.dto.response.CategoryResponse;
 import com.course.dto.response.ErrorResponse;
+import com.course.dto.response.PageResponse;
 import com.course.exceptions.NotFoundException;
 import com.course.security.annotations.HasPermission;
 import com.course.security.annotations.IsAuthenticated;
@@ -35,6 +36,9 @@ public class CategoryApi extends BaseServlet {
     private CategoryService categoryService;
     private CategoryDAO categoryDAO;
 
+    private static final String CATEGORY_NAME_REGEX = "^[a-zA-ZÀ-ỹ0-9_\\-\\s]+$";
+
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         gson = getBean(Gson.class.getSimpleName());
@@ -51,16 +55,36 @@ public class CategoryApi extends BaseServlet {
             handleGetAllNoParent(resp);
             return;
         } else {
+            String pageStr = req.getParameter("page");
+            String search = req.getParameter("search");
+            int page;
             try {
-                List<CategoryResponse> categoryResponses = categoryService.getAllCategories();
-                if (categoryResponses.isEmpty()) {
-                    ResponseUtils.writeResponse(resp, HttpServletResponse.SC_NO_CONTENT, gson.toJson("Không có category nào tồn tại"));
-                    return;
+                page = (pageStr != null) ? Integer.parseInt(pageStr) : PageConstant.PAGE_CURRENT;
+            } catch (NumberFormatException e) {
+                page = PageConstant.PAGE_CURRENT;
+            }
+            String sort = req.getParameter("sort");
+            List<Sort.Order> orders = new ArrayList<>();
+            if (!ObjectUtils.isEmpty(sort)) {
+                if (sort.equalsIgnoreCase("newest")) {
+                    orders.add(new Sort.Order(Sort.Direction.DESC, "createAt"));
                 }
-                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(categoryResponses));
+                if (sort.equalsIgnoreCase("oldest")) {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, "createAt"));
+                }
+            }
+            Sort sortT = null;
+            if (!ObjectUtils.isEmpty(orders)) {
+                sortT = Sort.by(orders);
+            }
+            CategoryFilterRequest categoryFilterRequest = new CategoryFilterRequest(sortT, search, page);
+
+            try {
+                PageResponse<CategoryResponse> categoryResponse = categoryService.getCategories(categoryFilterRequest);
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(categoryResponse));
             } catch (Exception e) {
                 e.printStackTrace();
-                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, gson.toJson("Server Error"));
+                ResponseUtils.writeResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server Error");
             }
         }
     }
@@ -75,7 +99,6 @@ public class CategoryApi extends BaseServlet {
         }
     }
 
-    private static final String CATEGORY_NAME_REGEX = "^[a-zA-ZÀ-ỹ0-9_\\-\\s]+$";
     @Override
     @IsAuthenticated
     @HasPermission("CREATE_CATEGORY")
@@ -85,19 +108,19 @@ public class CategoryApi extends BaseServlet {
         CategoryCreateRequest categoryCreateRequest = gson.fromJson(req.getReader(), CategoryCreateRequest.class);
         List<String> errors = new ArrayList<>();
         if(ObjectUtils.isEmpty(categoryCreateRequest)){
-            errors.add("CategoryCreateRequest không được rỗng");
+            errors.add("CategoryCreateRequest không được rỗng! ");
         }
         if(ObjectUtils.isEmpty(categoryCreateRequest.getName())){
-            errors.add("CategoryName không được rỗng");
+            errors.add("Tên thể loại không được rỗng! ");
         }
         if (categoryCreateRequest.getName().length() > 100 || categoryCreateRequest.getName().length() < 3) {
-            errors.add("Tên thể loại phải từ 3-100 kí tự");
+            errors.add("Tên thể loại phải từ 3-100 kí tự! ");
         }
         if (categoryService.isExistCategory(categoryCreateRequest)) {
-            errors.add("Thể loại này đã tồn tại");
+            errors.add("Thể loại này đã tồn tại! ");
         }
         if (!Pattern.matches(CATEGORY_NAME_REGEX, categoryCreateRequest.getName())) {
-            errors.add("Tên thể loại chỉ được chứa chữ cái, số, khoảng trắng, dấu gạch ngang (-) hoặc gạch dưới (_)");
+            errors.add("Tên thể loại chỉ được chứa chữ cái, số, khoảng trắng, dấu gạch ngang (-) hoặc gạch dưới (_)! ");
         }
         if (!ObjectUtils.isEmpty(errors)) {
             ErrorResponse errorResponse = new ErrorResponse();
@@ -123,19 +146,19 @@ public class CategoryApi extends BaseServlet {
             UpdateCategoryRequest updateCategoryRequest = gson.fromJson(req.getReader(), UpdateCategoryRequest.class);
             List<String> errors = new ArrayList<>();
             if(ObjectUtils.isEmpty(updateCategoryRequest)){
-                errors.add("UpdateCategoryRequest không được rỗng");
+                errors.add("UpdateCategoryRequest không được rỗng! ");
             }
-            if(ObjectUtils.isEmpty(updateCategoryRequest.getName())){
-                errors.add("CategoryName không được rỗng");
+            if(ObjectUtils.isEmpty(updateCategoryRequest.getName().trim())){
+                errors.add("CategoryName không được rỗng! ");
             }
             if (updateCategoryRequest.getName().length() > 100 || updateCategoryRequest.getName().length() < 3) {
-                errors.add("Tên thể loại phải từ 3-100 kí tự");
+                errors.add("Tên thể loại phải từ 3-100 kí tự! ");
             }
             if (categoryService.isDuplicateCategory(updateCategoryRequest)) {
-                errors.add("Thể loại này đã tồn tại");
+                errors.add("Thể loại này đã tồn tại! ");
             }
             if (!Pattern.matches(CATEGORY_NAME_REGEX, updateCategoryRequest.getName())) {
-                errors.add("Tên thể loại chỉ được chứa chữ cái, số, khoảng trắng, dấu gạch ngang (-) hoặc gạch dưới (_)");
+                errors.add("Tên thể loại chỉ được chứa chữ cái, số, khoảng trắng, dấu gạch ngang (-) hoặc gạch dưới (_)! ");
             }
             if (errors.size() > 0) {
                 ErrorResponse errorResponse = new ErrorResponse();
