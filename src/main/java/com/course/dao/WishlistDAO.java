@@ -1,5 +1,6 @@
 package com.course.dao;
 
+import com.course.dto.response.TestWishlistRespone;
 import com.course.entity.AccountEntity;
 import com.course.entity.WishlistEntity;
 
@@ -14,7 +15,8 @@ public interface WishlistDAO {
 
     boolean checkCourseExistInWishlist(Long courseId, Long accountId);
 
-    WishlistEntity findWishlistById(Long id);
+    WishlistEntity findWishlistByCourseIdAndAccountId(Long courseId, Long accountId);
 
     List<WishlistEntity> getByUserId(Long id);
+
 }

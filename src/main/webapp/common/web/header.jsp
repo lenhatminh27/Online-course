@@ -34,7 +34,7 @@
                                     <nav>
                                         <ul id="navigation">
                                             <li class="active"><a href="/home">Trang chủ</a></li>
-                                            <li><a href="courses.html">Khóa học</a></li>
+                                            <li><a href="courses">Khóa học</a></li>
                                             <li><a href="/blogs">Bài viết</a></li>
                                             <li id="redInstructor"><a href="/instructor">Giảng viên</a></li>
                                             <li><a href="/wallet">Nạp tiền</a></li>

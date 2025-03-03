@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.course.common.utils.PasswordUtils.hashPassword;
 
@@ -45,7 +46,6 @@ public class AccountServiceImpl implements AccountService {
     private final EmailService emailService;
 
     private final WalletDAO walletDAO;
-
 
 
     @Override
@@ -66,6 +66,14 @@ public class AccountServiceImpl implements AccountService {
         if (accountDAO.existsByEmail(registerRequest.getEmail())) {
             List<String> error = new ArrayList<>();
             error.add("Email đã tồn tại!");
+            ErrorResponse errorResponse = new ErrorResponse(error);
+            ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
+            return;
+        }
+
+        if (!validatePassword(registerRequest.getPassword())) {
+            List<String> error = new ArrayList<>();
+            error.add("mật khẩu phải có ít nhất 8 ký tự có cả số cả chữ, ít nhất 1 ký tự hoa, 1 ký tự thờng");
             ErrorResponse errorResponse = new ErrorResponse(error);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_BAD_REQUEST, gson.toJson(errorResponse));
             return;
@@ -169,5 +177,16 @@ public class AccountServiceImpl implements AccountService {
                 + "<p style=\"color: red; font-weight: bold;\">Lưu ý: Đường link này sẽ hết hạn sau 5 phút. Vui lòng thực hiện thay đổi mật khẩu trong thời gian này.</p>"
                 + "</body></html>";
         emailService.sendEmail(forgotPasswordRequest.getEmail(), subject, message);
+    }
+
+    @Override
+    public boolean validatePassword(String password) {
+        if (password.length() >= 8 &&
+                Pattern.compile("[a-z]").matcher(password).find() &&  // Chứa ít nhất một chữ cái thường
+                Pattern.compile("[A-Z]").matcher(password).find() &&  // Chứa ít nhất một chữ cái hoa
+                Pattern.compile("[0-9]").matcher(password).find()) {  // Chứa ít nhất một chữ số
+            return true;
+        }
+        return false;
     }
 }

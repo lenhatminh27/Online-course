@@ -5,6 +5,7 @@ import com.course.common.utils.ObjectUtils;
 import com.course.common.utils.ResponseUtils;
 import com.course.core.repository.data.Sort;
 import com.course.dto.request.CourseFilterRequest;
+import com.course.dto.response.CourseListRespone;
 import com.course.dto.response.CourseResponse;
 import com.course.dto.response.PageResponse;
 import com.course.security.annotations.handle.BaseServlet;
@@ -42,14 +43,12 @@ public class CourseListApi extends BaseServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         try {
-            int page;
-            int size;
-
             String pageRaw = req.getParameter("page");
-            String sizeRaw = req.getParameter("pageSize");
+            String sizeRaw = req.getParameter("size");
             String search = req.getParameter("search");
             String sort = req.getParameter("sort");
-            String category = req.getParameter("category");
+            int page;
+            int size;
 
             try {
                 page = !ObjectUtils.isEmpty(pageRaw) ? Integer.parseInt(pageRaw) : PageConstant.PAGE_CURRENT;
@@ -85,8 +84,8 @@ public class CourseListApi extends BaseServlet {
                 sortType = Sort.by(orders);
             }
 
-            CourseFilterRequest filterRequest = new CourseFilterRequest(sortType, search,page, size);
-            PageResponse<CourseResponse> response = courseService.getAllCoursePublic(filterRequest);
+            CourseFilterRequest filterRequest = new CourseFilterRequest(sortType, search, page, size);
+            PageResponse<CourseListRespone> response = courseService.getAllCoursePublic(filterRequest);
             ResponseUtils.writeResponse(resp, HttpServletResponse.SC_OK, gson.toJson(response));
 
         } catch (Exception e) {

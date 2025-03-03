@@ -298,15 +298,13 @@ public class CourseDAOImpl implements CourseDAO {
             long totalElements = countQuery.uniqueResult();
             int totalPages = (int) Math.ceil((double) totalElements / filterRequest.getSize());
 
+
             // Trả về kết quả dưới dạng PageResponse
             return new PageResponse<>(filterRequest.getPage(), totalPages, courses);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch public courses by page", e);
         }
     }
-
-
-
 
 
 }

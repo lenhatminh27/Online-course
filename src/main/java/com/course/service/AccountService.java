@@ -21,5 +21,7 @@ public interface AccountService {
 
     void sendResetPasswordEmail(ForgotPasswordRequest forgotPasswordRequest);
 
+    boolean validatePassword(String password);
+
 
 }
