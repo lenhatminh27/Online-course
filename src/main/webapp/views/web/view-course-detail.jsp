@@ -643,7 +643,7 @@
             <div class="col-md-8">
                 <div class="course-title">
                     <h1 x-text="$store.courseDetail.course.title"></h1>
-                    <p class="lead">4.6 sao (10000 xếp hạng) 500 học viên</p>
+<%--                    <p class="lead">4.6 sao (10000 xếp hạng) 500 học viên</p>--%>
                     <p x-text="'Được tạo bởi: ' + $store.courseDetail.course.accountResponse.email" class="lead"></p>
                     <p x-text="'Sửa lần cuối vào: ' + new Intl.DateTimeFormat('vi-VN').format(new Date($store.courseDetail.course.updatedAt))"
                        class="lead"></p>
@@ -1024,13 +1024,13 @@
             <%--                        </ul>--%>
             <%--                    </div>--%>
 
-            <div class="coupon-section">
-                <h5>Áp dụng coupon</h5>
-                <div class="coupon-code">
-                    <input type="text" class="form-control" placeholder="Nhập coupon"/>
-                    <button class="btn btn-info mt-2">Áp dụng</button>
-                </div>
-            </div>
+<%--            <div class="coupon-section">--%>
+<%--                <h5>Áp dụng coupon</h5>--%>
+<%--                <div class="coupon-code">--%>
+<%--                    <input type="text" class="form-control" placeholder="Nhập coupon"/>--%>
+<%--                    <button class="btn btn-info mt-2">Áp dụng</button>--%>
+<%--                </div>--%>
+<%--            </div>--%>
 
         </div>
     </div>

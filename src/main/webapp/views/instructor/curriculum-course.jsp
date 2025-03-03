@@ -779,12 +779,13 @@
 
 
                 async sendAdminReview(){
-                    const response = await apiRequestWithToken(environment.apiUrl + "/api/course/detail/" + courseId, {
-                        method: "POST",
+                    const response = await apiRequestWithToken(environment.apiUrl + "/api/courseToReview/" + courseId, {
+                        method: "PUT",
                     });
                     if(response){
-                       await this.loadCourse();
-                       await this.checkEdit();
+                        await this.loadCourse();
+                        await this.checkEdit();
+                        Swal.fire("Chuyển trạng thái thành công!", "", "success");
                     }
                 }
 
@@ -962,8 +963,11 @@
 
         <!-- Ẩn nút "Gửi đi để xem xét" nếu trạng thái là PUBLIC -->
         <button class="btn btn-primary w-100 mt-3"
-                x-show="$store.curriculum.course.status && $store.curriculum.course.status !== 'PUBLIC'"
-                onclick="redirectToPage('review.html')">Gửi đi để xem xét</button>
+                x-show="$store.curriculum.course.status && $store.curriculum.course.status !== 'PUBLIC' && $store.curriculum.course.status !== 'IN_REVIEW'"
+                @click="$store.curriculum.sendAdminReview()">
+            Gửi đi để xem xét
+        </button>
+
     </div>
     <div class="content ms-4" x-data>
         <h2>Chương trình giảng dạy</h2>

@@ -39,7 +39,7 @@ public class ToReviewCourseApi extends BaseServlet {
 
     @Override
     @IsAuthenticated
-    @HasPermission("UPdae")
+    @HasPermission("UPDATE_COURSE")
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
