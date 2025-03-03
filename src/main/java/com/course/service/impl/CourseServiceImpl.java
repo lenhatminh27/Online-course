@@ -45,7 +45,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final EmailService emailService;
 
-    private final RatingDao ratingDAO;
+    private final RatingDAO ratingDAO;
 
     private final WishlistDAO wishlistDAO;
 

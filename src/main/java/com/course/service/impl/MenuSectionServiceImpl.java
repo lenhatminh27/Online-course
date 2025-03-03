@@ -5,6 +5,8 @@ import com.course.core.bean.annotations.Service;
 import com.course.dao.*;
 import com.course.dto.response.*;
 import com.course.entity.*;
+import com.course.entity.enums.CourseStatus;
+import com.course.exceptions.BadRequestException;
 import com.course.exceptions.ForbiddenException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.AuthoritiesConstants;
@@ -51,6 +53,20 @@ public class MenuSectionServiceImpl implements MenuSectionService {
         return list.stream().map(this::convertToMenuSectionResponse).toList();
     }
 
+    @Override
+    public List<MenuSectionResponse> getMenuSectionByCourseIdPublic(Long courseId) {
+
+        CourseEntity course = courseDAO.findById(courseId);
+        if (course.getStatus() != CourseStatus.PUBLIC) {
+            throw new NotFoundException("Khóa học không tồn tại hoặc chưa được đăng công khai");
+        }
+        if (ObjectUtils.isEmpty(course)) {
+            throw new NotFoundException("Không tìm thấy course id tương ứng");
+        }
+        List<CourseSectionEntity> list = sectionDAO.findByCourse(course);
+        return list.stream().map(this::convertToMenuSectionResponse).toList();
+    }
+
     private MenuSectionResponse convertToMenuSectionResponse(CourseSectionEntity section) {
         List<CourseLessonEntity> listLesson = lessonDAO.findBySection(section);
         CourseEntity course = section.getCourse();
@@ -72,7 +88,7 @@ public class MenuSectionServiceImpl implements MenuSectionService {
                 .build();
     }
 
-    private MenuLessonResponse convertToMenuLessonResponse(CourseLessonEntity lesson){
+    private MenuLessonResponse convertToMenuLessonResponse(CourseLessonEntity lesson) {
         return MenuLessonResponse.builder()
                 .id(lesson.getId())
                 .sectionId(lesson.getCourseSection().getId())
@@ -82,4 +98,6 @@ public class MenuSectionServiceImpl implements MenuSectionService {
                 .orderIndex(lesson.getOrderIndex())
                 .build();
     }
+
+
 }

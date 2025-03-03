@@ -30,8 +30,8 @@ public class RatingEntity {
     @JoinColumn(name = "account_id")
     private AccountEntity account;
 
-    @Column(name = "rating", nullable = false)
-    private int rating;  // 1 => 5 check
+    @Column(name = "rating")
+    private Integer rating;
 
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
@@ -44,7 +44,4 @@ public class RatingEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_rating_id")
-    private RatingEntity parentRating;
 }
