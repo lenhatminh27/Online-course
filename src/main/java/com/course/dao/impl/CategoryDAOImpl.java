@@ -15,10 +15,24 @@ import org.hibernate.query.Query;
 
 import java.util.*;
 
+import static com.course.common.utils.HibernateUtils.getSession;
 import static com.course.common.utils.StringUtils.deAccent;
 
 @Repository
 public class CategoryDAOImpl implements CategoryDAO {
+
+    @Override
+    public boolean isCategoryInUse(Long categoryId) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(*) FROM course_categories WHERE categories_id = :categoryId";
+            Long count = (Long) session.createNativeQuery(hql)
+                    .setParameter("categoryId", categoryId)
+                    .uniqueResult();
+            return count != null && count > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     @Override
     public PageResponse<CategoriesEntity> getCategoriesByPage(CategoryFilterRequest categoryFilter) {
