@@ -21,8 +21,7 @@ public class PageRequest implements Serializable {
         this.pageSize = pageSize;
     }
 
-    public static PageRequest of(int pageNumber, int pageSize) {
-        return of(pageNumber, pageSize, Sort.unsorted());
+    public static PageRequest of(int pageNumber, int pageSize) {return of(pageNumber, pageSize, Sort.unsorted());
     }
 
     public static PageRequest of(int pageNumber, int pageSize, Sort sort) {
