@@ -29,5 +29,4 @@ public interface CourseDAO {
     List<CourseEntity> getTop3Courses();
 
     PageResponse<CourseEntity> getAllCourses(CourseFilterRequest filterRequest);
-
 }

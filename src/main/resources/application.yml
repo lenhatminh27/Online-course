@@ -8,8 +8,8 @@ security:
 smtp:
   host: smtp.gmail.com
   port: 587
-  username: leminhducqvbn@gmail.com
-  password: igis ykhd bkll fbjk
+  username: manhkspt2004@gmail.com
+  password: cyuc dwtq qoaq pvgi
 mail:
   smtp:
     auth: true

@@ -283,6 +283,9 @@
         .review-card-child .review-card {
             margin-top: 10px;
         }
+        .fa-bitcoin{
+            color: blueviolet;
+        }
 
     </style>
 </head>
@@ -643,7 +646,7 @@
             <div class="col-md-8">
                 <div class="course-title">
                     <h1 x-text="$store.courseDetail.course.title"></h1>
-                    <p class="lead">4.6 sao (10000 xếp hạng) 500 học viên</p>
+<%--                    <p class="lead">4.6 sao (10000 xếp hạng) 500 học viên</p>--%>
                     <p x-text="'Được tạo bởi: ' + $store.courseDetail.course.accountResponse.email" class="lead"></p>
                     <p x-text="'Sửa lần cuối vào: ' + new Intl.DateTimeFormat('vi-VN').format(new Date($store.courseDetail.course.updatedAt))"
                        class="lead"></p>
@@ -997,7 +1000,10 @@
 
                     <div class="price-box">
                         <!-- Hiển thị giá gốc bị gạch chân, nhân giá * 2 -->
-                        <h2 x-text="$store.courseDetail.course.price + 'VND'"></h2>
+                        <div style="display: flex; gap: 10px; align-items: center">
+                            <h2 x-text="$store.courseDetail.course.price" style="padding: 0px; margin: 0px"></h2> <i class='fa-brands fa-bitcoin' style="font-size: 25px"></i>
+                        </div>
+
                         <p class="text-muted">
                             <strike x-text="'₫ ' + ($store.courseDetail.course.price * 2).toLocaleString()"></strike>
                         </p>
@@ -1024,13 +1030,13 @@
             <%--                        </ul>--%>
             <%--                    </div>--%>
 
-            <div class="coupon-section">
-                <h5>Áp dụng coupon</h5>
-                <div class="coupon-code">
-                    <input type="text" class="form-control" placeholder="Nhập coupon"/>
-                    <button class="btn btn-info mt-2">Áp dụng</button>
-                </div>
-            </div>
+<%--            <div class="coupon-section">--%>
+<%--                <h5>Áp dụng coupon</h5>--%>
+<%--                <div class="coupon-code">--%>
+<%--                    <input type="text" class="form-control" placeholder="Nhập coupon"/>--%>
+<%--                    <button class="btn btn-info mt-2">Áp dụng</button>--%>
+<%--                </div>--%>
+<%--            </div>--%>
 
         </div>
     </div>

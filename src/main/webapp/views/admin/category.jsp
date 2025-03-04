@@ -140,13 +140,27 @@
                             }
                         }
                     } catch (error) {
-                        console.error('Lỗi khi xoá thể loại:', error);
-                        let errorMessage = error.response?.data?.message || error.message || 'A network error occurred.';
-                        Swal.fire({
-                            icon: "error",
-                            title: "Xoá thể loại thất bại",
-                            text: errorMessage
-                        });
+                        console.log(error);
+                        if (error.response?.status === 400 && error.data?.error) {
+                            console.error('Validation errors:', error.data.error);
+                            let errorMess = "";
+                            for (const x of error.data.error) {
+                                errorMess += x;
+                            }
+                            Swal.fire({
+                                icon: "error",
+                                title: "Xoá thể loại thất bại",
+                                text: errorMess
+                            });
+                        } else {
+                            let errorMessage = error.message || 'A network error occurred.';
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo thể loại thất bại",
+                                text: errorMessage,
+                            });
+                        }
                     }
                 },
 
@@ -236,17 +250,29 @@
                             });
                         }
                     } catch (error) {
-                        console.error('Lỗi khi cập nhật thể loại:', error);
-                        let errorMessage = error.response?.data?.message || error.message || 'A network error occurred.';
-                        Swal.fire({
-                            icon: "error",
-                            title: "Cập nhật thể loại thất bại",
-                            text: errorMessage
-                        });
+                        console.log(error);
+                        if (error.response?.status === 400 && error.data?.error) {
+                            console.error('Validation errors:', error.data.error);
+                            let errorMess = "";
+                            for (const x of error.data.error) {
+                                errorMess += x;
+                            }
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo phần học thất bại",
+                                text: errorMess,
+                            });
+                        } else {
+                            let errorMessage = error.message || 'A network error occurred.';
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: "error",
+                                title: "Tạo phần học thất bại",
+                                text: errorMessage,
+                            });
+                        }
                     }
                 }
-
-
             });
             Alpine.store('categories').loadCategories();
             Alpine.store('categories').loadCategoriesNoParent();
@@ -395,7 +421,7 @@
             <tr>
                 <th>ID</th>
                 <th>Tên thể loại</th>
-                <th>Thể loại cha</th>
+<%--                <th>Thể loại cha</th>--%>
                 <th>Miêu tả</th>
                 <th>Hành động</th>
             </tr>
@@ -405,7 +431,7 @@
                 <tr>
                     <td x-text="category.id"></td>
                     <td x-text="category.name"></td>
-                    <td x-text="category.parentName || 'Không có'"></td>
+<%--                    <td x-text="category.parentName || 'Không có'"></td>--%>
                     <td x-text="category.description"></td>
                     <td>
                         <button data-bs-toggle="modal" data-bs-target="#updateCategoryModal"
@@ -431,18 +457,15 @@
             </template>
         </div>
 
+        <%@include file="../../common/admin/footer.jsp" %>
     </div>
 
 
-    <!-- Footer Bắt đầu -->
-    <%@include file="../../common/admin/footer.jsp" %>
-    <!-- Footer Kết thúc -->
 </div>
 <!-- Nội dung Kết thúc -->
 
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
-</div>
 </body>
 </html>

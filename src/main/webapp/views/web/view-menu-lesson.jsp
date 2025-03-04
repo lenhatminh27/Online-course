@@ -314,7 +314,7 @@
                 ,
 
                 async sendComment() {
-                    if (this.comment.content.length > 500) {
+                    if (!this.isCreator && this.comment.content.length > 500) {
                         Swal.fire({
                             icon: "error",
                             title: "Gửi bình luận thất bại!",
@@ -347,7 +347,7 @@
                     }
                 },
                 async sendNoParentComment() {
-                    if (this.noParentComment.length > 500) {
+                    if (!this.isCreator && this.noParentComment.length > 500) {
                         Swal.fire({
                             icon: "error",
                             title: "Gửi bình luận thất bại!",
@@ -379,11 +379,11 @@
                     }
                 },
                 async updateComment() {
-                    if (this.inputUpdateComment.content.length > 500) {
+                    if (!this.isCreator && this.inputUpdateComment.content.length > 500) {
                         Swal.fire({
                             icon: "error",
                             title: "Gửi bình luận thất bại!",
-                            text: "Nội dung bình luận không được để trống!"
+                            text: "Nội dung bình luận không được quá 500 ký tự!"
                         });
                         return;
                     }
@@ -646,6 +646,16 @@
                               x-model="$store.menuSection.noParentComment"></textarea>
                     <button class="btn btn-outline-primary" @click="$store.menuSection.sendNoParentComment()">Gửi
                     </button>
+                    <template x-if="$store.menuSection.isCreator === false">
+                        <div>
+                            <template x-if="$store.menuSection.noParentComment.length > 500">
+                                <p style="color: red" x-text="$store.menuSection.noParentComment.length + '/500'"></p>
+                            </template>
+                            <template x-if="$store.menuSection.noParentComment.length <= 500">
+                                <p x-text="$store.menuSection.noParentComment.length + '/500'"></p>
+                            </template>
+                        </div>
+                    </template>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -675,12 +685,14 @@
                                                 <i class="fa-solid fa-ellipsis-vertical ml-5 mt-2 cursor-pointer"
                                                    type="button" data-bs-toggle="dropdown"></i>
                                                 <ul class="dropdown-menu">
-                                                    <template x-if="JSON.parse($store.menuSection.currentUser).email === comment.account?.email">
-                                                    <li @click="$store.menuSection.setUpdateComment(comment.id, comment.content)">
-                                                        <a
-                                                                class="dropdown-item">Sửa bình luận</a></li>
+                                                    <template
+                                                            x-if="JSON.parse($store.menuSection.currentUser).email === comment.account?.email">
+                                                        <li @click="$store.menuSection.setUpdateComment(comment.id, comment.content)">
+                                                            <a
+                                                                    class="dropdown-item">Sửa bình luận</a></li>
                                                     </template>
-                                                    <li @click="$store.menuSection.deleteComment(comment.id)"><a class="dropdown-item" style="color: red">Xoá bình luận</a>
+                                                    <li @click="$store.menuSection.deleteComment(comment.id)"><a
+                                                            class="dropdown-item" style="color: red">Xoá bình luận</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -698,6 +710,16 @@
                                         <button class="btn btn-outline-primary"
                                                 @click="$store.menuSection.updateComment()">Sửa
                                         </button>
+                                        <template x-if="$store.menuSection.isCreator === false">
+                                            <div>
+                                                <template x-if="$store.menuSection.inputUpdateComment.content.length > 500">
+                                                    <p style="color: red" x-text="$store.menuSection.inputUpdateComment.content.length + '/500'"></p>
+                                                </template>
+                                                <template x-if="$store.menuSection.inputUpdateComment.content.length <= 500">
+                                                    <p x-text="$store.menuSection.inputUpdateComment.content.length + '/500'"></p>
+                                                </template>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
                                 <p style="color: #0d6efd"
@@ -711,6 +733,16 @@
                                                 @click="$store.menuSection.sendComment()">
                                             Gửi
                                         </button>
+                                        <template x-if="$store.menuSection.isCreator === false">
+                                            <div>
+                                                <template x-if="$store.menuSection.comment.content.length > 500">
+                                                    <p style="color: red" x-text="$store.menuSection.comment.content.length + '/500'"></p>
+                                                </template>
+                                                <template x-if="$store.menuSection.comment.content.length <= 500">
+                                                    <p x-text="$store.menuSection.comment.content.length + '/500'"></p>
+                                                </template>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
                             </div>
@@ -738,12 +770,15 @@
                                                         <i class="fa-solid fa-ellipsis-vertical ml-5 mt-2 cursor-pointer"
                                                            type="button" data-bs-toggle="dropdown"></i>
                                                         <ul class="dropdown-menu">
-                                                            <template x-if="JSON.parse($store.menuSection.currentUser).email === child.account?.email">
+                                                            <template
+                                                                    x-if="JSON.parse($store.menuSection.currentUser).email === child.account?.email">
                                                                 <li @click="$store.menuSection.setUpdateComment(child.id, child.content)">
                                                                     <a
                                                                             class="dropdown-item">Sửa bình luận</a></li>
                                                             </template>
-                                                            <li @click="$store.menuSection.deleteComment(child.id)"><a class="dropdown-item" style="color: red">Xoá bình luận</a>
+                                                            <li @click="$store.menuSection.deleteComment(child.id)"><a
+                                                                    class="dropdown-item" style="color: red">Xoá bình
+                                                                luận</a>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -761,6 +796,16 @@
                                                 <button class="btn btn-outline-primary"
                                                         @click="$store.menuSection.updateComment()">Sửa
                                                 </button>
+                                                <template x-if="$store.menuSection.isCreator === false">
+                                                    <div>
+                                                        <template x-if="$store.menuSection.inputUpdateComment.content.length > 500">
+                                                            <p style="color: red" x-text="$store.menuSection.inputUpdateComment.content.length + '/500'"></p>
+                                                        </template>
+                                                        <template x-if="$store.menuSection.inputUpdateComment.content.length <= 500">
+                                                            <p x-text="$store.menuSection.inputUpdateComment.content.length + '/500'"></p>
+                                                        </template>
+                                                    </div>
+                                                </template>
                                             </div>
                                         </template>
 
@@ -776,6 +821,16 @@
                                                         @click="$store.menuSection.sendComment()">
                                                     Gửi
                                                 </button>
+                                                <template x-if="$store.menuSection.isCreator === false">
+                                                    <div>
+                                                        <template x-if="$store.menuSection.comment.content.length > 500">
+                                                            <p style="color: red" x-text="$store.menuSection.comment.content.length + '/500'"></p>
+                                                        </template>
+                                                        <template x-if="$store.menuSection.comment.content.length <= 500">
+                                                            <p x-text="$store.menuSection.comment.content.length + '/500'"></p>
+                                                        </template>
+                                                    </div>
+                                                </template>
                                             </div>
                                         </template>
                                     </div>

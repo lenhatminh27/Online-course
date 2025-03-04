@@ -9,11 +9,13 @@ import com.course.dto.request.CategoryFilterRequest;
 import com.course.dto.request.UpdateCategoryRequest;
 import com.course.dto.response.BookmarksBlogResponse;
 import com.course.dto.response.CategoryResponse;
+import com.course.dto.response.ErrorResponse;
 import com.course.dto.response.PageResponse;
 import com.course.entity.AccountEntity;
 import com.course.entity.BlogEntity;
 import com.course.entity.CategoriesEntity;
 import com.course.entity.SearchHistoryEntity;
+import com.course.exceptions.BadRequestException;
 import com.course.exceptions.NotFoundException;
 import com.course.security.context.AuthenticationContextHolder;
 import com.course.service.CategoryService;
@@ -133,13 +135,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long categoryId) {
         CategoriesEntity category = categoryDAO.findById(categoryId);
-        if (category != null) {
-            categoryDAO.deleteCategory(category);
-        }
-        else {
+        if (category == null) {
             throw new NotFoundException("Thể loại không tồn tại");
         }
-    }
+        boolean isCategoryInUse = categoryDAO.isCategoryInUse(categoryId);
+        if (isCategoryInUse) {
+            ErrorResponse errorResponse = new ErrorResponse(List.of("Không thể xoá thể loại vì đang được sử dụng trong khoá học"));
+            throw new BadRequestException(errorResponse);
+        }
+        categoryDAO.deleteCategory(category);
+     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {

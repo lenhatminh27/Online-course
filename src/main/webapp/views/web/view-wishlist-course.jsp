@@ -117,6 +117,10 @@
         }
 
 
+        .fa-heart{
+            color: red;
+            cursor: pointer;
+        }
 
 
     </style>
@@ -289,7 +293,45 @@
 
         // Create new scratch file from selection
 
-        
+        async function removeCourseWishlist(id, iconElement) {
+            try {
+                const response = await apiRequestWithToken(environment.apiUrl + "/api/wishlist/" + id, {
+                    method: "DELETE",
+                    body: JSON.stringify({courseId: id}),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                console.log(response);
+            } catch (error) {
+                console.error("Lỗi khi xóa wishlist:", error);
+            }
+        }
+
+        // Event Listener for wishlist Removal
+        CourseEvent.addEventListener("click", async function (event) {
+            if (event.target.classList.contains("bookmark-icon")) {
+                let article = event.target.closest(".properties__card");
+                if (!article) return;
+
+                let id = article.getAttribute("data-id");
+
+                if (event.target.classList.contains("fa-solid")) {
+                    Swal.fire({
+                        title: "Bạn có muốn xóa khóa học này khỏi danh sách yêu thích?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Xóa",
+                        cancelButtonText: "Hủy"
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await removeCourseWishlist(id, event.target);
+                            await loadData();
+                        }
+                    });
+                }
+            }
+        });
 
 
         // Initial Load
